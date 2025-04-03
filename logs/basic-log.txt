@@ -1,0 +1,2 @@
+[2025-04-03 14:10:09.458] [basic_logger] [info] test massage
+[2025-04-03 15:22:05.013] [basic_logger] [info] test massage
