@@ -7,19 +7,26 @@ PLCConnectionClient::PLCConnectionClient(const char* serverIpAddress, int server
     serverAddress_.sin_family = AF_INET; // AF_INET：IPV4アドレスを使う
 }
 
-void PLCConnectionClient::Connect()
+int PLCConnectionClient::Connect()
 {
+    int result;
+
     socket_ = socket(AF_INET, SOCK_STREAM, 0);
-    connect(socket_, (sockaddr *)&serverAddress_, sockAddressLen_);
+    std::cout << "PLCに接続します"<< std::endl; 
+    result = connect(socket_, (sockaddr *)&serverAddress_, sockAddressLen_);
+    return result;
 }
 
 void PLCConnectionClient::SendRequest(const char* text)
 {
+    std::cout << "PLCにリクエストを送ります。"<< std::endl; 
     send(socket_, text, std::strlen(text), 0);
 }
 
-void PLCConnectionClient::RecvResponse(char* text)
+ssize_t PLCConnectionClient::RecvResponse(char* text)
 {
-    ssize_t recvSize = recv(socket_, text, 1024, 0);
-    text[recvSize] = '\0';
+    std::cout << "受信開始します。"<< std::endl; 
+    ssize_t recvSize = recv(socket_, text, sizeof(text), 0);
+    std::cout << "受信しました。" << std::endl; 
+    return recvSize;
 }

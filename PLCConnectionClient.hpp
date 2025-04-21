@@ -16,9 +16,9 @@ private:
     struct sockaddr_in serverAddress_;
 public:
     PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
-    void Connect();
+    int Connect();
     void SendRequest(const char* text);
-    void RecvResponse(char* text);
+    ssize_t RecvResponse(char* text);
 };
 
 #endif
