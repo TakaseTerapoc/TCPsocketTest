@@ -1,0 +1,10 @@
+{
+    "PLCSettings": {
+      "IPAddress": "192.168.62.201",
+      "Port": 5021
+    },
+    "ServerSettings": {
+      "IPAddress": "192.168.0.100",
+      "Port": 8080
+    }
+  }

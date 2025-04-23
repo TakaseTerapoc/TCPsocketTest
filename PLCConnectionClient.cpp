@@ -13,20 +13,23 @@ int PLCConnectionClient::Connect()
 
     socket_ = socket(AF_INET, SOCK_STREAM, 0);
     std::cout << "PLCに接続します"<< std::endl; 
-    result = connect(socket_, (sockaddr *)&serverAddress_, sockAddressLen_);
+    result = connect(socket_, (sockaddr *)&serverAddress_, sizeof(serverAddress_));
     return result;
 }
 
-void PLCConnectionClient::SendRequest(const char* text)
+void PLCConnectionClient::SendRequest(const char* text, int len)
 {
     std::cout << "PLCにリクエストを送ります。"<< std::endl; 
-    send(socket_, text, std::strlen(text), 0);
+    std::cout << len << std::endl; 
+    send(socket_, text, len, 0);
 }
 
 ssize_t PLCConnectionClient::RecvResponse(char* text)
 {
+    extern bool isResponded;
     std::cout << "受信開始します。"<< std::endl; 
     ssize_t recvSize = recv(socket_, text, sizeof(text), 0);
-    std::cout << "受信しました。" << std::endl; 
+    std::cout << "受信しました。" << recvSize << std::endl; 
+    isResponded = true;
     return recvSize;
 }

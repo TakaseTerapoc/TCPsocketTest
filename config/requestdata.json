@@ -1,0 +1,18 @@
+{
+    "devices": [
+      {
+        "serialNumber": "1",
+        "command": "read",
+        "dataAddress": "D100",
+        "deviceCount": 1,
+        "sendIntervalMs": 1000
+      },
+      {
+        "serialNumber": "2",
+        "command": "write",
+        "dataAddress": "D200",
+        "deviceCount": 1,
+        "sendIntervalMs": 60000
+      }
+    ]
+ }

@@ -17,7 +17,7 @@ private:
 public:
     PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
     int Connect();
-    void SendRequest(const char* text);
+    void SendRequest(const char* text, int len);
     ssize_t RecvResponse(char* text);
 };
 
