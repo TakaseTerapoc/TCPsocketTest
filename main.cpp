@@ -6,6 +6,7 @@
 #include "PLCConnectionClient.hpp"
 #include "PLCRequestData.hpp"
 #include "PLCData.hpp"
+#include "globals.hpp"
 // #include "PLCRequestScheduler.hpp"
 #include "Config.hpp"
 #include <string>
@@ -31,6 +32,8 @@ const std::string ConfigFile = "config/config.json";
 const std::string RequestDataFile = "config/requestdata.json";
 const char* PLCSettingsIPAddress = "PLCSettings.IPAddress";
 const char* PLCSettingsPort = "PLCSettings.Port";
+
+std::queue<PLCRequestData> requestQueue;
 
 bool isResponded = true;
 

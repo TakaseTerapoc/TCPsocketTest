@@ -6,6 +6,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include "PLCRequestData.hpp"
 #include "plc_globals.h"  // PlcRequest, PLC::requestQueue, PLC::queueMutex, PLC::cv を定義
 
 class PLCRequestScheduler {
