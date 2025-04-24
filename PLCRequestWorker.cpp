@@ -54,8 +54,11 @@ void PLCRequestWorker::run() {
         std::cout << "キューから取り出しました。" << req.serialNumber << "->時間"<< ms << std::endl;
 
         // TCPリクエスト
+        isReceived = false;
         gPLCClient.SendRequest(req.MCprotocol, 12);
-        gPLCClient.RecvResponse();
+        while (!isReceived){
+            gPLCClient.RecvResponse();
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
 }
