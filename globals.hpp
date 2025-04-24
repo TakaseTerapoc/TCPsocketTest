@@ -10,12 +10,18 @@
  * @brief グローバルオブジェクトを格納するヘッダーファイルです。
  */
 
+// PLCConnectionClientのインスタンスです。
+extern PLCConnectionClient gPLCClient;
+
 // PLCへのリクエストを格納するキューです。
-extern std::queue<PLCRequestData> requestQueue;
+extern std::queue<PLCRequestData> gRequestQueue;
 
 // requestQueueのミューテックスです。
-extern std::mutex requestQueueMutex;
+extern std::mutex gRequestQueueMutex;
 
 // PLCのリクエストを格納するリストです。
-extern std::vector<PLCRequestData> rdata;
+extern std::vector<PLCRequestData> gRData;
+
+//　PLCからの受信完了フラグ
+extern bool isReceived;
 

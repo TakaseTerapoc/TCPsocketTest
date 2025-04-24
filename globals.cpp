@@ -1,10 +1,15 @@
 #include "globals.hpp"
 
+// PLCConnectionClientのインスタンスです。
+PLCConnectionClient gPLCClient;
+
 // PLCへのリクエストを格納するキューです。
-std::queue<PLCRequestData> requestQueue;
+std::queue<PLCRequestData> gRequestQueue;
 
 // requestQueueのミューテックスです。
-std::mutex requestQueueMutex;
+std::mutex gRequestQueueMutex;
 
 // PLCのリクエストを格納するリストです。
-std::vector<PLCRequestData> rdata;
+std::vector<PLCRequestData> gRData;
+
+bool isReceived;

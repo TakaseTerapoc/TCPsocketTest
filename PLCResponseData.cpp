@@ -1,10 +1,10 @@
-# include "PLCData.hpp"
+# include "PLCResponseData.hpp"
 
-PLCData::PLCData()
+PLCResponseData::PLCResponseData()
 {
 }
 
-void PLCData::setReceiptTime()
+void PLCResponseData::setReceiptTime()
 {
     // 現在時刻を取得
     boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
@@ -24,7 +24,7 @@ void PLCData::setReceiptTime()
 }
 
 // TODO:今後レスポンスデータを加工する必要がある。
-void PLCData::setResponseData(char* data)
+void PLCResponseData::setResponseData(char* data)
 {
     responseData = data;
 }

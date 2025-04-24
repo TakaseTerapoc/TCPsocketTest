@@ -1,5 +1,4 @@
-#ifndef PLCDATA_HPP
-#define PLCDATA_HPP
+#pragma once
 
 #include <iostream>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -11,7 +10,7 @@
  * @brief PLCから取得したデータと取得時刻、シリアルナンバーを格納するクラスです。
  * 後にサーバへ送信するため、各メンバはchar*型になっています。
 */
-class PLCData
+class PLCResponseData
 {
     private:
         // PLCレスポンスデータの受信時間です。
@@ -25,7 +24,7 @@ class PLCData
 
     public:
         // コンストラクタです。
-        PLCData();             
+        PLCResponseData();             
 
         // マイクロ秒で取得した受信時刻を、ミリ秒までのchar*型に変換します。
         void setReceiptTime();   
@@ -33,5 +32,3 @@ class PLCData
         // PLCレスポンスデータを格納します。
         void setResponseData(char* data);    
 };
-
-#endif

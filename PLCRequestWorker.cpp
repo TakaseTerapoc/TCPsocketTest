@@ -14,15 +14,20 @@ void PLCRequestWorker::start() {
     thread_ = std::thread(&PLCRequestWorker::run, this);
 }
 
+// ワーカjoin
+void PLCRequestWorker::join() {
+    if (thread_.joinable()) {
+        thread_.join();
+    }
+}
+
 // ワーカー停止
 void PLCRequestWorker::stop() {
     {
         std::lock_guard<std::mutex> lg(mutex_);
         running_ = false;
     }
-    if (thread_.joinable()) {
-        thread_.join();
-    }
+    join();
 }
 
 // キューから出し、PLCへのTCPリクエストを依頼する。
@@ -34,19 +39,23 @@ void PLCRequestWorker::run() {
         }
         PLCRequestData req;
         {
-            std::unique_lock<std::mutex> lock(requestQueueMutex);
-            if (requestQueue.empty()) {
+            std::unique_lock<std::mutex> lock(gRequestQueueMutex);
+            if (gRequestQueue.empty()) {
                 // cv.wait(lock);
                 continue;
             }
-            req = requestQueue.front();
-            requestQueue.pop();
+            req = gRequestQueue.front();
+            gRequestQueue.pop();
         }
+        // 確認やつ
         auto now = std::chrono::steady_clock::now();
         auto dur = now.time_since_epoch();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
         std::cout << "キューから取り出しました。" << req.serialNumber << "->時間"<< ms << std::endl;
 
-
+        // TCPリクエスト
+        gPLCClient.SendRequest(req.MCprotocol, 12);
+        gPLCClient.RecvResponse();
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
 }

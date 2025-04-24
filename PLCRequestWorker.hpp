@@ -19,6 +19,9 @@ class PLCRequestWorker
         // ワーカー開始
         void start();
 
+        // ワーカーjoin
+        void join();
+
         // ワーカー停止
         void stop();
 

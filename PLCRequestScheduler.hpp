@@ -20,6 +20,9 @@ public:
     // スケジューラ開始
     void start();
 
+    // スケジューラjoin
+    void join();
+
     // スケジューラ停止
     void stop();
 

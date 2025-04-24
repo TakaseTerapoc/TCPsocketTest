@@ -1,8 +1,8 @@
-#ifndef PLCINFORMATION_HPP
-#define PLCINFORMATION_HPP
+#pragma once
 
 #include <iostream>
 #include <cstring>
+#include "globals.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -15,10 +15,18 @@ private:
     int sockAddressLen_ = sizeof(struct sockaddr_in);
     struct sockaddr_in serverAddress_;
 public:
+    PLCConnectionClient(){}
     PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
-    int Connect();
-    void SendRequest(const char* text, int len);
-    ssize_t RecvResponse(char* text);
-};
 
-#endif
+    // 遅延初期化のための仕組み
+    inline PLCConnectionClient& getPLCConnectionClient()
+    {
+        static PLCConnectionClient instance;
+        return instance;
+    }
+
+    int Connect();
+    void getConnInfo(const char* serverIpAddress, int serverPortNumber);
+    void SendRequest(const char* text, int len);
+    ssize_t RecvResponse();
+};

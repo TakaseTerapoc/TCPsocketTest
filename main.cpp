@@ -5,7 +5,7 @@
 #include <fstream> 
 #include "PLCConnectionClient.hpp"
 #include "PLCRequestData.hpp"
-#include "PLCData.hpp"
+#include "PLCResponseData.hpp"
 #include "globals.hpp"
 #include "PLCRequestScheduler.hpp"
 #include "PLCRequestWorker.hpp"
@@ -34,115 +34,28 @@ const std::string RequestDataFile = "config/requestdata.json";
 const char* PLCSettingsIPAddress = "PLCSettings.IPAddress";
 const char* PLCSettingsPort = "PLCSettings.Port";
 
-// // グローバルオブジェクト
-// std::queue<PLCRequestData> requestQueue;
-// std::vector<PLCRequestData> rdata;
+// void SendTask(PLCConnectionClient* sock)
+// {
+//     for(;;){
+//         sock->SendRequest(bufM10, sizeof(bufM10));
+//         std::this_thread::sleep_for(std::chrono::milliseconds(1000)); 
+//     }
+// }
 
-int count = 0;
-char cBuff[256];
-char buf[] = {
-    0x50,0x00,      // サブヘッダ
-    0x00,           // ネットワーク番号（アクセス経路）
-    0xFF,           // PC番号（アクセス経路）
-    0xFF,0x03,      // 要求先ユニットI/O番号(アクセス経路)
-    0x00,           // 要求ユニット局番号 (アクセス経路)
-    0x00,0x18,      // 要求データ長
-    0x20,0x00,      // 監視タイマ
-    0x01,0x04,      // コマンド
-    0x00,0x00,      // サブコマンド
-    0x00,0x00,0x64, // 先頭デバイス番号
-    0xA8,           // デバイスコード
-    0x09,0x00,      // デバイス点数
-};
-
-char bufTest[] = {
-    0x16,                // サブヘッダ
-    0xff,                // PC番号（アクセス経路）
-    0x00,0x00,           // 監視タイマ
-    0x03,0x01,0x02,0x03 // テストデータ
-};
-
-const char bufD8400[] = {
-    0x01,                // サブヘッダ
-    0xff,                // PC番号（アクセス経路）
-    0x0a,0x00,           // 監視タイマ
-    0xD0,0x20,0x00,0x00, // 先頭デバイス番号
-    0x20,0x44,           // デバイスコード
-    0x02                // デバイス点数 
-};
-
-const char bufD100[] = {
-    0x01,
-    0xff,
-    0x00,0x00,
-    0x64,0x00,0x00,0x00,
-    0x20,0x44,
-    0x01,
-    0x00
-};
-
-char bufM10[] = {
-    0x00,                // サブヘッダ
-    0xff,                // PC番号（アクセス経路）
-    0x00,0x00,           // 監視タイマ
-    0x0a,0x00,0x00,0x00, // 先頭デバイス番号
-    0x20,0x4D,           // デバイスコード
-    0x02,                // デバイス点数
-    0x00, 
-};
-
-char bufM00Write[] = {
-    0x03,                // サブヘッダ
-    0xff,                // PC番号（アクセス経路）
-    0x00,0x00,           // 監視タイマ
-    0x64,0x00,0x00,0x00, // 先頭デバイス番号
-    0x20,0x4D,           // デバイスコード
-    0x01,                // デバイス点数 
-    0x00,
-};
-
-char bufStart[] = {
-    0x13,                // サブヘッダ
-    0xff,                // PC番号（アクセス経路）
-    0x00,0x00           // 監視タイマ      
-};
-
-char bufStop[] = {
-    0x14,                // サブヘッダ
-    0xff,                // PC番号（アクセス経路）
-    0x00,0x00           // 監視タイマ      
-};
-
-
-char bufName[] = {
-    0x15,                // サブヘッダ
-    0xff,                // PC番号（アクセス経路）
-    0x00,0x00,
-    0x00,          // 監視タイマ    
-};
-
-void SendTask(PLCConnectionClient* sock)
-{
-    for(;;){
-        sock->SendRequest(bufM10, sizeof(bufM10));
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000)); 
-    }
-}
-
-void RecvTask(PLCConnectionClient* sock)
-{
-    for(;;){
-        char text[256];
-        ssize_t len = sock->RecvResponse(text);
-        if (len > 0){
-            for (int i = 0; i < len; ++i)
-            {
-                printf("%02X ", text[i]);
-            }
-            printf("\n");
-        }
-    }
-}
+// void RecvTask(PLCConnectionClient* sock)
+// {
+//     for(;;){
+//         char text[256];
+//         ssize_t len = sock->RecvResponse(text);
+//         if (len > 0){
+//             for (int i = 0; i < len; ++i)
+//             {
+//                 printf("%02X ", text[i]);
+//             }
+//             printf("\n");
+//         }
+//     }
+// }
 
 
 int main(int argc, char* argv[]) 
@@ -170,12 +83,13 @@ int main(int argc, char* argv[])
 
     // PLC接続テスト
     std::cout << "設定ファイルの情報でPLCとサーバーに接続します。"<< std::endl; 
-    PLCConnectionClient pLCConnectionClient(
-        config.getPLCIpAddress().c_str(), 
-        config.getPLCPortNumber()
-    );
+    gPLCClient.getPLCConnectionClient().getConnInfo(config.getPLCIpAddress().c_str(), config.getPLCPortNumber());
+    // PLCConnectionClient pLCConnectionClient(
+    //     config.getPLCIpAddress().c_str(), 
+    //     config.getPLCPortNumber()
+    // );
 
-    if(pLCConnectionClient.Connect() < 0)
+    if(gPLCClient.Connect() < 0)
     {
         std::cout << "PLCに接続失敗しました。"<< std::endl; 
         exit(1);
@@ -215,10 +129,10 @@ int main(int argc, char* argv[])
             config.getserverIpAddress().c_str(), 
             config.getserverPortNumber()
         );
-        rdata.push_back(pLCRequestData);
+        gRData.push_back(pLCRequestData);
     }
 
-    for (const auto& r : rdata) {
+    for (const auto& r : gRData) {
         std::cout << r.command << " @ " << r.dataAddress << "\n";
     }
 
@@ -245,9 +159,9 @@ int main(int argc, char* argv[])
     //                 << "time=" << ms
     //                 << ", interval="   << req.sendIntervalMs << "\n";
     // }
-
-    // worker.stop();
-    // scheduler.stop();
+    // while(true){}
+    worker.join();
+    scheduler.join();
     // std::thread thread_send(SendTask, &pLCConnectionClient);
     // std::thread thread_recv(RecvTask, &pLCConnectionClient);
     // thread_send.join();

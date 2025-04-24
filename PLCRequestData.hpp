@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
-#include "PLCData.hpp"
+#include "PLCResponseData.hpp"
 
 class PLCRequestData {
 public:
@@ -20,7 +20,7 @@ public:
     int deviceCount;
 
     // 送信間隔（ミリ秒）
-    int sendIntervalMs;
+    int transmissionIntervalMs;
 
     // PLCのIPアドレス
     std::string PLCIpAddress;
@@ -36,9 +36,12 @@ public:
 
     // タイミングを計るときに必要な時間データ
     std::chrono::steady_clock::time_point nextTime;
+
+    // MCプロトコル
+    char MCprotocol[12];
     
     // PLCからのレスポンスデータ
-    std::vector<PLCData> data;
+    std::vector<PLCResponseData> data;
 
     //コンストラクタ
     PLCRequestData();
@@ -48,7 +51,7 @@ public:
         std::string command, 
         std::string dataAddress, 
         int deviceCount, 
-        int sendIntervalMs,
+        int transmissionIntervalMs,
         std::string PLCIpAddress,
         int PLCPortNumber,
         std::string serverIpAddress,
