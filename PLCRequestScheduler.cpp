@@ -1,21 +1,21 @@
 #include "PLCRequestScheduler.hpp"
 
 // シングルトンインスタンス取得
-RequestScheduler& RequestScheduler::getInstance() {
-    static RequestScheduler instance;
+PLCRequestScheduler& PLCRequestScheduler::getInstance() {
+    static PLCRequestScheduler instance;
     return instance;
 }
 
 // スケジューラ開始
-void RequestScheduler::start() {
+void PLCRequestScheduler::start() {
     std::lock_guard<std::mutex> lg(mutex_);
     if (running_) return;
     running_ = true;
-    thread_ = std::thread(&RequestScheduler::run, this);
+    thread_ = std::thread(&PLCRequestScheduler::run, this);
 }
 
 // スケジューラ停止
-void RequestScheduler::stop() {
+void PLCRequestScheduler::stop() {
     {
         std::lock_guard<std::mutex> lg(mutex_);
         running_ = false;
@@ -25,19 +25,8 @@ void RequestScheduler::stop() {
     }
 }
 
-// スケジュール追加
-void RequestScheduler::addSchedule(int address, int count, int intervalMs) {
-    std::lock_guard<std::mutex> lg(mutex_);
-    schedules_.push_back({
-        address,
-        count,
-        intervalMs,
-        std::chrono::steady_clock::now()
-    });
-}
-
-// ワーカーループ: 各周期でリクエストをキューに追加
-void RequestScheduler::run() {
+// 各リクエストの周期でリクエストをキューに追加
+void PLCRequestScheduler::run() {
     while (true) {
         {
             std::lock_guard<std::mutex> lg(mutex_);
@@ -45,14 +34,14 @@ void RequestScheduler::run() {
         }
 
         auto now = std::chrono::steady_clock::now();
-        for (auto& s : schedules_) {
-            if (now >= s.nextTime) {
+        for (auto& plcr : rdata) {
+            if (now >= plcr.nextTime) {
                 {
-                    std::lock_guard<std::mutex> ql(PLC::queueMutex);
-                    PLC::requestQueue.push({s.address, s.count});
+                    std::lock_guard<std::mutex> ql(requestQueueMutex);
+                    requestQueue.push(plcr);
                 }
-                PLC::cv.notify_one();
-                s.nextTime = now + std::chrono::milliseconds(s.intervalMs);
+                // PLC::cv.notify_one();
+                plcr.nextTime = now + std::chrono::milliseconds(plcr.sendIntervalMs);
             }
         }
 

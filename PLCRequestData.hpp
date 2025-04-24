@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <chrono>
 #include "PLCData.hpp"
 
 class PLCRequestData {
@@ -32,11 +33,16 @@ public:
 
     // サーバのポート
     int serverPortNumber;
+
+    // タイミングを計るときに必要な時間データ
+    std::chrono::steady_clock::time_point nextTime;
     
     // PLCからのレスポンスデータ
     std::vector<PLCData> data;
 
     //コンストラクタ
+    PLCRequestData();
+
     PLCRequestData(
         std::string serialNumber, 
         std::string command, 

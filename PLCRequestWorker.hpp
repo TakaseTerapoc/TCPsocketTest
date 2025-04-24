@@ -1,0 +1,41 @@
+#pragma once
+
+#include "globals.hpp"
+#include "PLCRequestData.hpp"
+#include <chrono>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
+/**
+ * @brief PLCRequestDataが格納されているキューを監視し、２００ms秒ごとにTCPへリクエストを送るクラスです。
+ */
+class PLCRequestWorker
+{
+    public:
+        // シングルトン取得
+        static PLCRequestWorker& getInstance();
+
+        // ワーカー開始
+        void start();
+
+        // ワーカー停止
+        void stop();
+
+    private:
+        // コンストラクタ
+        PLCRequestWorker() = default;
+
+        // デストラクタ
+        ~PLCRequestWorker() = default; 
+        PLCRequestWorker(const PLCRequestWorker&) = delete;
+        PLCRequestWorker& operator=(const PLCRequestWorker&) = delete;
+
+        // キューから出して、TCPリクエストを依頼する。
+        void run();  
+
+        std::thread      thread_;         // 実行スレッド
+        bool             running_{false}; // 実行中フラグ
+        std::mutex       mutex_;          // running_ の排他制御
+
+};

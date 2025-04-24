@@ -26,10 +26,8 @@ void PLCConnectionClient::SendRequest(const char* text, int len)
 
 ssize_t PLCConnectionClient::RecvResponse(char* text)
 {
-    extern bool isResponded;
     std::cout << "受信開始します。"<< std::endl; 
     ssize_t recvSize = recv(socket_, text, sizeof(text), 0);
     std::cout << "受信しました。" << recvSize << std::endl; 
-    isResponded = true;
     return recvSize;
 }

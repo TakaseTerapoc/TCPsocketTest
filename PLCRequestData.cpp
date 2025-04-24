@@ -1,5 +1,7 @@
 #include "PLCRequestData.hpp"
 
+PLCRequestData::PLCRequestData(){}
+
 PLCRequestData::PLCRequestData(
     std::string serialNumber, 
     std::string command, 

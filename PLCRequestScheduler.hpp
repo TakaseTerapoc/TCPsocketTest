@@ -7,8 +7,11 @@
 #include <mutex>
 #include <condition_variable>
 #include "PLCRequestData.hpp"
-#include "plc_globals.h"  // PlcRequest, PLC::requestQueue, PLC::queueMutex, PLC::cv を定義
+#include "globals.hpp"
 
+/**
+ * @brief PLCRequestDataを格納されているインターバルのタイミングでキューに格納するクラスです。
+ */
 class PLCRequestScheduler {
 public:
     // シングルトン取得
@@ -17,31 +20,25 @@ public:
     // スケジューラ開始
     void start();
 
-    // スケジューラ停止（終了を待つ）
+    // スケジューラ停止
     void stop();
 
-    // スケジュールを追加
-    void addSchedule(int address, int count, int intervalMs);
-
 private:
-    RequestScheduler();
-    ~RequestScheduler();
-    RequestScheduler(const RequestScheduler&) = delete;
-    RequestScheduler& operator=(const RequestScheduler&) = delete;
+    // コンストラクタ
+    PLCRequestScheduler() = default;
 
-    struct Schedule {
-        int address;  // 読み取り開始アドレス
-        int count;    // 読み取る点数
-        int intervalMs;                   // リクエスト周期（ms）
-        std::chrono::steady_clock::time_point nextTime;  // 次回実行時刻
-    };
+    // デストラクタ
+    ~PLCRequestScheduler() = default;
 
-    void run();  // ワーカーループ
+    // コピー禁止 
+    PLCRequestScheduler(const PLCRequestScheduler&) = delete;
+    PLCRequestScheduler& operator=(const PLCRequestScheduler&) = delete;
 
-    std::vector<Schedule> schedules_;  // スケジュールリスト
+    void run();  // キューに送る
+
     std::thread      thread_;         // 実行スレッド
     bool             running_{false}; // 実行中フラグ
-    std::mutex       mutex_;          // schedules_ と running_ の排他制御
+    std::mutex       mutex_;          // running_ の排他制御
 };
 
 #endif

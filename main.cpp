@@ -7,7 +7,8 @@
 #include "PLCRequestData.hpp"
 #include "PLCData.hpp"
 #include "globals.hpp"
-// #include "PLCRequestScheduler.hpp"
+#include "PLCRequestScheduler.hpp"
+#include "PLCRequestWorker.hpp"
 #include "Config.hpp"
 #include <string>
 #include <thread>
@@ -33,9 +34,9 @@ const std::string RequestDataFile = "config/requestdata.json";
 const char* PLCSettingsIPAddress = "PLCSettings.IPAddress";
 const char* PLCSettingsPort = "PLCSettings.Port";
 
-std::queue<PLCRequestData> requestQueue;
-
-bool isResponded = true;
+// // グローバルオブジェクト
+// std::queue<PLCRequestData> requestQueue;
+// std::vector<PLCRequestData> rdata;
 
 int count = 0;
 char cBuff[256];
@@ -124,8 +125,6 @@ void SendTask(PLCConnectionClient* sock)
 {
     for(;;){
         sock->SendRequest(bufM10, sizeof(bufM10));
-        isResponded = false;
-
         std::this_thread::sleep_for(std::chrono::milliseconds(1000)); 
     }
 }
@@ -171,12 +170,12 @@ int main(int argc, char* argv[])
 
     // PLC接続テスト
     std::cout << "設定ファイルの情報でPLCとサーバーに接続します。"<< std::endl; 
-    PLCConnectionClient pLCConnectionTest(
+    PLCConnectionClient pLCConnectionClient(
         config.getPLCIpAddress().c_str(), 
         config.getPLCPortNumber()
     );
 
-    if(pLCConnectionTest.Connect() < 0)
+    if(pLCConnectionClient.Connect() < 0)
     {
         std::cout << "PLCに接続失敗しました。"<< std::endl; 
         exit(1);
@@ -202,8 +201,6 @@ int main(int argc, char* argv[])
 
 
     // PLCリクエストファイルの内容を該当クラスに格納
-    std::vector<PLCRequestData> rdata;
-
     for (const auto& item : pt.get_child("devices"))
     {
         PLCRequestData pLCRequestData
@@ -225,8 +222,32 @@ int main(int argc, char* argv[])
         std::cout << r.command << " @ " << r.dataAddress << "\n";
     }
 
+    
     // スケジューラ起動
+    auto& scheduler = PLCRequestScheduler::getInstance();
+    scheduler.start();
 
+    // ワーカー起動
+    auto& worker = PLCRequestWorker::getInstance();
+    worker.start();
+
+    // std::queue<PLCRequestData> tmp = requestQueue;
+    // while (true) {
+    //     if(requestQueue.empty())
+    //     {
+    //         continue;
+    //     }
+    //     auto req = requestQueue.front();
+    //     // requestQueue.pop();
+    //     auto dur = req.nextTime.time_since_epoch();
+    //     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
+    //     std::cout << "device=" << req.dataAddress
+    //                 << "time=" << ms
+    //                 << ", interval="   << req.sendIntervalMs << "\n";
+    // }
+
+    // worker.stop();
+    // scheduler.stop();
     // std::thread thread_send(SendTask, &pLCConnectionClient);
     // std::thread thread_recv(RecvTask, &pLCConnectionClient);
     // thread_send.join();
