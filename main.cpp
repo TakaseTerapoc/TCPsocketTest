@@ -34,30 +34,6 @@ const std::string RequestDataFile = "config/requestdata.json";
 const char* PLCSettingsIPAddress = "PLCSettings.IPAddress";
 const char* PLCSettingsPort = "PLCSettings.Port";
 
-// void SendTask(PLCConnectionClient* sock)
-// {
-//     for(;;){
-//         sock->SendRequest(bufM10, sizeof(bufM10));
-//         std::this_thread::sleep_for(std::chrono::milliseconds(1000)); 
-//     }
-// }
-
-// void RecvTask(PLCConnectionClient* sock)
-// {
-//     for(;;){
-//         char text[256];
-//         ssize_t len = sock->RecvResponse(text);
-//         if (len > 0){
-//             for (int i = 0; i < len; ++i)
-//             {
-//                 printf("%02X ", text[i]);
-//             }
-//             printf("\n");
-//         }
-//     }
-// }
-
-
 int main(int argc, char* argv[]) 
 {
     std::cout << "設定ファイルを読み込みます。"<< std::endl; 

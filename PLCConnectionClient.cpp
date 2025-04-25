@@ -19,7 +19,7 @@ int PLCConnectionClient::Connect()
     int result;
 
     socket_ = socket(AF_INET, SOCK_STREAM, 0);
-    std::cout << "PLCに接続します"<< std::endl; 
+    std::cout << "PLCに接続します。sock="<< socket_ << std::endl; 
     result = connect(socket_, (sockaddr *)&serverAddress_, sizeof(serverAddress_));
     return result;
 }
@@ -27,24 +27,31 @@ int PLCConnectionClient::Connect()
 void PLCConnectionClient::SendRequest(const char* text, int len)
 {
     std::cout << "PLCにリクエストを送ります。"<< std::endl; 
-    std::cout << len << std::endl; 
+    std::cout << len << "::" << socket_<<std::endl; 
     for (int i = 0; i < len; ++i)
     {
         printf("%02X ", text[i]);
     }
     printf("\n");
-    if (send(socket_, text, len, 0) < 0)
-    {
-        std::cout << "送信エラー"<< std::endl; 
-    };
+
+    // if (send(socket_, text, len, 0) < 0)
+    // {
+    //     std::cout << "送信エラー"<< std::endl; 
+    // };
+    try {
+        std::cout << "[run] → SendR 前\n";
+        send(socket_, text, len, 0);
+        std::cout << "[run] ← Send 後\n";
+    } catch (const std::exception& e) {
+        std::cout << "[run][ERROR] Send 例外: " << e.what() << "\n";
+    }
 }
 
 ssize_t PLCConnectionClient::RecvResponse()
 {
-    char text[256];
     std::cout << "受信開始します。"<< std::endl; 
+    char text[256];
     ssize_t recvSize = recv(socket_, text, sizeof(text), 0);
     std::cout << "受信しました。" << recvSize << std::endl; 
-    isReceived = true;
     return recvSize;
 }

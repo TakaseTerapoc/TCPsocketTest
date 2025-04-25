@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <cstring>
-#include "globals.hpp"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
