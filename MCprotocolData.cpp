@@ -15,13 +15,6 @@ char buf[] = {
     0x09,0x00,      // デバイス点数
 };
 
-char bufTest[] = {
-    0x16,                // サブヘッダ
-    0xff,                // PC番号（アクセス経路）
-    0x00,0x00,           // 監視タイマ
-    0x03,0x01,0x02,0x03 // テストデータ
-};
-
 const char bufD8400[] = {
     0x01,                // サブヘッダ
     0xff,                // PC番号（アクセス経路）
@@ -61,22 +54,35 @@ char bufM00Write[] = {
     0x00,
 };
 
-char startPLC[] = {
+std::vector<char> startPLC = 
+{
     0x13,                // サブヘッダ
     0xff,                // PC番号（アクセス経路）
-    0x00,0x00           // 監視タイマ      
+    0x00,0x00,           // 監視タイマ
+    0x00      
 };
 
-char stopPLC[] = {
+std::vector<char> stopPLC = 
+{
     0x14,                // サブヘッダ
     0xff,                // PC番号（アクセス経路）
-    0x00,0x00           // 監視タイマ      
+    0x00,0x00,           // 監視タイマ      
+    0x00
 };
 
 
-char getPLCName[] = {
+std::vector<char> getPLCName = 
+{
     0x15,                // サブヘッダ
     0xff,                // PC番号（アクセス経路）
-    0x00,0x00,
-    0x00,          // 監視タイマ    
+    0x00,0x00,           // 監視タイマ
+    0x00,              
+};
+
+std::vector<char> test = 
+{
+    0x16,                // サブヘッダ
+    0xff,                // PC番号（アクセス経路）
+    0x00,0x00,           // 監視タイマ
+    0x03,0x01,0x02,0x03  // テストデータ
 };

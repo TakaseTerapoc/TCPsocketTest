@@ -37,8 +37,11 @@ public:
     // タイミングを計るときに必要な時間データ
     std::chrono::steady_clock::time_point nextTime;
 
-    // MCプロトコル
-    char MCprotocol[12];
+    // // MCプロトコル
+    // char MCprotocol[12];
+
+    // MCプロトコルベクター
+    std::vector<char> protocolbuf(20);
     
     // PLCからのレスポンスデータ
     std::vector<PLCResponseData> data;
@@ -57,4 +60,7 @@ public:
         std::string serverIpAddress,
         int serverPortNumber
     );
+
+    // 設定ファイルの情報をMCプロトコルに変換します。
+    void convertMCprotocol();
 };

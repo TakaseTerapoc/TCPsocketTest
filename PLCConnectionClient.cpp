@@ -34,23 +34,15 @@ void PLCConnectionClient::SendRequest(const char* text, int len)
     }
     printf("\n");
 
-    // if (send(socket_, text, len, 0) < 0)
-    // {
-    //     std::cout << "送信エラー"<< std::endl; 
-    // };
-    try {
-        std::cout << "[run] → SendR 前\n";
-        send(socket_, text, len, 0);
-        std::cout << "[run] ← Send 後\n";
-    } catch (const std::exception& e) {
-        std::cout << "[run][ERROR] Send 例外: " << e.what() << "\n";
-    }
+    if (send(socket_, text, len, 0) < 0)
+    {
+        std::cout << "送信エラー"<< std::endl; 
+    };
 }
 
-ssize_t PLCConnectionClient::RecvResponse()
+ssize_t PLCConnectionClient::RecvResponse(char* text)
 {
     std::cout << "受信開始します。"<< std::endl; 
-    char text[256];
     ssize_t recvSize = recv(socket_, text, sizeof(text), 0);
     std::cout << "受信しました。" << recvSize << std::endl; 
     return recvSize;

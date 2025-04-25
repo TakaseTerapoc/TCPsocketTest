@@ -14,7 +14,7 @@ class PLCRequestWorker
 {
     public:
         // シングルトン取得
-        static PLCRequestWorker& getInstance();
+        static PLCRequestWorker& getInstance(PLCConnectionClient& plcclient);
 
         // ワーカー開始
         void start();
@@ -37,8 +37,8 @@ class PLCRequestWorker
         // キューから出して、TCPリクエストを依頼する。
         void run();  
 
-        std::thread      thread_;         // 実行スレッド
-        bool             running_{false}; // 実行中フラグ
-        std::mutex       mutex_;          // running_ の排他制御
-
+        std::thread      thread_;                   // 実行スレッド
+        bool             running_{false};           // 実行中フラグ
+        std::mutex       mutex_;                    // running_ の排他制御
+        PLCConnectionClient pLCConnectionClient_;   // PLCConnectionClientのインスタンス
 };

@@ -17,15 +17,8 @@ public:
     PLCConnectionClient(){}
     PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
 
-    // 遅延初期化のための仕組み
-    inline PLCConnectionClient& getPLCConnectionClient()
-    {
-        static PLCConnectionClient instance;
-        return instance;
-    }
-
     int Connect();
     void getConnInfo(const char* serverIpAddress, int serverPortNumber);
     void SendRequest(const char* text, int len);
-    ssize_t RecvResponse();
+    ssize_t RecvResponse(char* text);
 };

@@ -59,13 +59,12 @@ int main(int argc, char* argv[])
 
     // PLC接続テスト
     std::cout << "設定ファイルの情報でPLCとサーバーに接続します。"<< std::endl; 
-    gPLCClient.getPLCConnectionClient().getConnInfo(config.getPLCIpAddress().c_str(), config.getPLCPortNumber());
-    // PLCConnectionClient pLCConnectionClient(
-    //     config.getPLCIpAddress().c_str(), 
-    //     config.getPLCPortNumber()
-    // );
+    PLCConnectionClient pLCConnectionClient(
+        config.getPLCIpAddress().c_str(), 
+        config.getPLCPortNumber()
+    );
 
-    if(gPLCClient.Connect() < 0)
+    if(pLCConnectionClient.Connect() < 0)
     {
         std::cout << "PLCに接続失敗しました。"<< std::endl; 
         exit(1);
@@ -112,36 +111,16 @@ int main(int argc, char* argv[])
         std::cout << r.command << " @ " << r.dataAddress << "\n";
     }
 
-    
     // スケジューラ起動
     auto& scheduler = PLCRequestScheduler::getInstance();
     scheduler.start();
 
     // ワーカー起動
-    auto& worker = PLCRequestWorker::getInstance();
+    auto& worker = PLCRequestWorker::getInstance(pLCConnectionClient);
     worker.start();
 
-    // std::queue<PLCRequestData> tmp = requestQueue;
-    // while (true) {
-    //     if(requestQueue.empty())
-    //     {
-    //         continue;
-    //     }
-    //     auto req = requestQueue.front();
-    //     // requestQueue.pop();
-    //     auto dur = req.nextTime.time_since_epoch();
-    //     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-    //     std::cout << "device=" << req.dataAddress
-    //                 << "time=" << ms
-    //                 << ", interval="   << req.sendIntervalMs << "\n";
-    // }
-    // while(true){}
     worker.join();
     scheduler.join();
-    // std::thread thread_send(SendTask, &pLCConnectionClient);
-    // std::thread thread_recv(RecvTask, &pLCConnectionClient);
-    // thread_send.join();
-    // thread_recv.join();
 
     return 0;
 }

@@ -1,6 +1,8 @@
 #pragma once
 
-class MCprotocolData-3UC
+#include <vector>
+
+class MCprotocolData
 {
     public:
 };
