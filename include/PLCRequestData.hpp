@@ -41,13 +41,13 @@ public:
     // char MCprotocol[12];
 
     // MCプロトコルベクター
-    std::vector<char> protocolbuf(20);
+    std::vector<char> protocolbuf{20};
     
     // PLCからのレスポンスデータ
     std::vector<PLCResponseData> data;
 
     //コンストラクタ
-    PLCRequestData();
+    PLCRequestData() = default;
 
     PLCRequestData(
         std::string serialNumber, 
