@@ -55,17 +55,17 @@ void PLCRequestWorker::run() {
         std::cout << "キューから取り出しました。" << req.serialNumber << "->時間"<< ms << std::endl;
 
         // TCPリクエスト
-        pLCConnectionClient_.SendRequest(req.MCprotocol, 12);
-        std::cout << "RecvResponseを動かします。"<< std::endl; 
-        char text[256];
-        if (pLCConnectionClient_.RecvResponse(text) > 0)
-        {
-            for (int i = 0; i < 12; ++i)
-            {
-                printf("%02X ", text[i]);
-            }
-            printf("\n");
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        // pLCConnectionClient_.SendRequest(req.MCprotocol, 12);
+        // std::cout << "RecvResponseを動かします。"<< std::endl; 
+        // char text[256];
+        // if (pLCConnectionClient_.RecvResponse(text) > 0)
+        // {
+        //     for (int i = 0; i < 12; ++i)
+        //     {
+        //         printf("%02X ", text[i]);
+        //     }
+        //     printf("\n");
+        // }
+        // std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
 }

@@ -3,8 +3,6 @@
 std::string READ = "read";
 std::string WRITE = "write";
 
-PLCRequestData::PLCRequestData(){}
-
 PLCRequestData::PLCRequestData(
     std::string serialNumber, 
     std::string command, 
@@ -31,7 +29,7 @@ PLCRequestData::PLCRequestData(
 void PLCRequestData::convertMCprotocol()
 {
     std::string commandstr = this->command;
-    std::string deviceCountstr = this->deviceCount;
+    std::string dataAddressstr = this->dataAddress;
     if (commandstr == "getname")
     {
         protocolbuf[0] = static_cast<char>(0x15);
@@ -40,7 +38,7 @@ void PLCRequestData::convertMCprotocol()
         protocolbuf.push_back(0x00);
         protocolbuf.push_back(0x00);
     }
-    else if (commandstr = "start")
+    else if (commandstr == "start")
     {
         protocolbuf.push_back(0x13);
         protocolbuf.push_back(0xff);
@@ -48,7 +46,7 @@ void PLCRequestData::convertMCprotocol()
         protocolbuf.push_back(0x00);
         protocolbuf.push_back(0x00);
     }
-    else if (commandstr = "stop")
+    else if (commandstr == "stop")
     {
         protocolbuf.push_back(0x13);
         protocolbuf.push_back(0xff);
@@ -57,9 +55,9 @@ void PLCRequestData::convertMCprotocol()
         protocolbuf.push_back(0x00);
     }
 
-    if (commandstr = "read")
+    if (commandstr == "read")
     {
-        char fs = firstChar(deviceCountstr)
+        char fs = firstChar(dataAddressstr);
         if (fs == 'D' || fs == 'R' || fs == 'T' || fs == 'C')
         {
             protocolbuf.push_back(0x01);
@@ -71,9 +69,9 @@ void PLCRequestData::convertMCprotocol()
     }
 }
 
-char firstChar(const std::string& s) {
+char PLCRequestData::firstChar(const std::string& s) {
     if (s.empty()) {
-        std::count << "文字列が空です" << std::endl;
+        std::cout << "文字列が空です" << std::endl;
         exit(1);
     }
     return s[0];

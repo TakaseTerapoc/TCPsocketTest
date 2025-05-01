@@ -1,6 +1,6 @@
-#include "Logger.hpp"
+#include "../include/Logger.hpp"
 
-Logger& Logger::GetInstance()
+Logger& Logger::getInstance()
 {
     static Logger instance;
     return instance;
@@ -20,11 +20,11 @@ void Logger::Init()
     std::vector<spdlog::sink_ptr> sinks; // シンクのベクター
     
     // コンソールシンクとファイルシンクを作成
-#ifdef DEBUG
+// #ifdef DEBUG
     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     sinks.push_back(console_sink);
-#endif
-    auto file_sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>("logs/SystemLogs", 0, 0);     // ファイルシンク 0時0分にローテーション
+// #endif
+    auto file_sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>("../logs/SystemLogs/SystemLog", 0, 0);     // ファイルシンク 0時0分にローテーション
     sinks.push_back(file_sink);
 
     // スレッドプールを使用する非同期メインロガーを作成(async_loggerのコンストラクタをmake_sharedで包んでる)
@@ -36,6 +36,9 @@ void Logger::Init()
     );
 
     m_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v"); // m_loggerのログフォーマット
+
+    // ログを出すたびに出力
+    m_logger->flush_on(spdlog::level::debug);
 
 #ifdef DEBUG
     m_logger->set_level(spdlog::level::debug);
@@ -49,7 +52,7 @@ void Logger::Init()
     m_sensor_logger = std::make_shared<spdlog::async_logger>(
         "sensor_logger",                                                             // ロガー名 
         std::initializer_list<spdlog::sink_ptr>{
-            std::make_shared<spdlog::sinks::daily_file_sink_mt>("logs/sensor", 0, 0) // センサー用のファイルシンク
+            std::make_shared<spdlog::sinks::daily_file_sink_mt>("../logs/SensorLogs/SensorLog", 0, 0) // センサー用のファイルシンク
         },
         spdlog::thread_pool(),                                                       // スレッドプールを指定
         spdlog::async_overflow_policy::block                                         // キューが満杯になったらブロックする
@@ -58,8 +61,14 @@ void Logger::Init()
     // センサー用ロガーはinfo固定
     m_sensor_logger->set_level(spdlog::level::info);
 
+    // ログを吐き出すたびに出力
+    m_sensor_logger->flush_on(spdlog::level::debug);
+
+
     // センサー用のログフォーマット
     m_sensor_logger->set_pattern("[%Y-%m-%d %H:%M:%S] %v"); 
+
+    // spdlog::flush_every(std::chrono::seconds(1)); 
 }
 
 void Logger::Debug(const std::string& message)

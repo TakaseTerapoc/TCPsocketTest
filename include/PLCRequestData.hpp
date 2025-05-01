@@ -63,4 +63,8 @@ public:
 
     // 設定ファイルの情報をMCプロトコルに変換します。
     void convertMCprotocol();
+
+private:
+    char firstChar(const std::string& s);
+
 };

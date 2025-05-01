@@ -6,21 +6,27 @@ PLCResponseData::PLCResponseData()
 
 void PLCResponseData::setReceiptTime()
 {
+    using namespace std::chrono;
+
     // 現在時刻を取得
-    boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time();
-    
-    // 現在時刻から年月日を取得
-    boost::gregorian::date d = now.date();
-    std::string yyyymmdd = boost::gregorian::to_iso_string(d);
+    auto now = system_clock::now();
+    auto ms  = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
 
-    // 現在時刻から時分秒ミリ秒を取得
-    boost::posix_time::time_duration tod = now.time_of_day();
-    std::string hhmmssff = to_iso_string(tod);
+    // 秒単位の time_t に変換し tm を得る
+    std::time_t t = system_clock::to_time_t(now);
+    std::tm tm    = *std::localtime(&t);
 
-    // 上で作成した文字列を結合し、receiptTimeに格納
-    receiptTime = yyyymmdd + hhmmssff;
+    // ostringstream にフォーマットを書き込む
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S")
+        << '.'
+        << std::setw(3) << std::setfill('0') << ms.count();
 
-    std::cout << receiptTime << std::endl;
+    // std::string に変換
+    receiptTime = oss.str();
+
+    // 確認のため出力
+    std::cout << "取得時刻: " << receiptTime << "\n";
 }
 
 // TODO:今後レスポンスデータを加工する必要がある。

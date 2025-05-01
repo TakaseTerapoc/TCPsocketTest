@@ -1,10 +1,10 @@
 #pragma once
 
 #include <iostream>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 /**
  * @brief PLCから取得したデータと取得時刻、シリアルナンバーを格納するクラスです。

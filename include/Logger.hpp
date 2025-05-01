@@ -17,7 +17,7 @@ class Logger
 {
 public:
     // シングルトンインスタンス取得
-    static Logger& GetInstance();
+    static Logger& getInstance();
 
     // ロガーの初期化
     void Init();

@@ -1,0 +1,30 @@
+# ---- 変数定義 ----
+cxx          = g++
+include_dirs = -I./include -I./external/spdlog/include -I./external/simpleini
+warning      = -Wall -Wextra -Werror
+# Release ビルド用フラグ
+cxxflags     = -std=c++17 $include_dirs $warning -O2
+
+# ---- ルール定義 ----
+rule compile
+  command   = $cxx $cxxflags -MMD -MP -c $in -o $out
+  depfile   = $out.d       # 出力した *.d を自動で読み込む
+  deps      = gcc          # GCC/Clang 互換の depfile フォーマットを期待
+  description = Compiling $in
+
+rule link
+  command     = $cxx $cxxflags -o $out $in
+  description = Linking $out
+
+# ---- ファイル一覧 ----
+# Ninja は自動 glob を持たないため、src/*.cpp は手動で列挙します
+# （プロジェクト規模が大きい場合はスクリプトで生成しても OK）
+build src/main.o:  compile src/main.cpp
+build src/Logger.o: compile src/Logger.cpp
+
+# ---- ターゲット ----
+# すべての .o をリンクして main を作る
+build main: link src/main.o src/Logger.o src/othercpp.o
+
+# デフォルトターゲット
+default main

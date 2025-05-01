@@ -1,19 +1,29 @@
-#include "ResourcesManeger.hpp"
+#include "ResourcesManager.hpp"
 
-    bool ResourcesManager::LoadMessages(const std::string& filename)
-    {
-        SI_Error rc = ini.LoadFile(filename.c_str());
-        return rc >= 0;
-    }
+// コンストラクタ／デストラクタ
+ResourcesManager::ResourcesManager() = default;
+ResourcesManager::~ResourcesManager() = default;
 
-    std::string ResourcesManager::GetLogMessages(const std::string& key)
-    {
-        const char* pVal = ini.GetValue("LogMessages", key.c_str(), "（未定義）");
-        return std::string(pVal);
-    }
+// シングルトン取得
+ResourcesManager& ResourcesManager::getInstance() {
+    static ResourcesManager instance;
+    return instance;
+}
 
-    std::string ResourcesManager::GetConfigInformation(const std::string& key)
-    {
-        const char* pVal = ini.GetValue("ConfigInformation", key.c_str(), "（未定義）");
-        return std::string(pVal);
-    }
+// 設定ファイルの読み込み
+bool ResourcesManager::LoadFile(const std::string& filename) {
+    SI_Error rc = ini.LoadFile(filename.c_str());
+    return rc >= 0;
+}
+
+// PLCConfig セクションから文字列を取得
+std::string ResourcesManager::GetPLCConfig(const std::string& key) {
+    const char* pVal = ini.GetValue("PLCConfig", key.c_str(), "（未定義）");
+    return std::string(pVal);
+}
+
+// serverConfig セクションから文字列を取得
+std::string ResourcesManager::GetServerConfig(const std::string& key) {
+    const char* pVal = ini.GetValue("serverConfig", key.c_str(), "（未定義）");
+    return std::string(pVal);
+}

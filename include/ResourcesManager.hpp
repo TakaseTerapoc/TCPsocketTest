@@ -1,19 +1,29 @@
+// ResourcesManager.hpp
 #pragma once
 
-#include "SimpleIni.h"
-
-#include <iostream>
+#include "../external/SimpleIni/SimpleIni.h"
 #include <string>
 
-class ResourcesManager
-{
+class ResourcesManager {
 public:
-    bool LoadMessages(const std::string& filename);
+    // 唯一のインスタンスを取得
+    static ResourcesManager& getInstance();
 
-    std::string GetLogMessages(const std::string& key);
+    // 設定ファイル読み込み
+    bool LoadFile(const std::string& filename);
 
-    std::string GetConfigInformation(const std::string& key);
+    // PLCConfig セクションから値を取得
+    std::string GetPLCConfig(const std::string& key);
+
+    // serverConfig セクションから値を取得
+    std::string GetServerConfig(const std::string& key);
 
 private:
+    ResourcesManager();
+    ~ResourcesManager();
+
+    ResourcesManager(const ResourcesManager&) = delete;
+    ResourcesManager& operator=(const ResourcesManager&) = delete;
+
     CSimpleIniA ini;
 };

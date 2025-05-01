@@ -1,108 +1,72 @@
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS
-#include <boost/bind.hpp>
 #include <iostream>
-#include <vector>
-#include <fstream> 
-#include "../include/PLCConnectionClient.hpp"
-#include "../PLCRequestData.hpp"
-#include "../PLCResponseData.hpp"
-#include "../globals.hpp"
-#include "../PLCRequestScheduler.hpp"
-#include "../PLCRequestWorker.hpp"
-#include "../Config.hpp"
-#include <string>
-#include <thread>
-#include <chrono>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <queue>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+#include "PLCConnectionClient.hpp"
+#include "PLCRequestData.hpp"
+#include "PLCResponseData.hpp"
+#include "globals.hpp"
+#include "PLCRequestScheduler.hpp"
+#include "PLCRequestWorker.hpp"
+#include "ResourcesManager.hpp"
+#include "Logger.hpp"
 
-using namespace boost::placeholders; 
-
-// #include "spdlog/spdlog.h"
-// #include "spdlog/sinks/basic_file_sink.h"
-
-const std::string ConfigFile = "config/config.json";
-const std::string RequestDataFile = "config/requestdata.json";
-const char* PLCSettingsIPAddress = "PLCSettings.IPAddress";
-const char* PLCSettingsPort = "PLCSettings.Port";
-
-int main(int argc, char* argv[]) 
+int main() 
 {
-    std::cout << "設定ファイルを読み込みます。"<< std::endl; 
-    
+    // Logger初期化
+    Logger::getInstance().Init();
+
     // 設定ファイル読込み
-    boost::property_tree::ptree pt;
-    try
-    {
-        boost::property_tree::read_json(ConfigFile, pt);
-    }
-    catch(const boost::property_tree::json_parser_error& e)
-    {
-        std::cout << "設定ファイルが読み込めませんでした。"<< std::endl;
+    Logger::getInstance().Debug("設定ファイルを読み込みます。");
+    if (!ResourcesManager::getInstance().LoadFile("../ini/config.ini")) {
+        Logger::getInstance().Error("設定ファイルの読込に失敗しました。");
         exit(1);
     }
-    std::cout << "設定ファイルを読み込みました。"<< std::endl;
-    Config config(
-        pt.get<std::string>("PLCSettings.IPAddress"),
-        pt.get<int>("PLCSettings.Port"),
-        pt.get<std::string>("ServerSettings.IPAddress"),
-        pt.get<int>("ServerSettings.Port")
-    );
+    Logger::getInstance().Info("設定ファイルを読み込みました。");
 
     // PLC接続テスト
-    std::cout << "設定ファイルの情報でPLCとサーバーに接続します。"<< std::endl; 
+    Logger::getInstance().Info("設定ファイルの情報でPLCとサーバーに接続します。");
     PLCConnectionClient pLCConnectionClient(
-        config.getPLCIpAddress().c_str(), 
-        config.getPLCPortNumber()
+        ResourcesManager::getInstance().GetPLCConfig("ipaddress").c_str(), 
+        atoi(ResourcesManager::getInstance().GetPLCConfig("port").c_str())
     );
 
     if(pLCConnectionClient.Connect() < 0)
     {
-        std::cout << "PLCに接続失敗しました。"<< std::endl; 
+        Logger::getInstance().Error("PLCへの接続が失敗しました。");
         exit(1);
     }
     else
     {
-        std::cout << "PLCに接続成功しました。"<< std::endl; 
+        Logger::getInstance().Info("PLCへの接続が成功しました。");
     }
 
 
     // PLCリクエストファイル読込
-    std::cout << "PLCへのリクエストデータファイルを読み込みます。"<< std::endl; 
-    try
-    {
-        boost::property_tree::read_json(RequestDataFile, pt);
-    }
-    catch(const boost::property_tree::json_parser_error& e)
-    {
-        std::cout << "リクエストデータファイルが読み込めませんでした。"<< std::endl;
-        exit(1);
-    }
-    std::cout << "リクエストデータファイルを読み込みました。"<< std::endl;
+    Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みます。");
+    // try
+    // {
+    //     boost::property_tree::read_json(RequestDataFile, pt);
+    // }
+    // catch(const boost::property_tree::json_parser_error& e)
+    // {
+    //     std::cout << "リクエストデータファイルが読み込めませんでした。"<< std::endl;
+    //     exit(1);
+    // }
+    Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みました。");
 
 
     // PLCリクエストファイルの内容を該当クラスに格納
-    for (const auto& item : pt.get_child("devices"))
+    for (int i = 0; i < 2; i++)
     {
         PLCRequestData pLCRequestData
         (
-            item.second.get<std::string>("serialNumber"),
-            item.second.get<std::string>("command"),
-            item.second.get<std::string>("dataAddress"),
-            item.second.get<int>("deviceCount"),
-            item.second.get<int>("sendIntervalMs"),
-            config.getPLCIpAddress().c_str(), 
-            config.getPLCPortNumber(),
-            config.getserverIpAddress().c_str(), 
-            config.getserverPortNumber()
+            "1",
+            "read",
+            "D100",
+            1,
+            1000,
+            ResourcesManager::getInstance().GetPLCConfig("ipaddress").c_str(), 
+            atoi(ResourcesManager::getInstance().GetPLCConfig("port").c_str()),
+            ResourcesManager::getInstance().GetServerConfig("ipaddress").c_str(), 
+            atoi(ResourcesManager::getInstance().GetServerConfig("port").c_str())
         );
         gRData.push_back(pLCRequestData);
     }
