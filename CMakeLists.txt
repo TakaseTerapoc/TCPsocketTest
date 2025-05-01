@@ -11,6 +11,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/external/spdlog/include
     ${PROJECT_SOURCE_DIR}/external/simpleini
+    ${PROJECT_SOURCE_DIR}/external/csv-parser
 )
 
 # ソースファイルをまとめて取得

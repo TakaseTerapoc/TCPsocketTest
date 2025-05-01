@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include "PLCConnectionClient.hpp"
 #include "PLCRequestData.hpp"
 #include "PLCResponseData.hpp"
@@ -7,6 +8,7 @@
 #include "PLCRequestWorker.hpp"
 #include "ResourcesManager.hpp"
 #include "Logger.hpp"
+#include "CSVIO.hpp"
 
 int main() 
 {
@@ -41,6 +43,24 @@ int main()
 
     // PLCリクエストファイル読込
     Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みます。");
+    try
+    {
+        // io::CSVReader<2> in("../request/datalist.csv");
+        // in.read_header(io::ignore_extra_column, "sensorID", "sensorAddress_name");
+        // std::string sensorID;
+        // std::string sensorAddress_name;
+        // while(in.read_row(sensorID, sensorAddress_name)){
+        //     std::cout << "sensorID: " << sensorID << std::endl;
+        //     std::cout << "sensorAddress_name: " << sensorAddress_name << std::endl;
+        //     std::cout << std::endl;
+        CSVIO::readCSVFile("../request/datalist.csv");
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "エラー: " << e.what() << std::endl;
+        exit(1);
+    }
+    
     // try
     // {
     //     boost::property_tree::read_json(RequestDataFile, pt);

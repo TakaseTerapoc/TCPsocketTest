@@ -1,4 +1,3 @@
-// ResourcesManager.hpp
 #pragma once
 
 #include "../external/SimpleIni/SimpleIni.h"

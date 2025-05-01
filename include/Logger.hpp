@@ -1,9 +1,9 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/sinks/daily_file_sink.h"
-#include "spdlog/async.h"
+#include "../external/spdlog/include/spdlog/spdlog.h"
+#include "../external/spdlog/include/spdlog/sinks/stdout_color_sinks.h"
+#include "../external/spdlog/include/spdlog/sinks/daily_file_sink.h"
+#include "../external/spdlog/include/spdlog/async.h"
 #include <memory>
 #include <vector>
 #include <thread>
