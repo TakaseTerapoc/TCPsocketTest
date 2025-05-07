@@ -23,10 +23,5 @@ file(GLOB SRC_FILES
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # コンパイラ警告オプション
-target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address -fno-omit-frame-pointer)
-target_link_libraries   (${PROJECT_NAME} PRIVATE -fsanitize=address)
-
-# ビルド方法（プロジェクトルートで実行）
-# mkdir build && cd build
-# cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
-# ninja
+# target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address -fno-omit-frame-pointer)
+# target_link_libraries   (${PROJECT_NAME} PRIVATE -fsanitize=address)

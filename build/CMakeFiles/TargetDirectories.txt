@@ -1,3 +1,3 @@
-/home/terapoc/takase_workspace/TCPsocketTest/build/CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
-/home/terapoc/takase_workspace/TCPsocketTest/build/CMakeFiles/edit_cache.dir
-/home/terapoc/takase_workspace/TCPsocketTest/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/build/CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
+/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/build/CMakeFiles/rebuild_cache.dir
