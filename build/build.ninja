@@ -39,7 +39,7 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/build/
+cmake_ninja_workdir = /home/takase/TCPsocketTest/build/
 # =============================================================================
 # Object build statements for EXECUTABLE target NAKANISHI_IOT_SYSTEM_PROTTYPE
 
@@ -49,109 +49,109 @@ cmake_ninja_workdir = /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/bui
 
 build cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE: phony || CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/CSVIO.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/CSVIO.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/CSVIO.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/CSVIO.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/CSVIO.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Config.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/Config.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Config.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/Config.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Config.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Logger.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/Logger.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Logger.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/Logger.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Logger.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/MCprotocolData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/MCprotocolData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/MCprotocolData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/MCprotocolData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/MCprotocolData.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCConnectionClient.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/PLCConnectionClient.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCConnectionClient.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/PLCConnectionClient.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCConnectionClient.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/PLCRequestData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/PLCRequestData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestData.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestScheduler.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/PLCRequestScheduler.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestScheduler.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/PLCRequestScheduler.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestScheduler.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestWorker.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/PLCRequestWorker.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestWorker.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/PLCRequestWorker.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestWorker.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCResponseData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/PLCResponseData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCResponseData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/PLCResponseData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCResponseData.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/ResourcesManager.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/ResourcesManager.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/ResourcesManager.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/ResourcesManager.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/ResourcesManager.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/globals.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/globals.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/globals.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/globals.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/globals.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/main.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/src/main.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/main.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/main.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/main.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
-  INCLUDES = -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/spdlog/include -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/simpleini -I/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
@@ -179,7 +179,7 @@ build NAKANISHI_IOT_SYSTEM_PROTTYPE: CXX_EXECUTABLE_LINKER__NAKANISHI_IOT_SYSTEM
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/build && /usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  COMMAND = cd /home/takase/TCPsocketTest/build && /usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
   DESC = No interactive CMake dialog available...
   restat = 1
 
@@ -190,7 +190,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/build && /usr/bin/cmake --regenerate-during-build -S/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild -B/mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/build
+  COMMAND = cd /home/takase/TCPsocketTest/build && /usr/bin/cmake --regenerate-during-build -S/home/takase/TCPsocketTest -B/home/takase/TCPsocketTest/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -206,7 +206,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 
 #############################################
-# Folder: /mnt/c/Users/terapoc15/Desktop/TCPsocketTestCrossBuild/build
+# Folder: /home/takase/TCPsocketTest/build
 
 build all: phony NAKANISHI_IOT_SYSTEM_PROTTYPE
 

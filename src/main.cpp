@@ -15,6 +15,7 @@ int main()
     // Logger初期化
     Logger::getInstance().Init();
 
+
     // 設定ファイル読込み
     Logger::getInstance().Debug("設定ファイルを読み込みます。");
     if (!ResourcesManager::getInstance().LoadFile("../ini/config.ini")) {
@@ -22,6 +23,32 @@ int main()
         exit(1);
     }
     Logger::getInstance().Info("設定ファイルを読み込みました。");
+
+
+    // PLCリクエストファイル読込
+    Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みます。");
+    try
+    {
+        auto list = CSVIO::readCSVFile("../request/testdataNew.csv");
+        for (size_t i = 0; i < list.size(); ++i) {
+            for (size_t j = 0; j < list[i].size(); ++j) {
+                if (j==2){
+                    std::cout << "data[" << i << "][" << j << "] = " << list[i][j] << std::endl;
+                }
+            }
+        }
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "エラー: " << e.what() << std::endl;
+        Logger::getInstance().Error("PLCへのリクエストデータファイルを読み込めませんでした。");
+        exit(1);
+    }
+    Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みました。");
+
+    // TODO:後で消す
+    return 0;
+
 
     // PLC接続テスト
     Logger::getInstance().Info("設定ファイルの情報でPLCとサーバーに接続します。");
@@ -39,38 +66,6 @@ int main()
     {
         Logger::getInstance().Info("PLCへの接続が成功しました。");
     }
-
-
-    // PLCリクエストファイル読込
-    Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みます。");
-    try
-    {
-        // io::CSVReader<2> in("../request/datalist.csv");
-        // in.read_header(io::ignore_extra_column, "sensorID", "sensorAddress_name");
-        // std::string sensorID;
-        // std::string sensorAddress_name;
-        // while(in.read_row(sensorID, sensorAddress_name)){
-        //     std::cout << "sensorID: " << sensorID << std::endl;
-        //     std::cout << "sensorAddress_name: " << sensorAddress_name << std::endl;
-        //     std::cout << std::endl;
-        CSVIO::readCSVFile("../request/datalist.csv");
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << "エラー: " << e.what() << std::endl;
-        exit(1);
-    }
-    
-    // try
-    // {
-    //     boost::property_tree::read_json(RequestDataFile, pt);
-    // }
-    // catch(const boost::property_tree::json_parser_error& e)
-    // {
-    //     std::cout << "リクエストデータファイルが読み込めませんでした。"<< std::endl;
-    //     exit(1);
-    // }
-    Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みました。");
 
 
     // PLCリクエストファイルの内容を該当クラスに格納
