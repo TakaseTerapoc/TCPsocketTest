@@ -24,18 +24,6 @@ public:
     // 送信間隔（ミリ秒）
     int transmissionIntervalMs;
 
-    // PLCのIPアドレス
-    std::string PLCIpAddress;
-
-    // PLCのポート
-    int PLCPortNumber;
-
-    // サーバのIPアドレス
-    std::string serverIpAddress;
-
-    // サーバのポート
-    int serverPortNumber;
-
     // タイミングを計るときに必要な時間データ
     std::chrono::steady_clock::time_point nextTime;
 

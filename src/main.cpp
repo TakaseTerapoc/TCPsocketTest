@@ -17,7 +17,7 @@ int main()
     Logger::getInstance().Init();
 
     // 設定ファイル読込み
-    Logger::getInstance().Debug("設定ファイルを読み込みます。");
+    Logger::getInstance().Info("設定ファイルを読み込みます。");
     if (!ResourcesManager::getInstance().LoadFile("../ini/config.ini")) {
         Logger::getInstance().Error("設定ファイルの読込に失敗しました。");
         exit(1);
@@ -47,8 +47,6 @@ int main()
     // MCプロトコルへ変換
     MCprotocolData mcProtocolData;
     mcProtocolData.covertToMCprotocolData(gRData);
-
-    return 0;
 
     // PLC接続テスト
     Logger::getInstance().Info("設定ファイルの情報でPLCとサーバーに接続します。");

@@ -2,10 +2,14 @@
 
 #include <iostream>
 #include <cstring>
+#include <cstdint>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+#include "Logger.hpp"
+#include "../external/fmt/format.h"
 
 class PLCConnectionClient
 {

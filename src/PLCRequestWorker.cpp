@@ -54,16 +54,29 @@ void PLCRequestWorker::run() {
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
         std::cout << "キューから取り出しました。" << req.serialNumber << "->時間"<< ms << std::endl;
 
-        // TCPリクエスト
-        pLCConnectionClient_.SendRequest(req.protocolbuf.data(), req.protocolbuf.size());
+        // TCPリクエスト 
+        pLCConnectionClient_.SendRequest(req.protocolbuf.data(), 12);
         std::cout << "RecvResponseを動かします。"<< std::endl; 
         char text[256];
 
         // レスポンス受信
-        if (pLCConnectionClient_.RecvResponse(text) > 0)
+        int len = pLCConnectionClient_.RecvResponse(text);
+        std::string responseData;
+        if (len > 0)
         {
-            Logger::getInstance().Sensor(text);
+            Logger::getInstance().Sensor("【シリアルナンバー】" + req.serialNumber + "【データ】" + responseData);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
+}
+
+std::string PLCRequestWorker::makeLogData(char* text, int len, PLCRequestData& req) {
+    std::string responseData;
+    responseData += "【データ】";
+    for (int i = 0; i < len; ++i)
+    {
+        responseData += fmt::format("{:02X} ", text[i]);
+    }
+
+    return responseData;
 }

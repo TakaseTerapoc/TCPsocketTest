@@ -118,17 +118,16 @@ void MCprotocolData::covertToMCprotocolData(std::vector<PLCRequestData>& gRData)
         std::string address;
         int firstNumber = 0;
         int lastNumber = 0;
-        Logger::getInstance().Info("1");
+
         // コマンドに応じてMCプロトコルを変換
         if (data.command == "read")
         {
             size_t i = 0;
             std::string code;
             std::string address;
-            // for (auto& row : data.csvrows)
-            Logger::getInstance().Info("2");
             for (int i = 0; i < (data.csvrows).size(); i++)
             {
+                data.deviceCount++;
                 auto& row = data.csvrows[i];
                 if(i == 0)
                 {
@@ -142,7 +141,7 @@ void MCprotocolData::covertToMCprotocolData(std::vector<PLCRequestData>& gRData)
                     lastNumber = std::stoi(row[2]);
                 }
             }
-            makeDevicePoint(data.protocolbuf, firstNumber, lastNumber);
+            makeDevicePoint(data, firstNumber, lastNumber);
 
             // 確認用
             std::cout << "【シリアルナンバー】" << data.serialNumber << std::endl;
@@ -201,15 +200,15 @@ void MCprotocolData::makeCommand(std::vector<std::string>& row, PLCRequestData& 
 
 void MCprotocolData::makeDeviceCode(std::vector<char>& buf, std::string& code)
 {
-    if (code == "77" || code == "88")
+    if (code == "77")
     {
         buf[8] = (char)0x20;
-        buf[9] = (char)0x44;
+        buf[9] = (char)0x4D;
     }
     else if (code == "68")
     {
         buf[8] = (char)0x20;
-        buf[9] = (char)0x4D;
+        buf[9] = (char)0x44;
     }
 }
 
@@ -237,15 +236,14 @@ std::array<uint8_t,4> MCprotocolData::decStrToBytes32(const std::string& decStr)
 }
 
 // デバイス点数を作成する関数
-void MCprotocolData::makeDevicePoint(std::vector<char>& buf, int firstNumber, int lastNumber)
+void MCprotocolData::makeDevicePoint(PLCRequestData& data, int firstNumber, int lastNumber)
 {
-    if (lastNumber == 0)
+    if ( data.deviceCount == 1)
     {
-        buf[10] = (char)0x01;
+        data.protocolbuf[10] = (char)0x01;
     }
     else
     {
-    int deviceCount = lastNumber - firstNumber + 1;
-    buf[10] = (char)(deviceCount & 0xFF);
+        data.protocolbuf[10] = (char)((lastNumber - firstNumber + 1) & 0xFF);
     }
 }

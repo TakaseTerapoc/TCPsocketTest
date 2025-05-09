@@ -35,7 +35,7 @@ class MCprotocolData
         std::array<uint8_t,4> decStrToBytes32(const std::string& decStr);
 
         // デバイス点数を作成する関数
-        void makeDevicePoint(std::vector<char>& buf, int firstNumber, int lastNumber);
+        void makeDevicePoint(PLCRequestData& data, int firstNumber, int lastNumber);
 
         // 後ろからsubstringする関数
         std::string substrBack(std::string& str, size_t pos, size_t len);

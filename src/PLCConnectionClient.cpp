@@ -19,15 +19,13 @@ int PLCConnectionClient::Connect()
     int result;
 
     socket_ = socket(AF_INET, SOCK_STREAM, 0);
-    std::cout << "PLCに接続します。sock="<< socket_ << std::endl; 
     result = connect(socket_, (sockaddr *)&serverAddress_, sizeof(serverAddress_));
     return result;
 }
 
 void PLCConnectionClient::SendRequest(const char* text, int len)
 {
-    std::cout << "PLCにリクエストを送ります。"<< std::endl; 
-    std::cout << len << "::" << socket_<<std::endl; 
+    Logger::getInstance().Info("PLCにリクエストを送ります。");
     for (int i = 0; i < len; ++i)
     {
         printf("%02X ", text[i]);
@@ -36,14 +34,14 @@ void PLCConnectionClient::SendRequest(const char* text, int len)
 
     if (send(socket_, text, len, 0) < 0)
     {
-        std::cout << "送信エラー"<< std::endl; 
+        Logger::getInstance().Error("PLCへのリクエスト送信に失敗しました。");
     };
 }
 
 ssize_t PLCConnectionClient::RecvResponse(char* text)
 {
-    std::cout << "受信開始します。"<< std::endl; 
+    Logger::getInstance().Info("受信開始します。"); 
     ssize_t recvSize = recv(socket_, text, sizeof(text), 0);
-    std::cout << "受信しました。" << recvSize << std::endl; 
+    Logger::getInstance().Info("受信しました。"+ std::to_string(recvSize) + "byte");
     return recvSize;
 }

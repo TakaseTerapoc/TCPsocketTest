@@ -50,86 +50,98 @@ cmake_ninja_workdir = /home/takase/TCPsocketTest/build/
 build cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE: phony || CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/CSVIO.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/CSVIO.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/CSVIO.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Config.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/Config.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Config.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Logger.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/Logger.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Logger.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/MCprotocolData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/MCprotocolData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/MCprotocolData.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCConnectionClient.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/PLCConnectionClient.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCConnectionClient.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/PLCRequestData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestData.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestScheduler.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/PLCRequestScheduler.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestScheduler.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestWorker.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/PLCRequestWorker.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestWorker.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCResponseData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/PLCResponseData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCResponseData.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/ResourcesManager.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/ResourcesManager.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/ResourcesManager.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/globals.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/globals.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/globals.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 
 build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/main.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Debug /home/takase/TCPsocketTest/src/main.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+  DEFINES = -DFMT_HEADER_ONLY
   DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/main.cpp.o.d
   FLAGS = -g -std=c++17
-  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser
+  INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   OBJECT_FILE_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src
 

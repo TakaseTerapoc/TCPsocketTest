@@ -1,11 +1,14 @@
 #pragma once
 
-#include "globals.hpp"
-#include "PLCRequestData.hpp"
 #include <chrono>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+
+#include "globals.hpp"
+#include "PLCRequestData.hpp"
+#include "../external/fmt/format.h"
+
 
 /**
  * @brief PLCRequestDataが格納されているキューを監視し、２００ms秒ごとにTCPへリクエストを送るクラスです。
@@ -41,4 +44,7 @@ class PLCRequestWorker
         bool             running_{false};           // 実行中フラグ
         std::mutex       mutex_;                    // running_ の排他制御
         PLCConnectionClient pLCConnectionClient_;   // PLCConnectionClientのインスタンス
+
+        // LogData作成
+        std::string makeLogData(char* text, int len, PLCRequestData& req);
 };
