@@ -25,7 +25,7 @@ void PLCResponseData::setReceiptTime()
     // std::string に変換
     receiptTime = oss.str();
 
-    // 確認のため出力
+    // 確認出力
     std::cout << "取得時刻: " << receiptTime << "\n";
 }
 

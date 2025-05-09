@@ -182,11 +182,13 @@ void MCprotocolData::makeCommand(std::vector<std::string>& row, PLCRequestData& 
     code = row[2].substr(0, row[2].size() - 4);
     if (code == "77" || code == "88")
     {
+        data.transmissionIntervalMs = 1000;
         data.protocolbuf = readPLCwithBit;
         makeDeviceCode(data.protocolbuf, code);
     }
     else if (code == "68")
     {
+        data.transmissionIntervalMs = 60000;
         data.protocolbuf = readPLCwithWord;
         makeDeviceCode(data.protocolbuf, code);
     }
