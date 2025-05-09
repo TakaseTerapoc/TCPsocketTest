@@ -5,6 +5,7 @@
 #include <map>
 #include <chrono>
 #include "PLCResponseData.hpp"
+#include "Logger.hpp"
 
 class PLCRequestData {
 public:

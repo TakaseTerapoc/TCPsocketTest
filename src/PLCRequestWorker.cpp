@@ -58,15 +58,11 @@ void PLCRequestWorker::run() {
         pLCConnectionClient_.SendRequest(req.protocolbuf.data(), req.protocolbuf.size());
         std::cout << "RecvResponseを動かします。"<< std::endl; 
         char text[256];
-        
+
         // レスポンス受信
         if (pLCConnectionClient_.RecvResponse(text) > 0)
         {
-            for (int i = 0; i < 12; ++i)
-            {
-                printf("%02X ", text[i]);
-            }
-            printf("\n");
+            Logger::getInstance().Sensor(text);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
