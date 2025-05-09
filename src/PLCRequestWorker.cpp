@@ -71,6 +71,7 @@ void PLCRequestWorker::run() {
 }
 
 std::string PLCRequestWorker::makeLogData(char* text, int len, PLCRequestData& req) {
+    // TODO:いっぺんに取り出したデータを加工する必要がある。（分ける。そして積算のものは積算する。そして2進数で表現する。
     std::string responseData;
     responseData += "【データ】";
     for (int i = 0; i < len; ++i)
