@@ -9,12 +9,12 @@
 #include "ResourcesManager.hpp"
 #include "Logger.hpp"
 #include "CSVIO.hpp"
+#include "MCprotocolData.hpp"
 
 int main() 
 {
     // Logger初期化
     Logger::getInstance().Init();
-
 
     // 設定ファイル読込み
     Logger::getInstance().Debug("設定ファイルを読み込みます。");
@@ -29,13 +29,11 @@ int main()
     Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みます。");
     try
     {
-        auto list = CSVIO::readCSVFile("../request/testdataNew.csv");
-        for (size_t i = 0; i < list.size(); ++i) {
-            for (size_t j = 0; j < list[i].size(); ++j) {
-                if (j==2){
-                    std::cout << "data[" << i << "][" << j << "] = " << list[i][j] << std::endl;
-                }
-            }
+        gRData = CSVIO::readCSVFile("../request/testdataDemo.csv");
+        if(gRData.size() == 0)
+        {
+            Logger::getInstance().Error("PLCへのリクエストデータファイルの読込に失敗しました。");
+            exit(1);
         }
     }
     catch(const std::exception& e)
@@ -46,9 +44,11 @@ int main()
     }
     Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みました。");
 
-    // TODO:後で消す
-    return 0;
+    // MCプロトコルへ変換
+    MCprotocolData mcProtocolData;
+    mcProtocolData.covertToMCprotocolData(gRData);
 
+    return 0;
 
     // PLC接続テスト
     Logger::getInstance().Info("設定ファイルの情報でPLCとサーバーに接続します。");
@@ -65,29 +65,6 @@ int main()
     else
     {
         Logger::getInstance().Info("PLCへの接続が成功しました。");
-    }
-
-
-    // PLCリクエストファイルの内容を該当クラスに格納
-    for (int i = 0; i < 2; i++)
-    {
-        PLCRequestData pLCRequestData
-        (
-            "1",
-            "read",
-            "D100",
-            1,
-            1000,
-            ResourcesManager::getInstance().GetPLCConfig("ipaddress").c_str(), 
-            atoi(ResourcesManager::getInstance().GetPLCConfig("port").c_str()),
-            ResourcesManager::getInstance().GetServerConfig("ipaddress").c_str(), 
-            atoi(ResourcesManager::getInstance().GetServerConfig("port").c_str())
-        );
-        gRData.push_back(pLCRequestData);
-    }
-
-    for (const auto& r : gRData) {
-        std::cout << r.command << " @ " << r.dataAddress << "\n";
     }
 
     // スケジューラ起動

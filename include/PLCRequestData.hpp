@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <chrono>
 #include "PLCResponseData.hpp"
 
@@ -11,7 +12,7 @@ public:
     std::string serialNumber;
 
     // コマンド (例: "write", "read" など)
-    std::string command;
+    std::string command = "read";
 
     // データアドレス (例: "D200" など)
     std::string dataAddress;
@@ -37,8 +38,8 @@ public:
     // タイミングを計るときに必要な時間データ
     std::chrono::steady_clock::time_point nextTime;
 
-    // // MCプロトコル
-    // char MCprotocol[12];
+    // csvdataを格納するための変数
+    std::vector<std::vector<std::string>> csvrows;
 
     // MCプロトコルベクター
     std::vector<char> protocolbuf{20};

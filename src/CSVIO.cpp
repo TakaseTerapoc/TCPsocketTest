@@ -1,6 +1,6 @@
 #include "CSVIO.hpp"
 
-std::vector<std::vector<std::string>> CSVIO::readCSVFile(const std::string& fileName)
+std::vector<PLCRequestData> CSVIO::readCSVFile(const std::string& fileName)
 {
     std::vector<std::vector<std::string>> csvdata;
 
@@ -31,13 +31,18 @@ std::vector<std::vector<std::string>> CSVIO::readCSVFile(const std::string& file
             }
             csvdata.push_back(std::move(rowdata));
         }
+        if(csvdata.size() == 0)
+        {
+            Logger::getInstance().Error("CSVファイルのデータがありません。");
+            exit(1);
+        }
         // 4列目のデータ順に並び替える
         sortData(csvdata);
-        return csvdata;
+        return convertCSVDataToPLCRequestData(separateCSVData(csvdata));
     }
     catch (const std::exception& e){
         Logger::getInstance().Error("CSVファイルの読込に失敗しました。");
-        return csvdata;
+        exit(1);
     }
 }
 
@@ -96,3 +101,62 @@ std::string CSVIO::convertASCIIstring(std::string str)
     return addressscode;
 }
 
+std::map<std::string, std::vector<std::vector<std::string>>> CSVIO::separateCSVData(std::vector<std::vector<std::string>>& csvdata)
+{
+    std::map<std::string, std::vector<std::vector<std::string>>> separateData;
+
+    for (auto& row : csvdata) {
+        std::string addresscode = row[2];
+        std::string initialstring = addresscode.erase(addresscode.size() - 4);
+        separateData[initialstring].push_back(row);
+    }
+
+    return separateData;
+}
+
+std::vector<PLCRequestData> CSVIO::convertCSVDataToPLCRequestData(const std::map<std::string, std::vector<std::vector<std::string>>>& csvdata)
+{
+    std::vector<PLCRequestData> gRData;
+    int serialNumber = 1;
+    for (auto& [prefix, rows] : csvdata) {
+        PLCRequestData current;
+        int prevValue = 0;
+        bool firstRow = true;  
+
+        // 行を順にチェック
+        for (auto& row : rows) {
+            int value = std::stoi(row[2]);
+            // 1行目はそのまま current に追加
+            if (!firstRow && value - prevValue > SeparateIntarbal) {
+                // ここまでの current を確定して gRData に追加
+                current.serialNumber = std::to_string(serialNumber++);
+                gRData.push_back(std::move(current));
+
+                // 新しいグループ用にリセット
+                current = PLCRequestData{};
+                firstRow = true;
+            }
+
+            // current にこの行を追加
+            current.csvrows.push_back(row);
+            prevValue = value;
+            firstRow = false;
+        }
+
+        // 最後に残った current を追加
+        if (!current.csvrows.empty()) {
+            current.serialNumber = std::to_string(serialNumber++);
+            gRData.push_back(std::move(current));
+        }
+    }
+
+    // 確認出力
+    for (auto& data : gRData) {
+        std::cout << "----- serial = " << data.serialNumber << " -----\n";
+        for (auto& row : data.csvrows) {
+            for (auto& col : row) std::cout << col << " ";
+            std::cout << "\n";
+        }
+    }
+    return gRData;
+}
