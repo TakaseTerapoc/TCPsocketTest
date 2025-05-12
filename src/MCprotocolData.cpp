@@ -214,10 +214,7 @@ void MCprotocolData::makeDeviceCode(std::vector<char>& buf, std::string& code)
 
 void MCprotocolData::makeTopDeviceNumber(std::vector<char>& buf, std::string& address)
 {
-    Logger::getInstance().Info("5");
-    Logger::getInstance().Info(address);
     auto bytes = decStrToBytes32(address);
-    Logger::getInstance().Info("7");
     for (int i = 0; i < 4; ++i) {
         buf[4 + i] = bytes[i];
     }

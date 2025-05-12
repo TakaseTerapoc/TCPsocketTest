@@ -150,6 +150,18 @@ std::vector<PLCRequestData> CSVIO::convertCSVDataToPLCRequestData(const std::map
         }
     }
 
+    // データ間隔算出
+    for (auto& data : gRData) {
+        for (size_t i = 0; i < data.csvrows.size(); ++i) {
+            if (i > 0) {
+                int prevValue = std::stoi(data.csvrows[i - 1][2]);
+                int currentValue = std::stoi(data.csvrows[i][2]);
+                data.dataInterval.push_back(currentValue - prevValue);
+                std::cout << "データ間隔: " << data.dataInterval.back() << std::endl;
+            }
+        }
+    }
+
     // 確認出力
     for (auto& data : gRData) {
         std::cout << "----- serial = " << data.serialNumber << " -----\n";

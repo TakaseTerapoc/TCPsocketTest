@@ -46,5 +46,5 @@ class PLCRequestWorker
         PLCConnectionClient pLCConnectionClient_;   // PLCConnectionClientのインスタンス
 
         // LogData作成
-        std::string makeLogData(char* text, int len, PLCRequestData& req);
+        std::string makeTransmitData(char* text, int len, PLCRequestData& req);
 };

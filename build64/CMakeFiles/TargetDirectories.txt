@@ -1,3 +1,0 @@
-/build/build64/CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
-/build/build64/CMakeFiles/edit_cache.dir
-/build/build64/CMakeFiles/rebuild_cache.dir

@@ -18,8 +18,14 @@ public:
     // データアドレス (例: "D200" など)
     std::string dataAddress;
 
+    // デバイスコード (例: "D", "M", "C" など)
+    std::string deviceCode;
+
     // デバイス点数
     int deviceCount;
+
+    // データ間隔 (一つのリクエストに対して複数のデータがある場合、どれくらいの間隔でデータが存在するか。)
+    std::vector<int> dataInterval;
 
     // 送信間隔（ミリ秒）
     int transmissionIntervalMs;
@@ -30,26 +36,14 @@ public:
     // csvdataを格納するための変数
     std::vector<std::vector<std::string>> csvrows;
 
-    // MCプロトコルベクター
+    // MCプロトコル
     std::vector<char> protocolbuf{20};
     
     // PLCからのレスポンスデータ
     std::vector<PLCResponseData> data;
 
-    //コンストラクタ
+    // コンストラクタ
     PLCRequestData() = default;
-
-    PLCRequestData(
-        std::string serialNumber, 
-        std::string command, 
-        std::string dataAddress, 
-        int deviceCount, 
-        int transmissionIntervalMs,
-        std::string PLCIpAddress,
-        int PLCPortNumber,
-        std::string serverIpAddress,
-        int serverPortNumber
-    );
 
     // 設定ファイルの情報をMCプロトコルに変換します。
     void convertMCprotocol();

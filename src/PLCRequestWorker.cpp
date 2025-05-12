@@ -64,20 +64,22 @@ void PLCRequestWorker::run() {
         std::string responseData;
         if (len > 0)
         {
-            Logger::getInstance().Sensor("【シリアルナンバー】" + req.serialNumber + "【データ】" + responseData);
+            Logger::getInstance().Sensor("【シリアルナンバー】" + req.serialNumber + "【データ】" + makeTransmitData(text, len, req));
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
 }
 
-std::string PLCRequestWorker::makeLogData(char* text, int len, PLCRequestData& req) {
+std::string PLCRequestWorker::makeTransmitData(char* text, int len, PLCRequestData& req) {
     // TODO:いっぺんに取り出したデータを加工する必要がある。（分ける。そして積算のものは積算する。そして2進数で表現する。
     std::string responseData;
-    responseData += "【データ】";
-    for (int i = 0; i < len; ++i)
+    std::string tempdata;
+
+    for (int i = 2; i < len; ++i)
     {
-        responseData += fmt::format("{:02X} ", text[i]);
+        tempdata = fmt::format("{:02X} ", text[i]);
     }
+    
 
     return responseData;
 }

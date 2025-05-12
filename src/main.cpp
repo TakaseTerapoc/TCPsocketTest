@@ -48,6 +48,9 @@ int main()
     MCprotocolData mcProtocolData;
     mcProtocolData.covertToMCprotocolData(gRData);
 
+    // // TODO:後で消す
+    // return 0;
+
     // PLC接続テスト
     Logger::getInstance().Info("設定ファイルの情報でPLCとサーバーに接続します。");
     PLCConnectionClient pLCConnectionClient(

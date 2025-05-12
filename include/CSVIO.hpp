@@ -17,7 +17,7 @@ class CSVIO{
         // CSVデータを取り出す関数
         static std::vector<PLCRequestData> readCSVFile(const std::string& fileName);
 
-        // センサーデータを分割する関数
+        // センサーデータを昇順にソートする関数
         static void sortData(std::vector<std::vector<std::string>>& csvdata);
 
         // 文字列からASCIIコードに変換する関数
