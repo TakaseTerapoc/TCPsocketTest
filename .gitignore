@@ -1,0 +1,5 @@
+# build ディレクトリを無視
+/build/
+/build-debug/
+/build-release/
+/buildarm/
