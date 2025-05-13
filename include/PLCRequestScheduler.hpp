@@ -6,7 +6,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include "PLCRequestData.hpp"
+#include "PLCRequestResponseData.hpp"
 #include "globals.hpp"
 
 /**

@@ -6,9 +6,9 @@
 #include <condition_variable>
 
 #include "globals.hpp"
-#include "PLCRequestData.hpp"
+#include "PLCRequestResponseData.hpp"
+#include "MCprotocolManager.hpp"
 #include "../external/fmt/format.h"
-
 
 /**
  * @brief PLCRequestDataが格納されているキューを監視し、２００ms秒ごとにTCPへリクエストを送るクラスです。

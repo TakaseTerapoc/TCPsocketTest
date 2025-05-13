@@ -53,20 +53,31 @@ void PLCRequestWorker::run() {
         auto now = std::chrono::steady_clock::now();
         auto dur = now.time_since_epoch();
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-        std::cout << "キューから取り出しました。" << req.serialNumber << "->時間"<< ms << std::endl;
+        Logger::getInstance().Info("キューから取り出しました。" + req.serialNumber + "【時間】" + std::to_string(ms));
 
         // TCPリクエスト 
         pLCConnectionClient_.SendRequest(req.protocolbuf.data(), 12);
-        std::cout << "RecvResponseを動かします。"<< std::endl; 
-        char text[256];
+        Logger::getInstance().Info("RecvResponseを動かします。");
 
         // レスポンス受信
+        char text[256];
         int len = pLCConnectionClient_.RecvResponse(text);
-        std::string responseData;
+        req.receiptTime = Logger::getInstance().timestamp;
         if (len > 0)
         {
-            Logger::getInstance().Sensor("【シリアルナンバー】" + req.serialNumber + "【データ】");
+            Logger::getInstance().Info("【デバイスコード】" + req.deviceCode );
         }
-        // std::this_thread::sleep_for(std::chrono::milliseconds(150));
+        Logger::getInstance().Info("送信データを作成します");
+        std::vector<std::vector<std::string>> sendData = MCprotocolManager::convertSendData(text, len, req);
+        
+        // sendData確認
+        for (int i = 0; i < sendData.size(); i++)
+        {
+            for (int j = 0; j < sendData[i].size(); j++)
+            {
+                Logger::getInstance().Info("sendData[" + std::to_string(i) + "][" + std::to_string(j) + "]" + sendData[i][j]);
+            }
+        }
+
     }
 }

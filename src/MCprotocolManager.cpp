@@ -73,7 +73,7 @@ void MCprotocolManager::covertToMCprotocolData(std::vector<PLCRequestResponseDat
             std::string address;
             for (int i = 0; i < (data.sensorrows).size(); i++)
             {
-                data.deviceCount++;
+                // data.deviceCount++;
                 auto& row = data.sensorrows[i];
                 if(i == 0)
                 {
@@ -184,7 +184,7 @@ std::array<uint8_t,4> MCprotocolManager::decStrToBytes32(const std::string& decS
 // デバイス点数を作成する関数
 void MCprotocolManager::makeDevicePoint(PLCRequestResponseData& data, int firstNumber, int lastNumber)
 {
-    if ( data.deviceCount == 1)
+    if ( lastNumber == 0)
     {
         data.protocolbuf[10] = (char)0x01;
     }
@@ -194,46 +194,69 @@ void MCprotocolManager::makeDevicePoint(PLCRequestResponseData& data, int firstN
     }
 }
 
-std::string MCprotocolManager::convertSendData(char* text, int len, PLCRequestResponseData& req) {
+std::vector<std::vector<std::string>> MCprotocolManager::convertSendData(char* text, int len, PLCRequestResponseData& req) {
     std::string responseData;
+    std::string format;
+    std::vector<std::vector<std::string>> sendData;
 
-    for (int i = 2; i < len; ++i)
+    for (int i = 0; i < len; ++i)
     {
-        responseData += toBinaryString(text[i]);
-    }
+        if (i > 1)
+        {
+            responseData += responseData += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
 
-    std::cout << "受信データ: " << responseData << std::endl;
-
-    for (int i = 0; i < req.sensorrows.size(); i++)
-    {
-        req.sensorrows[i].push_back();
-    }
-
-    for (int i = 0; i < ; ++i)
-    {
-        uint8_t byte = static_cast<uint8_t>(text[i]);
-        std::printf("recv[%2d] = 0x%02X\n", i, byte);
-    }
-
-    return responseData;
-}
-
-std::string MCprotocolManager::toBinaryString(uint8_t byte) {
-    return std::bitset<8>(byte).to_string();
-}
-
-std::string MCprotocolManager::makeSendData(uint8_t byte)
-{
-    std::string binaryString = std::bitset<8>(byte).to_string();
-    std::string transmitData;
-
-    for (char bit : binaryString) {
-        if (bit == '1') {
-            transmitData += "1";
-        } else {
-            transmitData += "0";
+        }
+        else
+        {
+            format += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
         }
     }
 
-    return transmitData;
+    Logger::getInstance().Info("【シリアルナンバー】" + req.serialNumber + "【フォーマット】"+ format +"【受信データ(2進数)】" + responseData);
+
+    for (int i = 0; i < req.sensorrows.size(); i++)
+    {
+        std::string data;
+        if (req.deviceCode == "77")
+        {
+            
+            if (i == 0){
+                data = responseData.substr(0, 1);
+            }
+            else
+            {
+                int startPosition = std::stoi(req.sensorrows[i][2]) - std::stoi(req.sensorrows[i - 1][2]);
+                data = responseData.substr(startPosition, 1);
+            }
+        }
+        else if (req.deviceCode == "68")
+        {
+            if (i == 0){
+                data = convertDecimalString(swapString(responseData.substr(0, 4)));
+
+            }
+            else
+            {
+                int startPosition = (std::stoi(req.sensorrows[i][2]) - std::stoi(req.sensorrows[i - 1][2])) * 4;
+                data = convertDecimalString(swapString(responseData.substr(startPosition, 4)));
+            }
+        }
+        req.sensorrows[i].insert(req.sensorrows[i].begin(), req.receiptTime);
+        req.sensorrows[i].insert(req.sensorrows[i].begin() + 2, std::to_string(req.transmissionIntervalMs));
+        req.sensorrows[i].push_back(data);
+    }
+    sendData = req.sensorrows;
+
+    return sendData;
+}
+
+std::string MCprotocolManager::swapString(const std::string& str) {
+    std::string first = str.substr(0, 2);
+    std::string second = str.substr(2, 2);
+    std::string result = second + first;
+    return result; 
+}
+
+std::string MCprotocolManager::convertDecimalString(const std::string& hex) {
+    return std::to_string(strtoul(hex.c_str(), NULL, 16));
 }

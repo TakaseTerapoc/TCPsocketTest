@@ -9,6 +9,8 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
+#include <iomanip>
+#include <sstream>
 
 /**
  * @brief ロガークラスです。
@@ -39,6 +41,12 @@ public:
 
     // ログをフラッシュする
     void Flush();
+
+    // 現在のタイムスタンプを取得する
+    std::string GetCurrentTimestampString();
+
+    // タイムスタンプ
+    std::string timestamp;
 
 private:
     Logger() = default;             // コンストラクタ

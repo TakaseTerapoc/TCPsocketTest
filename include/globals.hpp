@@ -3,7 +3,7 @@
 #include <vector>
 #include <queue>
 #include <mutex>
-#include "PLCRequestData.hpp"
+#include "PLCRequestResponseData.hpp"
 #include "PLCConnectionClient.hpp"
 
 /**

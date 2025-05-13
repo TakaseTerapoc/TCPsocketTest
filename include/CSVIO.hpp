@@ -5,7 +5,7 @@
 #include <string>
 #include "../external/csv-parser/csv.hpp"
 #include "Logger.hpp"
-#include "PLCRequestData.hpp"
+#include "PLCRequestResponseData.hpp"
 
 const int SeparateIntarbal = 60; // データの分離間隔
 

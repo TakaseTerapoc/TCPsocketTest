@@ -10,8 +10,9 @@
 #include <cstdint>
 #include <stdexcept>
 #include <iomanip>
+
 #include "Logger.hpp"
-#include "PLCRequestData.hpp"
+#include "PLCRequestResponseData.hpp"
 
 
 class MCprotocolManager
@@ -42,11 +43,11 @@ class MCprotocolManager
         static std::string substrBack(std::string& str, size_t pos, size_t len);
 
         // レスポンスデータ(１６進数)を10進数に変換して算出する関数
-        static std::string convertSendData(char* text, int len, PLCRequestResponseData& req);
+        static std::vector<std::vector<std::string>> convertSendData(char* text, int len, PLCRequestResponseData& req);
 
-        // 16進→2進数文字列変換
-        static std::string toBinaryString(uint8_t byte); 
+        // レスポンス文字列を正しい順番に並び替える。
+        static std::string swapString(const std::string& str);
 
-        // 送信データを作成する関数
-        static void makeSendData(PLCRequestResponseData& data, std::string& code, std::string& address, int firstNumber, int lastNumber);
+        // 16進→10進文字列変換
+        static std::string convertDecimalString(const std::string& hex);
 };

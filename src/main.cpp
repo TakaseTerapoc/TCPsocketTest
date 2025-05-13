@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "PLCConnectionClient.hpp"
-#include "PLCRequestData.hpp"
+#include "PLCRequestResponseData.hpp"
 #include "PLCResponseData.hpp"
 #include "globals.hpp"
 #include "PLCRequestScheduler.hpp"
@@ -48,7 +48,7 @@ int main()
     MCprotocolManager::covertToMCprotocolData(gRData);
 
     // // TODO:後で消す
-    return 0;
+    // return 0;
 
     // PLC接続テスト
     Logger::getInstance().Info("設定ファイルの情報でPLCとサーバーに接続します。");

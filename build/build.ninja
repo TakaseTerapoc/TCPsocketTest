@@ -99,9 +99,9 @@ build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCConnectionClient.cpp.o
   TARGET_COMPILE_PDB = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/
   TARGET_PDB = NAKANISHI_IOT_SYSTEM_PROTTYPE.pdb
 
-build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/PLCRequestData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
+build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestResponseData.cpp.o: CXX_COMPILER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release /home/takase/TCPsocketTest/src/PLCRequestResponseData.cpp || cmake_object_order_depends_target_NAKANISHI_IOT_SYSTEM_PROTTYPE
   DEFINES = -DFMT_HEADER_ONLY
-  DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestData.cpp.o.d
+  DEP_FILE = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestResponseData.cpp.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17
   INCLUDES = -I/home/takase/TCPsocketTest/include -I/home/takase/TCPsocketTest/external/spdlog/include -I/home/takase/TCPsocketTest/external/simpleini -I/home/takase/TCPsocketTest/external/csv-parser -I/home/takase/TCPsocketTest/external/fmt
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
@@ -177,7 +177,7 @@ build CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/main.cpp.o: CXX_COMPILER_
 #############################################
 # Link the executable NAKANISHI_IOT_SYSTEM_PROTTYPE
 
-build NAKANISHI_IOT_SYSTEM_PROTTYPE: CXX_EXECUTABLE_LINKER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/CSVIO.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Config.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Logger.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/MCprotocolManager.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCConnectionClient.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestData.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestScheduler.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestWorker.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCResponseData.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/ResourcesManager.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/globals.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/main.cpp.o
+build NAKANISHI_IOT_SYSTEM_PROTTYPE: CXX_EXECUTABLE_LINKER__NAKANISHI_IOT_SYSTEM_PROTTYPE_Release CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/CSVIO.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Config.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/Logger.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/MCprotocolManager.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCConnectionClient.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestResponseData.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestScheduler.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCRequestWorker.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/PLCResponseData.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/ResourcesManager.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/globals.cpp.o CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir/src/main.cpp.o
   FLAGS = -O3 -DNDEBUG
   OBJECT_DIR = CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
   POST_BUILD = :
