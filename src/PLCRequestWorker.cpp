@@ -38,7 +38,7 @@ void PLCRequestWorker::run() {
             std::lock_guard<std::mutex> lg(mutex_);
             if (!running_) break;
         }
-        PLCRequestData req;
+        PLCRequestResponseData req;
         {
             std::unique_lock<std::mutex> lock(gRequestQueueMutex);
             if (gRequestQueue.empty()) {
@@ -48,6 +48,7 @@ void PLCRequestWorker::run() {
             req = gRequestQueue.front();
             gRequestQueue.pop();
         }
+
         // 確認やつ
         auto now = std::chrono::steady_clock::now();
         auto dur = now.time_since_epoch();
@@ -64,22 +65,8 @@ void PLCRequestWorker::run() {
         std::string responseData;
         if (len > 0)
         {
-            Logger::getInstance().Sensor("【シリアルナンバー】" + req.serialNumber + "【データ】" + makeTransmitData(text, len, req));
+            Logger::getInstance().Sensor("【シリアルナンバー】" + req.serialNumber + "【データ】");
         }
         // std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
-}
-
-std::string PLCRequestWorker::makeTransmitData(char* text, int len, PLCRequestData& req) {
-    // TODO:いっぺんに取り出したデータを加工する必要がある。（分ける。そして積算のものは積算する。そして2進数で表現する。
-    std::string responseData;
-    std::string tempdata;
-
-    for (int i = 2; i < len; ++i)
-    {
-        tempdata = fmt::format("{:02X} ", text[i]);
-    }
-    
-
-    return responseData;
 }

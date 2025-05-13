@@ -15,7 +15,7 @@ const int SeparateIntarbal = 60; // データの分離間隔
 class CSVIO{
     public:
         // CSVデータを取り出す関数
-        static std::vector<PLCRequestData> readCSVFile(const std::string& fileName);
+        static std::vector<PLCRequestResponseData> readCSVFile(const std::string& fileName);
 
         // センサーデータを昇順にソートする関数
         static void sortData(std::vector<std::vector<std::string>>& csvdata);
@@ -29,5 +29,5 @@ class CSVIO{
         static std::map<std::string, std::vector<std::vector<std::string>>> separateCSVData(std::vector<std::vector<std::string>>& csvdata);
 
         // カテゴリーごとに分けたcsvデータをPLCRequestDataに格納する関数
-        static std::vector<PLCRequestData> convertCSVDataToPLCRequestData(const std::map<std::string, std::vector<std::vector<std::string>>>& csvdata);
+        static std::vector<PLCRequestResponseData> convertCSVDataToPLCRequestData(const std::map<std::string, std::vector<std::vector<std::string>>>& csvdata);
 };

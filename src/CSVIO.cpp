@@ -1,6 +1,6 @@
 #include "CSVIO.hpp"
 
-std::vector<PLCRequestData> CSVIO::readCSVFile(const std::string& fileName)
+std::vector<PLCRequestResponseData> CSVIO::readCSVFile(const std::string& fileName)
 {
     std::vector<std::vector<std::string>> csvdata;
 
@@ -114,12 +114,12 @@ std::map<std::string, std::vector<std::vector<std::string>>> CSVIO::separateCSVD
     return separateData;
 }
 
-std::vector<PLCRequestData> CSVIO::convertCSVDataToPLCRequestData(const std::map<std::string, std::vector<std::vector<std::string>>>& csvdata)
+std::vector<PLCRequestResponseData> CSVIO::convertCSVDataToPLCRequestData(const std::map<std::string, std::vector<std::vector<std::string>>>& csvdata)
 {
-    std::vector<PLCRequestData> gRData;
+    std::vector<PLCRequestResponseData> gRData;
     int serialNumber = 1;
     for (auto& [prefix, rows] : csvdata) {
-        PLCRequestData current;
+        PLCRequestResponseData current;
         int prevValue = 0;
         bool firstRow = true;  
 
@@ -133,18 +133,18 @@ std::vector<PLCRequestData> CSVIO::convertCSVDataToPLCRequestData(const std::map
                 gRData.push_back(std::move(current));
 
                 // 新しいグループ用にリセット
-                current = PLCRequestData{};
+                current = PLCRequestResponseData{};
                 firstRow = true;
             }
 
             // current にこの行を追加
-            current.csvrows.push_back(row);
+            current.sensorrows.push_back(row);
             prevValue = value;
             firstRow = false;
         }
 
         // 最後に残った current を追加
-        if (!current.csvrows.empty()) {
+        if (!current.sensorrows.empty()) {
             current.serialNumber = std::to_string(serialNumber++);
             gRData.push_back(std::move(current));
         }
@@ -152,10 +152,10 @@ std::vector<PLCRequestData> CSVIO::convertCSVDataToPLCRequestData(const std::map
 
     // データ間隔算出
     for (auto& data : gRData) {
-        for (size_t i = 0; i < data.csvrows.size(); ++i) {
+        for (size_t i = 0; i < data.sensorrows.size(); ++i) {
             if (i > 0) {
-                int prevValue = std::stoi(data.csvrows[i - 1][2]);
-                int currentValue = std::stoi(data.csvrows[i][2]);
+                int prevValue = std::stoi(data.sensorrows[i - 1][2]);
+                int currentValue = std::stoi(data.sensorrows[i][2]);
                 data.dataInterval.push_back(currentValue - prevValue);
                 std::cout << "データ間隔: " << data.dataInterval.back() << std::endl;
             }
@@ -165,7 +165,7 @@ std::vector<PLCRequestData> CSVIO::convertCSVDataToPLCRequestData(const std::map
     // 確認出力
     for (auto& data : gRData) {
         std::cout << "----- serial = " << data.serialNumber << " -----\n";
-        for (auto& row : data.csvrows) {
+        for (auto& row : data.sensorrows) {
             for (auto& col : row) std::cout << col << " ";
             std::cout << "\n";
         }

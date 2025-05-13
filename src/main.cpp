@@ -9,7 +9,7 @@
 #include "ResourcesManager.hpp"
 #include "Logger.hpp"
 #include "CSVIO.hpp"
-#include "MCprotocolData.hpp"
+#include "MCprotocolManager.hpp"
 
 int main() 
 {
@@ -45,11 +45,10 @@ int main()
     Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みました。");
 
     // MCプロトコルへ変換
-    MCprotocolData mcProtocolData;
-    mcProtocolData.covertToMCprotocolData(gRData);
+    MCprotocolManager::covertToMCprotocolData(gRData);
 
     // // TODO:後で消す
-    // return 0;
+    return 0;
 
     // PLC接続テスト
     Logger::getInstance().Info("設定ファイルの情報でPLCとサーバーに接続します。");

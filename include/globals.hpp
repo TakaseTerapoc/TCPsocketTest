@@ -11,11 +11,11 @@
  */
 
 // PLCへのリクエストを格納するキューです。
-extern std::queue<PLCRequestData> gRequestQueue;
+extern std::queue<PLCRequestResponseData> gRequestQueue;
 
 // requestQueueのミューテックスです。
 extern std::mutex gRequestQueueMutex;
 
 // PLCのリクエストを格納するリストです。
-extern std::vector<PLCRequestData> gRData;
+extern std::vector<PLCRequestResponseData> gRData;
 

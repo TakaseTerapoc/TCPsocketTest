@@ -4,10 +4,9 @@
 #include <vector>
 #include <map>
 #include <chrono>
-#include "PLCResponseData.hpp"
 #include "Logger.hpp"
 
-class PLCRequestData {
+class PLCRequestResponseData {
 public:
     // シリアル番号
     std::string serialNumber;
@@ -33,20 +32,35 @@ public:
     // タイミングを計るときに必要な時間データ
     std::chrono::steady_clock::time_point nextTime;
 
-    // csvdataを格納するための変数
-    std::vector<std::vector<std::string>> csvrows;
+    /* csvdataを格納するための変数
+     * sensorrows[n] = { SerialNumber, DeviceAddress, DeviceAddressAscii, Comment }
+     */ 
+    std::vector<std::vector<std::string>> sensorrows;
 
     // MCプロトコル
     std::vector<char> protocolbuf{20};
     
-    // PLCからのレスポンスデータ
+    //PLCからのレスポンスデータ
     std::vector<PLCResponseData> data;
 
+
+    // PLCレスポンスデータの受信時間です。
+    std::string receiptTime;        
+    
+    // PLCレスポンスデータです。
+    std::string responseData;
+
+    // サーバに送信する際のデータです。
+    std::vector<std::vector<std::string>> sendData;
+
+
     // コンストラクタ
-    PLCRequestData() = default;
+    PLCRequestResponseData() = default;
 
     // 設定ファイルの情報をMCプロトコルに変換します。
     void convertMCprotocol();
+
+    void setReceiptTime();
 
 private:
     char firstChar(const std::string& s);

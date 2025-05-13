@@ -44,7 +44,4 @@ class PLCRequestWorker
         bool             running_{false};           // 実行中フラグ
         std::mutex       mutex_;                    // running_ の排他制御
         PLCConnectionClient pLCConnectionClient_;   // PLCConnectionClientのインスタンス
-
-        // LogData作成
-        std::string makeTransmitData(char* text, int len, PLCRequestData& req);
 };
