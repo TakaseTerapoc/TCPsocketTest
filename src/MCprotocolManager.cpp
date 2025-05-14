@@ -127,7 +127,7 @@ void MCprotocolManager::makeCommand(std::vector<std::string>& row, PLCRequestRes
     code = row[2].substr(0, row[2].size() - 4);
     if (code == "77" || code == "88")
     {
-        data.transmissionIntervalMs = 1000;
+        data.transmissionIntervalMs = 60000;
         data.protocolbuf = readPLCwithBit;
         makeDeviceCode(data.protocolbuf, code);
     }

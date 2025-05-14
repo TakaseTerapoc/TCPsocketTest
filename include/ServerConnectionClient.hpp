@@ -9,6 +9,8 @@
 #include <iostream>
 #include <cstring>
 
+#include "Logger.hpp"
+
 /**
  * @brief サーバーとのUDPを管理するクラスです。
 */
@@ -19,9 +21,8 @@ public:
     ~ServerConnectionClient();
 
     bool sendMessage(const std::string& message);
-    bool sendTestMessage(); 
 
 private:
-    int sockfd;
-    struct sockaddr_in serverAddr;
+    int socket_;
+    struct sockaddr_in serverAddr_;
 };
