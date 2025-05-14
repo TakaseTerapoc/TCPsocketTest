@@ -203,7 +203,7 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertSendData(char* t
     {
         if (i > 1)
         {
-            responseData += responseData += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
+            responseData += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
 
         }
         else
@@ -220,7 +220,8 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertSendData(char* t
         if (req.deviceCode == "77")
         {
             
-            if (i == 0){
+            if (i == 0)
+            {
                 data = responseData.substr(0, 1);
             }
             else
@@ -231,7 +232,8 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertSendData(char* t
         }
         else if (req.deviceCode == "68")
         {
-            if (i == 0){
+            if (i == 0)
+            {
                 data = convertDecimalString(swapString(responseData.substr(0, 4)));
 
             }
@@ -241,8 +243,8 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertSendData(char* t
                 data = convertDecimalString(swapString(responseData.substr(startPosition, 4)));
             }
         }
-        req.sensorrows[i].insert(req.sensorrows[i].begin(), req.receiptTime);
-        req.sensorrows[i].insert(req.sensorrows[i].begin() + 2, std::to_string(req.transmissionIntervalMs));
+        req.sensorrows[i].push_back(req.receiptTime);
+        req.sensorrows[i].push_back(std::to_string(req.transmissionIntervalMs));
         req.sensorrows[i].push_back(data);
     }
     sendData = req.sensorrows;

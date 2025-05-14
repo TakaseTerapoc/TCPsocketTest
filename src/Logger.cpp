@@ -99,10 +99,10 @@ void Logger::Sensor(const std::string& message)
 {
     if (m_sensor_logger) {
         std::string timestamp = GetCurrentTimestampString();
-        m_logger->info("[{}] {}", timestamp, message);
+        m_sensor_logger->info("[{}] {}", timestamp, message);
     }
     else {
-        m_logger->error("Sensor logger is not initialized.");
+        m_sensor_logger->error("Sensor logger is not initialized.");
     }
 }
 

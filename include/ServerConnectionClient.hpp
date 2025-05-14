@@ -9,13 +9,17 @@
 #include <iostream>
 #include <cstring>
 
-
-class UDPClient {
+/**
+ * @brief サーバーとのUDPを管理するクラスです。
+*/
+class ServerConnectionClient {
 public:
-    UDPClient(const std::string& serverIp, int serverPort);
-    ~UDPClient();
+    ServerConnectionClient() = default;
+    ServerConnectionClient(const std::string& serverIp, int serverPort);
+    ~ServerConnectionClient();
 
     bool sendMessage(const std::string& message);
+    bool sendTestMessage(); 
 
 private:
     int sockfd;

@@ -1,7 +1,7 @@
-// UDPClient.cpp
 #include "ServerConnectionClient.hpp"
 
-UDPClient::UDPClient(const std::string& serverIp, int serverPort) {
+ServerConnectionClient::ServerConnectionClient(const std::string& serverIp, int serverPort) 
+{
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) {
         perror("socket creation failed");
@@ -18,12 +18,26 @@ UDPClient::UDPClient(const std::string& serverIp, int serverPort) {
     }
 }
 
-UDPClient::~UDPClient() {
+ServerConnectionClient::~ServerConnectionClient() 
+{
     close(sockfd);
 }
 
-bool UDPClient::sendMessage(const std::string& message) {
+bool ServerConnectionClient::sendMessage(const std::string& message) 
+{
     ssize_t sentLen = sendto(sockfd, message.c_str(), message.size(), 0,
+                             (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+    if (sentLen < 0) {
+        perror("sendto failed");
+        return false;
+    }
+    return true;
+}
+
+bool ServerConnectionClient::sendTestMessage() 
+{
+    std::string testMessage = "TestMessage";
+    ssize_t sentLen = sendto(sockfd, testMessage.c_str(), testMessage.size(), 0,
                              (struct sockaddr*)&serverAddr, sizeof(serverAddr));
     if (sentLen < 0) {
         perror("sendto failed");

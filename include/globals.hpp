@@ -19,3 +19,9 @@ extern std::mutex gRequestQueueMutex;
 // PLCのリクエストを格納するリストです。
 extern std::vector<PLCRequestResponseData> gRData;
 
+// サーバーへ送信するデータを格納するリストです。
+extern std::vector<std::vector<std::string>> gSendData;
+
+// gSendDataのミューテックスです。
+extern std::mutex gSendDataMutex;
+

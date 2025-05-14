@@ -39,10 +39,6 @@ public:
 
     // MCプロトコル
     std::vector<char> protocolbuf{20};
-    
-    // //PLCからのレスポンスデータ
-    // std::vector<PLCResponseData> data;
-
 
     // PLCレスポンスデータの受信時間です。
     std::string receiptTime;        
@@ -53,16 +49,6 @@ public:
     // サーバに送信する際のデータです。
     std::vector<std::vector<std::string>> sendData;
 
-
     // コンストラクタ
     PLCRequestResponseData() = default;
-
-    // // 設定ファイルの情報をMCプロトコルに変換します。
-    // void convertMCprotocol();
-
-    // void setReceiptTime();
-
-// private:
-//     char firstChar(const std::string& s);
-
 };

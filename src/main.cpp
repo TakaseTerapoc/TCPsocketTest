@@ -10,6 +10,8 @@
 #include "Logger.hpp"
 #include "CSVIO.hpp"
 #include "MCprotocolManager.hpp"
+#include "ServerConnectionClient.hpp"
+#include "ServerRequestWorker.hpp"
 
 int main() 
 {
@@ -44,11 +46,10 @@ int main()
     }
     Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みました。");
 
+
     // MCプロトコルへ変換
     MCprotocolManager::covertToMCprotocolData(gRData);
 
-    // // TODO:後で消す
-    // return 0;
 
     // PLC接続テスト
     Logger::getInstance().Info("設定ファイルの情報でPLCとサーバーに接続します。");
@@ -57,26 +58,46 @@ int main()
         atoi(ResourcesManager::getInstance().GetPLCConfig("port").c_str())
     );
 
-    if(pLCConnectionClient.Connect() < 0)
+    int connectionresult = -1;
+    size_t i = 0;
+
+    // PLCに接続できるまでループ
+    while (connectionresult < 0)
     {
-        Logger::getInstance().Error("PLCへの接続が失敗しました。");
-        exit(1);
+        if (i > 0)
+        {
+            Logger::getInstance().Error("PLCへの接続を再試行します。");
+        }
+        connectionresult = pLCConnectionClient.Connect();
+        if(connectionresult < 0)
+        {
+            Logger::getInstance().Error("PLCへの接続が失敗しました。");
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
     }
-    else
-    {
-        Logger::getInstance().Info("PLCへの接続が成功しました。");
-    }
+    Logger::getInstance().Info("PLCへの接続が成功しました。");
 
-    // スケジューラ起動
-    auto& scheduler = PLCRequestScheduler::getInstance();
-    scheduler.start();
+    //サーバー接続用意※接続はしない
+    ServerConnectionClient serverConnectionClient(
+        ResourcesManager::getInstance().GetServerConfig("ipaddress").c_str(), 
+        atoi(ResourcesManager::getInstance().GetServerConfig("port").c_str())
+    );
 
-    // ワーカー起動
-    auto& worker = PLCRequestWorker::getInstance(pLCConnectionClient);
-    worker.start();
+    // PLCスケジューラ起動
+    auto& PLCScheduler = PLCRequestScheduler::getInstance();
+    PLCScheduler.start();
 
-    worker.join();
-    scheduler.join();
+    // PLCワーカー起動
+    auto& PLCWorker = PLCRequestWorker::getInstance(pLCConnectionClient);
+    PLCWorker.start();
+
+    // サーバーワーカー起動
+    auto& serverWorker = ServerRequestWorker::getInstance(serverConnectionClient);
+    serverWorker.start();
+
+    PLCWorker.join();
+    PLCScheduler.join();
+    serverWorker.join();
 
     return 0;
 }

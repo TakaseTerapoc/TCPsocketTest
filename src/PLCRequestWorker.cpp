@@ -56,7 +56,7 @@ void PLCRequestWorker::run() {
         Logger::getInstance().Info("キューから取り出しました。" + req.serialNumber + "【時間】" + std::to_string(ms));
 
         // TCPリクエスト 
-        pLCConnectionClient_.SendRequest(req.protocolbuf.data(), 12);
+        pLCConnectionClient_.SendRequest(req.protocolbuf.data(), req.protocolbuf.size());
         Logger::getInstance().Info("RecvResponseを動かします。");
 
         // レスポンス受信
@@ -79,5 +79,13 @@ void PLCRequestWorker::run() {
             }
         }
 
+        // gSendDataに格納
+        {
+            std::lock_guard<std::mutex> lock(gSendDataMutex);
+            for (int i = 0; i < sendData.size(); i++)
+            {
+                gSendData.push_back(sendData[i]);
+            }
+        }
     }
 }
