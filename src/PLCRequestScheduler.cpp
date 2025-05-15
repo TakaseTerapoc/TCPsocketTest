@@ -46,7 +46,7 @@ void PLCRequestScheduler::run() {
                     gRequestQueue.push(plcr);
                 }
                 // PLC::cv.notify_one();
-                plcr.nextTime = now + std::chrono::milliseconds(plcr.transmissionIntervalMs);
+                plcr.nextTime = now + std::chrono::milliseconds(plcr.sendIntervalMs);
             }
         }
 

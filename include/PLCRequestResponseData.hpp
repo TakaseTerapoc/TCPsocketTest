@@ -27,7 +27,7 @@ public:
     std::vector<int> dataInterval;
 
     // 送信間隔（ミリ秒）
-    int transmissionIntervalMs;
+    int sendIntervalMs;
 
     // タイミングを計るときに必要な時間データ
     std::chrono::steady_clock::time_point nextTime;

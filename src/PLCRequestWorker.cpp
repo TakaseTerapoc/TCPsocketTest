@@ -33,6 +33,13 @@ void PLCRequestWorker::stop() {
 
 // キューから出し、PLCへのTCPリクエストを依頼する。
 void PLCRequestWorker::run() {
+
+    // まとめて送信するデータを格納するリスト
+    std::vector<DataLumpBase*> dataLumps;
+    DataLumpTest* dataLumpTest = new DataLumpTest();
+
+    dataLumps.push_back(dataLumpTest);
+
     while (true) {
         {
             std::lock_guard<std::mutex> lg(mutex_);
@@ -67,8 +74,15 @@ void PLCRequestWorker::run() {
         {
             Logger::getInstance().Info("【デバイスコード】" + req.deviceCode );
         }
+        else
+        {
+            Logger::getInstance().Error("レスポンス受信に失敗しました。");
+            continue;
+        }
+
+        // 送信データ作成
         Logger::getInstance().Info("送信データを作成します");
-        std::vector<std::vector<std::string>> sendData = MCprotocolManager::convertSendData(text, len, req);
+        std::vector<std::vector<std::string>> sendData = MCprotocolManager::convertResponseDataToSendData(text, len, req);
         
         // sendData確認
         for (int i = 0; i < sendData.size(); i++)

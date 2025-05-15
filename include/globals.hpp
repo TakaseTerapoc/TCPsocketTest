@@ -5,6 +5,7 @@
 #include <mutex>
 #include "PLCRequestResponseData.hpp"
 #include "PLCConnectionClient.hpp"
+#include "DataLumpBase.hpp"
 
 /**
  * @brief グローバルオブジェクトを格納するヘッダーファイルです。
@@ -21,6 +22,9 @@ extern std::vector<PLCRequestResponseData> gRData;
 
 // サーバーへ送信するデータを格納するリストです。
 extern std::vector<std::vector<std::string>> gSendData;
+
+// サーバーへ送信するデータを格納するリスト２です。
+extern std::vector<DataLumpBase> gSendData2;
 
 // gSendDataのミューテックスです。
 extern std::mutex gSendDataMutex;

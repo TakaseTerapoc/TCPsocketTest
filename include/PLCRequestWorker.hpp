@@ -4,11 +4,13 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <memory>
 
 #include "globals.hpp"
 #include "PLCRequestResponseData.hpp"
 #include "MCprotocolManager.hpp"
 #include "../external/fmt/format.h"
+#include "DataLumpTest.hpp"
 
 /**
  * @brief PLCRequestDataが格納されているキューを監視し、２００ms秒ごとにTCPへリクエストを送るクラスです。

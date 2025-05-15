@@ -127,13 +127,13 @@ void MCprotocolManager::makeCommand(std::vector<std::string>& row, PLCRequestRes
     code = row[2].substr(0, row[2].size() - 4);
     if (code == "77" || code == "88")
     {
-        data.transmissionIntervalMs = 60000;
+        data.sendIntervalMs = 60000;
         data.protocolbuf = readPLCwithBit;
         makeDeviceCode(data.protocolbuf, code);
     }
     else if (code == "68")
     {
-        data.transmissionIntervalMs = 60000;
+        data.sendIntervalMs = 60000;
         data.protocolbuf = readPLCwithWord;
         makeDeviceCode(data.protocolbuf, code);
     }
@@ -194,7 +194,7 @@ void MCprotocolManager::makeDevicePoint(PLCRequestResponseData& data, int firstN
     }
 }
 
-std::vector<std::vector<std::string>> MCprotocolManager::convertSendData(char* text, int len, PLCRequestResponseData& req) {
+std::vector<std::vector<std::string>> MCprotocolManager::convertResponseDataToSendData(char* text, int len, PLCRequestResponseData& req) {
     std::string responseData;
     std::string format;
     std::vector<std::vector<std::string>> sendData;
@@ -243,8 +243,8 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertSendData(char* t
                 data = convertDecimalString(swapString(responseData.substr(startPosition, 4)));
             }
         }
-        req.sensorrows[i].push_back(req.receiptTime);
-        req.sensorrows[i].push_back(std::to_string(req.transmissionIntervalMs));
+        // req.sensorrows[i].push_back(req.receiptTime);
+        // req.sensorrows[i].push_back(std::to_string(req.transmissionIntervalMs));
         req.sensorrows[i].push_back(data);
     }
     sendData = req.sensorrows;

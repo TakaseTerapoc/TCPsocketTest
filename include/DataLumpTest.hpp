@@ -5,7 +5,7 @@
 #include "Logger.hpp"
 #include "DataLumpBase.hpp"
 
-class DataLumpTest : DataLumpBase {
+class DataLumpTest : public DataLumpBase {
 public:
     void setAAAA1(std::vector<std::string>& strVector);
 
@@ -18,6 +18,17 @@ public:
     void setAAAA10(std::vector<std::string>& strVector);
 
     void setAAAA99(std::vector<std::string>& strVector);
+
+    std::vector<std::string> getMembers() const {
+         return {
+            "AAAA1: " + std::to_string(AAAA1.size()),
+            "AAAA2: " + std::to_string(AAAA2.size()),
+            "AAAA4: " + std::to_string(AAAA4.size()),
+            "AAAA7: " + std::to_string(AAAA7.size()),
+            "AAAA10: " + std::to_string(AAAA10.size()),
+            "AAAA99: " + std::to_string(AAAA99.size())
+         }
+    }
 
 private:
     std::vector<std::string> AAAA1;
