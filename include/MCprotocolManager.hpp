@@ -22,10 +22,19 @@ class MCprotocolManager
         //コンストラクタ
         MCprotocolManager() = delete;
 
+        //【新】MCプロトコルデータを変換する関数
+        static void covertToMCprotocolData2(std::vector<PLCRequestResponseData>& gRData);
+
+        static void makeCommand2(std::map<std::string,std::string>& row, PLCRequestResponseData& data, std::string& code, std::string& address);
+
+        static std::vector<std::map<std::string,std::string>> convertResponseDataToSendData2(char* text, int len, PLCRequestResponseData& req);
+
+
+        //【旧】MCプロトコルデータを変換する関数
         // PLCRequestDataの各種メンバーからMCプロトコルデータに変換する関数
         static void covertToMCprotocolData(std::vector<PLCRequestResponseData>& gRData);
 
-        // コマンドを作詞する関数
+        // コマンドを作成する関数
         static void makeCommand(std::vector<std::string>& row, PLCRequestResponseData& data,std::string& code, std::string& address);
 
         // デバイスコードを作成する関数

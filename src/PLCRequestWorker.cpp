@@ -82,24 +82,79 @@ void PLCRequestWorker::run() {
 
         // 送信データ作成
         Logger::getInstance().Info("送信データを作成します");
-        std::vector<std::vector<std::string>> sendData = MCprotocolManager::convertResponseDataToSendData(text, len, req);
-        
-        // sendData確認
-        for (int i = 0; i < sendData.size(); i++)
-        {
-            for (int j = 0; j < sendData[i].size(); j++)
-            {
-                Logger::getInstance().Info("sendData[" + std::to_string(i) + "][" + std::to_string(j) + "]" + sendData[i][j]);
+        // std::vector<std::vector<std::string>> sendData = MCprotocolManager::convertResponseDataToSendData(text, len, req);
+        std::vector<std::map<std::string,std::string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, len, req);
+        std::string sendDatastr;
+        for (size_t i = 0; i < sendData.size(); ++i) {
+            for (const auto& [key, value] : sendData[i]) {
+                    sendDatastr += key + ": " + value + " | ";
+                }
+            sendDatastr += ", ";
+        }
+        Logger::getInstance().Info("送信データ: " + sendDatastr);
+            
+        std::string test; // 結果を格納する変数
+
+        for (auto& row : sendData) {
+            auto catIt = row.find("categoryID");
+            auto sensorIt = row.find("sensorID");
+
+            if (catIt != row.end() && sensorIt != row.end()) {
+                if (catIt->second == "CATE100" ){
+                    if(sensorIt->second == "AAAA1")
+                    {
+                        dataLumpTest->setAAAA1(row);
+                    }
+                    else if(sensorIt->second == "AAAA2")
+                    {
+                        dataLumpTest->setAAAA2(row);
+                    }
+                    else if(sensorIt->second == "AAAA4")
+                    {
+                        dataLumpTest->setAAAA4(row);
+                    }
+                    else if(sensorIt->second == "AAAA7")
+                    {
+                        dataLumpTest->setAAAA7(row);
+                    }
+                    else if(sensorIt->second == "AAAA10")
+                    {
+                        dataLumpTest->setAAAA10(row);
+                    }
+                    else if(sensorIt->second == "AAAA99")
+                    {
+                        dataLumpTest->setAAAA99(row);
+                    }
+                }
+                else{
+                    Logger::getInstance().Error("categoryIDがありません。");
+                }
             }
         }
 
-        // gSendDataに格納
-        {
-            std::lock_guard<std::mutex> lock(gSendDataMutex);
-            for (int i = 0; i < sendData.size(); i++)
-            {
-                gSendData.push_back(sendData[i]);
-            }
+        if (dataLumpTest->isLumpFull()) {
+            // 送信データをPLCへ送信
+            Logger::getInstance().Info("データをサーバへ送信します。");
+            dataLumpTest->setLumpFull(false);
         }
+
+
+        // for (int i = 0; i < sendData.size(); i++)
+        // {
+        //     for (int j = 0; j < sendData[i].size(); j++)
+        //     {
+        //         Logger::getInstance().Info("sendData[" + std::to_string(i) + "][" + std::to_string(j) + "]" + sendData[i][j]);
+        //     }
+        // }
+        // sendData確認
+
+        // gSendDataに格納
+        // {
+        //     std::lock_guard<std::mutex> lock(gSendDataMutex);
+        //     for (int i = 0; i < sendData.size(); i++)
+        //     {
+        //         gSendData.push_back(sendData[i]);
+        //     }
+        // }
     }
 }

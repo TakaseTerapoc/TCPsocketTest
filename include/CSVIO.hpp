@@ -14,6 +14,27 @@ const int SeparateIntarbal = 60; // データの分離間隔
 */
 class CSVIO{
     public:
+        // 【新】
+        // CSVデータをmap形式で取り出す関数
+        static std::vector<std::map<std::string, std::string>> readCSVFileToMapVector(const std::string& fileName);
+
+        // mapデータからPLCRequestResponseDataを作成する関数
+        static std::vector<PLCRequestResponseData> makeRequestDataFromMapdata(std::vector<std::map<std::string, std::string>>& mapdata);
+
+        // asciiコードの行をmapに追加
+        static void addASCIIrow(std::vector<std::map<std::string, std::string>>& mapdata);
+
+        // map形式のデータをソートする関数
+        static void sortData(std::vector<std::map<std::string, std::string>>& mapdata);
+
+        // アドレスの位置を見てmapdataをPLCRequestResponseDataに格納する
+        static std::vector<PLCRequestResponseData> groupMapDataByASCII(const std::vector<std::map<std::string, std::string>>& mapdata);
+
+        // 取り出したCSVデータをアドレスカテゴリーごとに分ける関数
+        static std::map<std::string, std::vector<std::map<std::string, std::string>>> separateMapData(std::vector<std::map<std::string, std::string>>& mapdata);
+
+
+        // 【旧】
         // CSVデータを取り出す関数
         static std::vector<PLCRequestResponseData> readCSVFile(const std::string& fileName);
 

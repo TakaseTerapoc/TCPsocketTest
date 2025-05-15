@@ -1,5 +1,52 @@
 #include "CSVIO.hpp"
 
+std::vector<std::map<std::string, std::string>> CSVIO::readCSVFileToMapVector(const std::string& fileName)
+{
+    std::vector<std::map<std::string, std::string>> result;
+    csv::CSVReader reader(fileName);
+    const auto& col_names = reader.get_col_names();
+
+    try {
+        for (csv::CSVRow& row : reader) {
+            std::map<std::string, std::string> rowMap;
+
+            for (const std::string& col : col_names) {
+                rowMap[col] = row[col].get<>();
+            }
+
+            result.push_back(std::move(rowMap));
+        }
+        if(result.size() == 0)
+        {
+            Logger::getInstance().Error("CSVファイルのデータがありません。");
+            exit(1);
+        }
+        return result;
+    }
+    catch (const std::exception& e){
+        Logger::getInstance().Error("CSVファイルの読込に失敗しました。");
+        exit(1);
+    }
+}
+
+std::vector<PLCRequestResponseData> CSVIO::makeRequestDataFromMapdata(std::vector<std::map<std::string, std::string>>& mapdata)
+{
+    addASCIIrow(mapdata);
+    sortData(mapdata);
+    return groupMapDataByASCII(mapdata);
+}
+
+void CSVIO::addASCIIrow(std::vector<std::map<std::string, std::string>>& mapdata)
+{
+    std::vector<std::map<std::string, std::string>> result;
+    for (auto& row : mapdata) {
+        std::map<std::string, std::string> newRow = row;
+        newRow["ASCII"] = convertASCIIstring(row["device"]);
+        result.push_back(std::move(newRow));
+    }
+    mapdata = std::move(result);
+}
+
 std::vector<PLCRequestResponseData> CSVIO::readCSVFile(const std::string& fileName)
 {
     std::vector<std::vector<std::string>> csvdata;
@@ -44,6 +91,15 @@ std::vector<PLCRequestResponseData> CSVIO::readCSVFile(const std::string& fileNa
         Logger::getInstance().Error("CSVファイルの読込に失敗しました。");
         exit(1);
     }
+}
+
+void CSVIO::sortData(std::vector<std::map<std::string, std::string>>& mapdata)
+{
+    std::sort(mapdata.begin(), mapdata.end(),
+        [](const auto& a, const auto& b) {
+            return std::stol(a.at("ASCII")) < std::stol(b.at("ASCII"));
+        }
+    );
 }
 
 void CSVIO::sortData(std::vector<std::vector<std::string>>& csvdata)
@@ -99,6 +155,59 @@ std::string CSVIO::convertASCIIstring(std::string str)
 
     addressscode = initialcode + codenumber;
     return addressscode;
+}
+
+std::map<std::string, std::vector<std::map<std::string, std::string>>> CSVIO::separateMapData(std::vector<std::map<std::string, std::string>>& mapdata)
+{
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> separateData;
+
+    for (auto& row : mapdata) {
+        std::string addresscode = row["ASCII"];
+        std::string initialstring = addresscode.erase(addresscode.size() - 4);
+        separateData[initialstring].push_back(row);
+    }
+
+    return separateData;
+}
+
+std::vector<PLCRequestResponseData> CSVIO::groupMapDataByASCII(
+    const std::vector<std::map<std::string, std::string>>& mapdata)
+{
+    std::vector<PLCRequestResponseData> result;
+
+    // コピーしてソート対象にする
+    std::vector<std::map<std::string, std::string>> sorted = mapdata;
+
+    // ASCII順に昇順ソート
+    std::sort(sorted.begin(), sorted.end(), [](const auto& a, const auto& b) {
+        return std::stol(a.at("ASCII")) < std::stol(b.at("ASCII"));
+    });
+
+    PLCRequestResponseData currentGroup;
+    long prevASCII = -999999;
+    int serialCounter = 1;
+
+    for (const auto& row : sorted) {
+        long currentASCII = std::stol(row.at("ASCII"));
+
+        if (!currentGroup.mapdata.empty() && (currentASCII - prevASCII > 60)) {
+            // 一つのまとまりとして完了 → 結果に追加
+            currentGroup.serialNumber = std::to_string(serialCounter++);
+            result.push_back(std::move(currentGroup));
+            currentGroup = PLCRequestResponseData(); // 新しいグループ
+        }
+
+        currentGroup.mapdata.push_back(row);
+        prevASCII = currentASCII;
+    }
+
+    // 最後のグループを追加
+    if (!currentGroup.mapdata.empty()) {
+        currentGroup.serialNumber = std::to_string(serialCounter++);
+        result.push_back(std::move(currentGroup));
+    }
+
+    return result;
 }
 
 std::map<std::string, std::vector<std::vector<std::string>>> CSVIO::separateCSVData(std::vector<std::vector<std::string>>& csvdata)

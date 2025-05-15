@@ -37,6 +37,11 @@ public:
      */ 
     std::vector<std::vector<std::string>> sensorrows;
 
+    /* mapdataを格納するためのリスト
+     * sensorrows[n] = { SerialNumber, DeviceAddress, DeviceAddressAscii, Comment }
+     */ 
+    std::vector<std::map<std::string, std::string>> mapdata;
+
     // MCプロトコル
     std::vector<char> protocolbuf{20};
 

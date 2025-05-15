@@ -56,6 +56,150 @@ std::vector<char> test =
     (char)0x03,(char)0x01,(char)0x02,(char)0x03     // テストデータ
 };
 
+void MCprotocolManager::covertToMCprotocolData2(std::vector<PLCRequestResponseData>& gRData)
+{
+    for (auto& data : gRData)
+    {
+        std::string code;
+        std::string address;
+        int firstNumber = 0;
+        int lastNumber = 0;
+
+        // コマンドに応じてMCプロトコルを変換
+        if (data.command == "read")
+        {
+            size_t i = 0;
+            for (int i = 0; i < (data.mapdata).size(); i++)
+            {
+                // data.deviceCount++;
+                auto& row = data.mapdata[i];
+                if(i == 0)
+                {
+                    makeCommand2(row, data, code, address);
+                    makeTopDeviceNumber(data.protocolbuf, address);
+                    makeDeviceCode(data.protocolbuf, code);
+                    firstNumber = std::stoi(row.at("ASCII"));
+                } 
+                else if (i == (data.mapdata).size() - 1)
+                {
+                    lastNumber = std::stoi(row.at("ASCII"));
+                }
+            }
+            makeDevicePoint(data, firstNumber, lastNumber);
+
+            // 確認用
+            std::cout << "【シリアルナンバー】" << data.serialNumber << std::endl;
+            for (std::size_t i = 0; i < data.protocolbuf.size(); ++i) {
+                uint8_t byte = static_cast<uint8_t>(data.protocolbuf[i]);
+                std::printf("readPLCwithWord[%2zu] = 0x%02X\n", i, byte);
+            }
+
+        }
+        else if (data.command == "write")
+        {
+            // data.protocolbuf = bufM00Write;
+        }
+        else if (data.command == "start")
+        {
+            data.protocolbuf = startPLC;
+        }
+        else if (data.command == "stop")
+        {
+            data.protocolbuf = stopPLC;
+        }
+        else if (data.command == "getname")
+        {
+            data.protocolbuf = getPLCName;
+        }
+    }
+}
+
+void MCprotocolManager::makeCommand2(std::map<std::string,std::string>& row, PLCRequestResponseData& data, std::string& code, std::string& address)
+{
+    address = row.at("ASCII").substr((row.at("ASCII")).size() - 4);
+    code = row.at("ASCII").substr(0, (row.at("ASCII")).size() - 4);
+
+    if (code == "77" || code == "88")
+    {
+        data.sendIntervalMs = 60000;
+        data.protocolbuf = readPLCwithBit;
+        makeDeviceCode(data.protocolbuf, code);
+    }
+    else if (code == "68")
+    {
+        data.sendIntervalMs = 60000;
+        data.protocolbuf = readPLCwithWord;
+        makeDeviceCode(data.protocolbuf, code);
+    }
+    else
+    {
+        // TODO:後で要修正
+        // data.protocolbuf = bufD100;
+    }
+
+    // デバイスコードを入れる。
+    data.deviceCode = code;
+}
+
+std::vector<std::map<std::string,std::string>> MCprotocolManager::convertResponseDataToSendData2(char* text, int len, PLCRequestResponseData& req) {
+    std::string responseData;
+    std::string format;
+    std::vector<std::map<std::string,std::string>> sendData;
+
+    for (int i = 0; i < len; ++i)
+    {
+        if (i > 1)
+        {
+            responseData += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
+
+        }
+        else
+        {
+            format += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
+        }
+    }
+
+    Logger::getInstance().Info("【シリアルナンバー】" + req.serialNumber + "【フォーマット】"+ format +"【受信データ(2進数)】" + responseData);
+
+    for (int i = 0; i < req.mapdata.size(); i++)
+    {
+        std::string data;
+        if (req.deviceCode == "77")
+        {
+            
+            if (i == 0)
+            {
+                data = responseData.substr(0, 1);
+            }
+            else
+            {
+                int startPosition = std::stoi(req.mapdata[i]["ASCII"]) - std::stoi(req.mapdata[i - 1]["ASCII"]);
+                data = responseData.substr(startPosition, 1);
+            }
+        }
+        else if (req.deviceCode == "68")
+        {
+            if (i == 0)
+            {
+                data = convertDecimalString(swapString(responseData.substr(0, 4)));
+
+            }
+            else
+            {
+                int startPosition = (std::stoi(req.mapdata[i]["ASCII"]) - std::stoi(req.mapdata[i - 1]["ASCII"])) * 4;
+                data = convertDecimalString(swapString(responseData.substr(startPosition, 4)));
+            }
+        }
+        // req.sensorrows[i].push_back(req.receiptTime);
+        // req.sensorrows[i].push_back(std::to_string(req.transmissionIntervalMs));
+        req.mapdata[i]["data"] = data;
+    }
+    sendData = req.mapdata;
+
+    return sendData;
+}
+
+
 void MCprotocolManager::covertToMCprotocolData(std::vector<PLCRequestResponseData>& gRData)
 {
     for (auto& data : gRData)

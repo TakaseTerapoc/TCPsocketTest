@@ -29,26 +29,46 @@ int main()
 
     // PLCリクエストファイル読込
     Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みます。");
-    try
-    {
-        gRData = CSVIO::readCSVFile("../request/testdataDemo.csv");
-        if(gRData.size() == 0)
-        {
-            Logger::getInstance().Error("PLCへのリクエストデータファイルの読込に失敗しました。");
-            exit(1);
+    // 【新】
+    // CSVファイルをmap形式のデータに出力
+    std::vector<std::map<std::string, std::string>> mapdata = CSVIO::readCSVFileToMapVector("../request/testdataDemo.csv");
+
+    // map形式のデータをPLCRequestResponseDataに変換
+    gRData = CSVIO::makeRequestDataFromMapdata(mapdata);
+    for (const auto& group : gRData) {
+        std::cout << "Serial: " << group.serialNumber << "\n";
+        for (const auto& row : group.mapdata) {
+            std::cout << "  ASCII: " << row.at("ASCII")
+                    << "  device: " << row.at("device")
+                    << "  sensorID: " << row.at("sensorID") << "\n";
         }
     }
-    catch(const std::exception& e)
-    {
-        std::cerr << "エラー: " << e.what() << std::endl;
-        Logger::getInstance().Error("PLCへのリクエストデータファイルを読み込めませんでした。");
-        exit(1);
-    }
+    
+    // 【旧】
+    // try
+    // {
+    //     gRData = CSVIO::readCSVFile("../request/testdataDemo.csv");
+    //     if(gRData.size() == 0)
+    //     {
+    //         Logger::getInstance().Error("PLCへのリクエストデータファイルの読込に失敗しました。");
+    //         exit(1);
+    //     }
+    // }
+    // catch(const std::exception& e)
+    // {
+    //     std::cerr << "エラー: " << e.what() << std::endl;
+    //     Logger::getInstance().Error("PLCへのリクエストデータファイルを読み込めませんでした。");
+    //     exit(1);
+    // }
     Logger::getInstance().Info("PLCへのリクエストデータファイルを読み込みました。");
 
 
     // MCプロトコルへ変換
-    MCprotocolManager::covertToMCprotocolData(gRData);
+    // 【新】
+    MCprotocolManager::covertToMCprotocolData2(gRData);
+
+    // 【旧】
+    //MCprotocolManager::covertToMCprotocolData(gRData);
 
 
     // PLC接続テスト
