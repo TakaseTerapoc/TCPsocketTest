@@ -22,10 +22,11 @@ public:
         this->AAAA99 = copysource.AAAA99;
         this->lumpFull = copysource.lumpFull;
     }
+    
+    int intervalMS = 0;
 
-    
-    
-    
+    std::map<std::string,bool> test; 
+
     void setAAAA1(const std::map<std::string, std::string>& strVector);
 
     void setAAAA2(const std::map<std::string, std::string>& strVector);
