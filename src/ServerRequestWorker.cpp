@@ -99,16 +99,20 @@ std::string ServerRequestWorker::shapeSendData(const DataLumpBase* sendData)
                 continue;
             }
         }
+        // 並び替え
         std::swap(tempvector[1], tempvector[3]);
         sendDataVector.insert(sendDataVector.end(), tempvector.begin(), tempvector.end());
     }
 
-    // sendDataVectorを出力
+    // sendDataVectorをstringに変換
     for (int i = 0; i < sendDataVector.size(); i++) {
         shapedSendData += sendDataVector[i];
     }
 
-    //aa
+    // 末尾のカンマを削除
+    shapedSendData.pop_back();
+
+    // 確認用
     Logger::getInstance().Info("整形したデータ: " + shapedSendData);
 
     return shapedSendData;
