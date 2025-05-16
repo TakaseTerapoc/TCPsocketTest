@@ -23,6 +23,9 @@ public:
         this->lumpFull = copysource.lumpFull;
     }
 
+    
+    
+    
     void setAAAA1(const std::map<std::string, std::string>& strVector);
 
     void setAAAA2(const std::map<std::string, std::string>& strVector);

@@ -35,14 +35,6 @@ int main()
 
     // map形式のデータをPLCRequestResponseDataに変換
     gRData = CSVIO::makeRequestDataFromMapdata(mapdata);
-    for (const auto& group : gRData) {
-        std::cout << "Serial: " << group.serialNumber << "\n";
-        for (const auto& row : group.mapdata) {
-            std::cout << "  ASCII: " << row.at("ASCII")
-                    << "  device: " << row.at("device")
-                    << "  sensorID: " << row.at("sensorID") << "\n";
-        }
-    }
     
     // 【旧】
     // try
