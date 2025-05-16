@@ -1,5 +1,8 @@
 #include "PLCRequestWorker.hpp"
 
+// まとめて送信するデータを格納するリスト
+DataLumpTest* dataLumpTest = new DataLumpTest();
+
 // シングルトンインスタンス取得
 PLCRequestWorker& PLCRequestWorker::getInstance(PLCConnectionClient& plcclient) {
     static PLCRequestWorker instance;
@@ -33,13 +36,6 @@ void PLCRequestWorker::stop() {
 
 // キューから出し、PLCへのTCPリクエストを依頼する。
 void PLCRequestWorker::run() {
-
-    // まとめて送信するデータを格納するリスト
-    std::vector<DataLumpBase*> dataLumps;
-    DataLumpTest* dataLumpTest = new DataLumpTest();
-
-    dataLumps.push_back(dataLumpTest);
-
     while (true) {
         {
             std::lock_guard<std::mutex> lg(mutex_);
@@ -135,6 +131,9 @@ void PLCRequestWorker::run() {
         if (dataLumpTest->isLumpFull()) {
             // 送信データをPLCへ送信
             Logger::getInstance().Info("データをサーバへ送信します。");
+            DataLumpBase* copyLump = new DataLumpTest(*dataLumpTest);
+            gDataLumps.push_back(copyLump);
+            dataLumpTest->allClear();
             dataLumpTest->setLumpFull(false);
         }
 

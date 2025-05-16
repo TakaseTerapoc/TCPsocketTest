@@ -38,27 +38,30 @@ void ServerRequestWorker::run() {
             std::lock_guard<std::mutex> lg(mutex_);
             if (!running_) break;
         }
-        std::vector<std::string> sendData;
+        DataLumpBase* sendData;
         {
             std::unique_lock<std::mutex> lock(gSendDataMutex);
-            if (gSendData.empty()) {
+            if (gDataLumps.empty()) {
                 // cv.wait(lock);
                 continue;
             }
-            sendData = gSendData.front();
+            sendData = gDataLumps.front();
 
             // TODO:単純に消すんじゃなくて別のベクターに格納して消す
-            gSendData.erase(gSendData.begin());
+            gDataLumps.erase(gDataLumps.begin());
         }
 
         std::string shapedSendData;
-        shapedSendData = sendData[4] + "," + sendData[0] + "," + sendData[1] + "," + sendData[6];
+        // 送信データを整形
+        shapedSendData = shapeSendData(sendData);
 
-        // 確認やつ
-        Logger::getInstance().Info("リストから取り出しました。【SendData】" + shapedSendData);
+        // shapedSendData = sendData[4] + "," + sendData[0] + "," + sendData[1] + "," + sendData[6];
 
-        // ログ出力
-        Logger::getInstance().Sensor(shapedSendData);
+        // // 確認やつ
+        // Logger::getInstance().Info("リストから取り出しました。【SendData】" + shapedSendData);
+
+        // // ログ出力
+        // Logger::getInstance().Sensor(shapedSendData);
 
         // UDPリクエスト 
         if(!serverConnectionClient_.sendMessage(shapedSendData))
@@ -67,7 +70,46 @@ void ServerRequestWorker::run() {
         }
         else
         {
+            Logger::getInstance().Sensor(shapedSendData);
             Logger::getInstance().Info("サーバーへのリクエスト送信に成功しました。");
         }
     }
+}
+
+std::string ServerRequestWorker::shapeSendData(const DataLumpBase* sendData) 
+{
+    std::string shapedSendData;
+    std::string timeStamp = Logger::getInstance().GetCurrentTimestampString();
+    std::vector<std::map<std::string,std::string>> members;
+    std::vector<std::string> sendDataVector;
+
+    // タイムスタンプ整形
+    timeStamp.erase(timeStamp.size() - 4);
+
+    shapedSendData += timeStamp + ",";
+
+    // DataLumpBaseのメンバーを送信する文字列に整形する処理
+    members = sendData->getMembers();
+    bool cateFrag = false;
+    for (auto& member : members) {
+        std::vector<std::string> tempvector;
+        for (auto& pair : member) {
+            if (pair.first == "categoryID" || pair.first == "sensorID" || pair.first == "device" || pair.first == "data") {
+                tempvector.push_back(pair.second + ",");
+                continue;
+            }
+        }
+        std::swap(tempvector[1], tempvector[3]);
+        sendDataVector.insert(sendDataVector.end(), tempvector.begin(), tempvector.end());
+    }
+
+    // sendDataVectorを出力
+    for (int i = 0; i < sendDataVector.size(); i++) {
+        shapedSendData += sendDataVector[i];
+    }
+
+    //aa
+    Logger::getInstance().Info("整形したデータ: " + shapedSendData);
+
+    return shapedSendData;
 }

@@ -8,7 +8,6 @@
         {
             lumpFull = true;
             Logger::getInstance().Info("DataLumpTestがいっぱいになりました。");
-            allClear();
         }
     }
 
@@ -20,7 +19,6 @@
         {
             lumpFull = true;
             Logger::getInstance().Info("DataLumpTestがいっぱいになりました。");
-            allClear();
         }
     }
 
@@ -32,7 +30,6 @@
         {
             lumpFull = true;
             Logger::getInstance().Info("DataLumpTestがいっぱいになりました。");
-            allClear();
         }
     }
 
@@ -44,7 +41,6 @@
         {
             lumpFull = true;
             Logger::getInstance().Info("DataLumpTestがいっぱいになりました。");
-            allClear();
         }
     }
 
@@ -56,7 +52,6 @@
         {
             lumpFull = true;
             Logger::getInstance().Info("DataLumpTestがいっぱいになりました。");
-            allClear();
         }
     }
 
@@ -68,7 +63,6 @@
         {
             lumpFull = true;
             Logger::getInstance().Info("DataLumpTestがいっぱいになりました。");
-            allClear();
         }
     }
 
@@ -80,4 +74,16 @@
         AAAA7.clear();
         AAAA10.clear();
         AAAA99.clear();
+    }
+
+    std::vector<std::map<std::string,std::string>> DataLumpTest::getMembers() const
+    {
+        std::vector<std::map<std::string,std::string>> members;
+        members.push_back(AAAA1);
+        members.push_back(AAAA2);
+        members.push_back(AAAA4);
+        members.push_back(AAAA7);
+        members.push_back(AAAA10);
+        members.push_back(AAAA99);
+        return members;
     }

@@ -12,5 +12,8 @@ std::vector<PLCRequestResponseData> gRData;
 // サーバーへ送信するデータを格納するリストです。
 std::vector<std::vector<std::string>> gSendData;
 
+// サーバーへ送信するDataLumpBaseを格納するリストです。
+std::vector<DataLumpBase*> gDataLumps;
+
 // gSendDataのミューテックスです。
 std::mutex gSendDataMutex;

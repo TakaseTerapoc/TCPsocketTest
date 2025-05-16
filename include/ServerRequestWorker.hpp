@@ -4,13 +4,14 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <algorithm> 
 
 #include "globals.hpp"
 #include "../external/fmt/format.h"
 #include "ServerConnectionClient.hpp"
 
 /**
- * @brief SendDataが格納されているリストを監視し、サーバーへリクエストを送るクラスです。
+ * @brief SendDataが格納されているリストを監視し、サーバーへデータを送るクラスです。
  */
 class ServerRequestWorker
 {
@@ -36,11 +37,12 @@ class ServerRequestWorker
         ServerRequestWorker(const ServerRequestWorker&) = delete;
         ServerRequestWorker& operator=(const ServerRequestWorker&) = delete;
 
-        // キューから出して、TCPリクエストを依頼する。
+        // リストから出して、UDP送信を依頼する。
         void run();  
 
-        std::thread      thread_;                   // 実行スレッド
-        bool             running_{false};           // 実行中フラグ
-        std::mutex       mutex_;                    // running_ の排他制御
-        ServerConnectionClient serverConnectionClient_;   // ServerConnectionClientのインスタンス
+        std::thread      thread_;                                   // 実行スレッド
+        bool             running_{false};                           // 実行中フラグ
+        std::mutex       mutex_;                                    // running_ の排他制御
+        ServerConnectionClient serverConnectionClient_;             // ServerConnectionClientのインスタンス
+        std::string shapeSendData(const DataLumpBase* sendData);          // DataLumpBaseのメンバーを送信する文字列に整形する関数 
 };

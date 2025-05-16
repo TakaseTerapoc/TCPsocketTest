@@ -26,6 +26,9 @@ extern std::vector<std::vector<std::string>> gSendData;
 // サーバーへ送信するデータを格納するリスト２です。
 extern std::vector<DataLumpBase> gSendData2;
 
+// サーバーへ送信するDataLumpBaseを格納するリストです。
+extern std::vector<DataLumpBase*> gDataLumps;
+
 // gSendDataのミューテックスです。
 extern std::mutex gSendDataMutex;
 
