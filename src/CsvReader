@@ -1,0 +1,50 @@
+#include "CsvReader.hpp"
+#include "Logger.hpp"
+#include "../external/csv-parser/csv.hpp"
+
+std::vector<std::map<std::string, std::string>> CsvReader::readWithHeader(const std::string& filename) {
+    std::vector<std::map<std::string, std::string>> result;
+    csv::CSVReader reader(filename);
+    const auto& col_names = reader.get_col_names();
+
+    try {
+        for (csv::CSVRow& row : reader) {
+            std::map<std::string, std::string> rowMap;
+            for (const std::string& col : col_names) {
+                rowMap[col] = row[col].get<>();
+            }
+            result.push_back(std::move(rowMap));
+        }
+    } catch (const std::exception& e) {
+        Logger::getInstance().Error("CSVファイルの読込に失敗しました。");
+        exit(1);
+    }
+
+    return result;
+}
+
+std::vector<std::vector<std::string>> CsvReader::read(const std::string& filename) {
+    std::vector<std::vector<std::string>> result;
+
+    try {
+        csv::CSVReader reader(filename, csv::CSVFormat().header_row(-1));  // ヘッダーなし指定
+
+        for (csv::CSVRow& row : reader) {
+            std::vector<std::string> line;
+            for (csv::CSVField& field : row) {
+                line.push_back(field.get<>());
+            }
+            result.push_back(std::move(line));
+        }
+
+        if (result.empty()) {
+            Logger::getInstance().Error("CSVファイルにデータがありません。");
+        }
+
+    } catch (const std::exception& e) {
+        Logger::getInstance().Error("CSVファイルの読込に失敗しました。理由: " + std::string(e.what()));
+        exit(1);
+    }
+
+    return result;
+}

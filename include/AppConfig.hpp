@@ -3,10 +3,10 @@
 #include "../external/SimpleIni/SimpleIni.h"
 #include <string>
 
-class ResourcesManager {
+class AppConfig {
 public:
     // 唯一のインスタンスを取得
-    static ResourcesManager& getInstance();
+    static AppConfig& getInstance();
 
     // 設定ファイル読み込み
     bool LoadFile(const std::string& filename);
@@ -18,11 +18,11 @@ public:
     std::string GetServerConfig(const std::string& key);
 
 private:
-    ResourcesManager();
-    ~ResourcesManager();
+    AppConfig();
+    ~AppConfig();
 
-    ResourcesManager(const ResourcesManager&) = delete;
-    ResourcesManager& operator=(const ResourcesManager&) = delete;
+    AppConfig(const AppConfig&) = delete;
+    AppConfig& operator=(const AppConfig&) = delete;
 
     CSimpleIniA ini;
 };

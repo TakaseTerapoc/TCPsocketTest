@@ -13,7 +13,6 @@
 
 #include "Logger.hpp"
 #include "PLCRequestResponseData.hpp"
-#include "PtrVector.hpp"
 
 
 class MCprotocolManager
