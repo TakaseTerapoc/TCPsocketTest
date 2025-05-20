@@ -178,32 +178,46 @@ std::vector<PLCRequestResponseData> CSVIO::groupMapDataByASCII(
     // コピーしてソート対象にする
     std::vector<std::map<std::string, std::string>> sorted = mapdata;
 
-    // ASCII順に昇順ソート
-    std::sort(sorted.begin(), sorted.end(), [](const auto& a, const auto& b) {
-        return std::stol(a.at("ASCII")) < std::stol(b.at("ASCII"));
-    });
-
     PLCRequestResponseData currentGroup;
     long prevASCII = -999999;
+    long preInterval = -999999;
     int serialCounter = 1;
 
+    std::map<std::string, std::string> tempMemory;
+
+    size_t i = 0;
     for (const auto& row : sorted) {
         long currentASCII = std::stol(row.at("ASCII"));
+        long currentInterval = std::stoi(row.at("sendIntervalMS"));
+        if (i == 0)
+        {
+            preInterval = currentInterval;
+        }
 
-        if (!currentGroup.mapdata.empty() && (currentASCII - prevASCII > 60)) {
+        if ((!currentGroup.mapdata.empty() && (currentASCII - prevASCII > SeparateIntarbal))//1つのまとまりを作るデータ間隔を60にする
+            || (currentInterval != preInterval)) // 送信間隔が変わった場合 
+        {
             // 一つのまとまりとして完了 → 結果に追加
             currentGroup.serialNumber = std::to_string(serialCounter++);
+            currentGroup.sendIntervalMs = row.at("sendIntervalMS").empty() ? 0 : std::stoi(row.at("sendIntervalMS")) * 1000;
             result.push_back(std::move(currentGroup));
             currentGroup = PLCRequestResponseData(); // 新しいグループ
         }
 
         currentGroup.mapdata.push_back(row);
         prevASCII = currentASCII;
+        preInterval = currentInterval;
+        if (i == sorted.size() - 1)
+        {
+            tempMemory = row;
+        }
+        i++;
     }
 
     // 最後のグループを追加
     if (!currentGroup.mapdata.empty()) {
         currentGroup.serialNumber = std::to_string(serialCounter++);
+        currentGroup.sendIntervalMs = tempMemory.at("sendIntervalMS").empty() ? 0 : std::stoi(tempMemory.at("sendIntervalMS")) * 1000;
         result.push_back(std::move(currentGroup));
     }
 

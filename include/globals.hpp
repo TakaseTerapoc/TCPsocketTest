@@ -3,13 +3,18 @@
 #include <vector>
 #include <queue>
 #include <mutex>
+#include <atomic>
 #include "PLCRequestResponseData.hpp"
-#include "PLCConnectionClient.hpp"
 #include "DataLumpBase.hpp"
+#include "AppController.hpp"
+#include "PLCConnectionClient.hpp"
+
 
 /**
  * @brief グローバルオブジェクトを格納するヘッダーファイルです。
  */
+
+ class AppController;
 
 // PLCへのリクエストを格納するキューです。
 extern std::queue<PLCRequestResponseData> gRequestQueue;
@@ -32,3 +37,6 @@ extern std::vector<DataLumpBase*> gDataLumps;
 // gSendDataのミューテックスです。
 extern std::mutex gSendDataMutex;
 
+// シグナル制御・管理するためのオブジェクトです。
+extern std::atomic<bool> gShouldExit;
+extern AppController* gAppInstance;

@@ -33,6 +33,9 @@ class CSVIO{
         // 取り出したCSVデータをアドレスカテゴリーごとに分ける関数
         static std::map<std::string, std::vector<std::map<std::string, std::string>>> separateMapData(std::vector<std::map<std::string, std::string>>& mapdata);
 
+        // データの分離間隔
+        // TODO:本当にこの場所でいいのか。。。要検討
+        static const int SeparateIntarbal = 60; 
 
         // 【旧】
         // CSVデータを取り出す関数

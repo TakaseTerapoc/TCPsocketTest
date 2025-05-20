@@ -121,19 +121,17 @@ void MCprotocolManager::makeCommand2(std::map<std::string,std::string>& row, PLC
 
     if (code == "77" || code == "88")
     {
-        data.sendIntervalMs = 60000;
         data.protocolbuf = readPLCwithBit;
         makeDeviceCode(data.protocolbuf, code);
     }
     else if (code == "68")
     {
-        data.sendIntervalMs = 60000;
         data.protocolbuf = readPLCwithWord;
         makeDeviceCode(data.protocolbuf, code);
     }
     else
     {
-        // TODO:後で要修正
+        // TODO:後で他のコマンドも追加する。
         // data.protocolbuf = bufD100;
     }
 
@@ -190,8 +188,6 @@ std::vector<std::map<std::string,std::string>> MCprotocolManager::convertRespons
                 data = convertDecimalString(swapString(responseData.substr(startPosition, 4)));
             }
         }
-        // req.sensorrows[i].push_back(req.receiptTime);
-        // req.sensorrows[i].push_back(std::to_string(req.transmissionIntervalMs));
         req.mapdata[i]["data"] = data;
     }
     sendData = req.mapdata;
