@@ -88,7 +88,7 @@ void MCprotocolManager::covertToMCprotocolData2(std::vector<PLCRequestResponseDa
             makeDevicePoint(data, firstNumber, lastNumber);
 
             // 確認用
-            std::cout << "【シリアルナンバー】" << data.serialNumber << std::endl;
+            std::cout << "【シリアルナンバー】" << data.serialNumber << " 【間隔】" << data.sendIntervalMs << "ミリ秒" <<std::endl;
             for (std::size_t i = 0; i < data.protocolbuf.size(); ++i) {
                 uint8_t byte = static_cast<uint8_t>(data.protocolbuf[i]);
                 std::printf("readPLCwithWord[%2zu] = 0x%02X\n", i, byte);
