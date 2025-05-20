@@ -21,3 +21,6 @@ std::mutex gSendDataMutex;
 // シグナル制御・管理するための変数です。
 std::atomic<bool> gShouldExit = false;
 AppController* gAppInstance = nullptr;
+
+// DataLumpのvectorです。
+std::vector<DataLump> gDataLump;

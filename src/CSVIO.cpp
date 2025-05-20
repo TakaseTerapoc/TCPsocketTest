@@ -39,11 +39,47 @@ vector<PLCRequestResponseData> CSVIO::makeRequestDataFromMapdata(vector<map<stri
     addASCIIrow(mapdata);
     sortData(mapdata);
     groupedIntervalData = groupMapCataByInterval(mapdata);
+    makeDataLumpFromIntervalData(groupedIntervalData);
     groupedAddressData = groupGroupDataByASCII(groupedIntervalData);
 
     return  makeRequestDataFromMapdata(groupedAddressData);
 
     // return groupMapDataByASCII(mapdata);
+}
+
+void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>> groupedIntervalData)
+{
+    vector<DataLump> result;
+
+    for (const auto& [intervalStr, dataVec] : groupedIntervalData) {
+        DataLump lump;
+
+        lump.sendIntervalMs = atoi(intervalStr.c_str());
+
+        for (const auto& row : dataVec) {
+            // sensorReadyStatusにsensorIDをfalseで格納
+            auto it = row.find("sensorID");
+            if (it != row.end()) {
+                map<string, bool> sensorStatus;
+                sensorStatus[it->second] = false;
+                lump.sensorReadyStatus.push_back(sensorStatus);
+            }
+        }
+
+        result.push_back(std::move(lump));
+    }
+
+    // result確認
+    for (const auto& lump : result) {
+        cout << "Interval " << lump.sendIntervalMs << "ミリ秒" << endl;
+        for (const auto& sensorStatus : lump.sensorReadyStatus) {
+            for (const auto& [sensorID, status] : sensorStatus) {
+                cout << "Sensor ID: " << sensorID << ", Status: " << status << endl;
+            }
+        }
+    }
+
+    gDataLump = result;
 }
 
 void CSVIO::addASCIIrow(vector<map<string, string>>& mapdata)
@@ -192,6 +228,7 @@ map<string, vector<map<string, string>>> CSVIO::groupMapCataByInterval(const vec
             result[interval].push_back(entry);
         }
     }
+    vector<map<string, bool>> tempMemory;
 
     // 結果の表示（確認用）
     for (const auto& [interval, group] : result) {

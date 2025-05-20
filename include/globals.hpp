@@ -8,6 +8,7 @@
 #include "DataLumpBase.hpp"
 #include "AppController.hpp"
 #include "PLCConnectionClient.hpp"
+#include "DataLump.hpp"
 
 
 /**
@@ -40,3 +41,6 @@ extern std::mutex gSendDataMutex;
 // シグナル制御・管理するためのオブジェクトです。
 extern std::atomic<bool> gShouldExit;
 extern AppController* gAppInstance;
+
+// DataLumpのvectorです。
+extern std::vector<DataLump> gDataLump;

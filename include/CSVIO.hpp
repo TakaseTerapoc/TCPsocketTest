@@ -6,6 +6,8 @@
 #include "../external/csv-parser/csv.hpp"
 #include "Logger.hpp"
 #include "PLCRequestResponseData.hpp"
+#include "globals.hpp"
+#include "DataLump.hpp"
 
 const int SeparateIntarbal = 60; // データの分離間隔
 using namespace std;
@@ -37,6 +39,10 @@ class CSVIO{
 
         // グループ分けしたデータをPLCRequestResponseDataに格納する関数
         static vector<PLCRequestResponseData> makeRequestDataFromMapdata(const map<string, vector<vector<map<string, string>>>>& groupedData);
+
+        // DataLumpを作成する関数
+        static void makeDataLumpFromIntervalData(map<string, vector<map<string, string>>> groupedIntervalData);
+
         // デバイスのイニシャル文字コードを見て、一度にデータが取れる範囲を決定する。
         static int getInterval(string ASCIIstr);
 
