@@ -37,9 +37,9 @@ void AppController::run() {
     initLogger();
     loadConfig();
     prepareRequestData();
-    // setupConnections();
-    // startWorkers();
-    // waitForShutdown();
+    setupConnections();
+    startWorkers();
+    waitForShutdown();
 }
 
 void AppController::initLogger() {

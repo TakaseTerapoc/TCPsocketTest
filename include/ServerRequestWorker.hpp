@@ -10,6 +10,8 @@
 #include "../external/fmt/format.h"
 #include "ServerConnectionClient.hpp"
 
+using namespace std;
+
 /**
  * @brief SendDataが格納されているリストを監視し、サーバーへデータを送るクラスです。
  */
@@ -40,9 +42,10 @@ class ServerRequestWorker
         // リストから出して、UDP送信を依頼する。
         void run();  
 
-        std::thread      thread_;                                   // 実行スレッド
+        thread      thread_;                                   // 実行スレッド
         bool             running_{false};                           // 実行中フラグ
-        std::mutex       mutex_;                                    // running_ の排他制御
+        mutex       mutex_;                                    // running_ の排他制御
         ServerConnectionClient serverConnectionClient_;             // ServerConnectionClientのインスタンス
-        std::string shapeSendData(const DataLumpBase* sendData);          // DataLumpBaseのメンバーを送信する文字列に整形する関数 
+        // string shapeSendData(const DataLumpBase* sendData);          // DataLumpBaseのメンバーを送信する文字列に整形する関数 
+        string shapeSendData(const vector<map<string,string>>& sendData);  // DataLumpBaseのメンバーを送信する文字列に整形する関数
 };

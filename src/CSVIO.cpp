@@ -39,7 +39,11 @@ vector<PLCRequestResponseData> CSVIO::makeRequestDataFromMapdata(vector<map<stri
     addASCIIrow(mapdata);
     sortData(mapdata);
     groupedIntervalData = groupMapCataByInterval(mapdata);
+
+    // DataLumpを作成する
     makeDataLumpFromIntervalData(groupedIntervalData);
+
+
     groupedAddressData = groupGroupDataByASCII(groupedIntervalData);
 
     return  makeRequestDataFromMapdata(groupedAddressData);
@@ -54,7 +58,7 @@ void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>
     for (const auto& [intervalStr, dataVec] : groupedIntervalData) {
         DataLump lump;
 
-        lump.sendIntervalMs = atoi(intervalStr.c_str());
+        lump.sendIntervalMs = atoi(intervalStr.c_str()) * 1000; // ミリ秒に変換
 
         for (const auto& row : dataVec) {
             // sensorReadyStatusにsensorIDをfalseで格納
@@ -305,7 +309,7 @@ vector<PLCRequestResponseData> CSVIO::makeRequestDataFromMapdata(
         for (const auto& group : groups) {
             PLCRequestResponseData data;
             if (!group.empty()) {
-                data.sendIntervalMs = atoi(group[0].at("sendIntervalMS").c_str());
+                data.sendIntervalMs = atoi(group[0].at("sendIntervalMS").c_str()) * 1000;
                 data.serialNumber = to_string(serialCounter++);
             }
 

@@ -3,6 +3,8 @@
 // まとめて送信するデータを格納するリスト
 DataLumpTest* dataLumpTest = new DataLumpTest();
 
+using namespace std;
+
 // シングルトンインスタンス取得
 PLCRequestWorker& PLCRequestWorker::getInstance(PLCConnectionClient& plcclient) {
     static PLCRequestWorker instance;
@@ -12,10 +14,10 @@ PLCRequestWorker& PLCRequestWorker::getInstance(PLCConnectionClient& plcclient) 
 
 // ワーカー開始
 void PLCRequestWorker::start() {
-    std::lock_guard<std::mutex> lg(mutex_);
+    lock_guard<mutex> lg(mutex_);
     if (running_) return;
     running_ = true;
-    thread_ = std::thread(&PLCRequestWorker::run, this);
+    thread_ = thread(&PLCRequestWorker::run, this);
 }
 
 // ワーカjoin
@@ -28,7 +30,7 @@ void PLCRequestWorker::join() {
 // ワーカー停止
 void PLCRequestWorker::stop() {
     {
-        std::lock_guard<std::mutex> lg(mutex_);
+        lock_guard<mutex> lg(mutex_);
         running_ = false;
     }
     join();
@@ -38,12 +40,12 @@ void PLCRequestWorker::stop() {
 void PLCRequestWorker::run() {
     while (true) {
         {
-            std::lock_guard<std::mutex> lg(mutex_);
+            lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
         PLCRequestResponseData req;
         {
-            std::unique_lock<std::mutex> lock(gRequestQueueMutex);
+            unique_lock<mutex> lock(gRequestQueueMutex);
             if (gRequestQueue.empty()) {
                 // cv.wait(lock);
                 continue;
@@ -53,10 +55,10 @@ void PLCRequestWorker::run() {
         }
 
         // 確認やつ
-        auto now = std::chrono::steady_clock::now();
+        auto now = chrono::steady_clock::now();
         auto dur = now.time_since_epoch();
-        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-        Logger::getInstance().Info("キューから取り出しました。" + req.serialNumber + "【時間】" + std::to_string(ms));
+        auto ms = chrono::duration_cast<chrono::milliseconds>(dur).count();
+        Logger::getInstance().Info("キューから取り出しました。" + req.serialNumber + "【時間】" + to_string(ms));
 
         // TCPリクエスト 
         pLCConnectionClient_.SendRequest(req.protocolbuf.data(), req.protocolbuf.size());
@@ -78,9 +80,9 @@ void PLCRequestWorker::run() {
 
         // 送信データ作成
         Logger::getInstance().Info("送信データを作成します");
-        // std::vector<std::vector<std::string>> sendData = MCprotocolManager::convertResponseDataToSendData(text, len, req);
-        std::vector<std::map<std::string,std::string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, len, req);
-        std::string sendDatastr;
+        // vector<vector<string>> sendData = MCprotocolManager::convertResponseDataToSendData(text, len, req);
+        vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, len, req);
+        string sendDatastr;
         for (size_t i = 0; i < sendData.size(); ++i) {
             for (const auto& [key, value] : sendData[i]) {
                     sendDatastr += key + ": " + value + " | ";
@@ -88,72 +90,80 @@ void PLCRequestWorker::run() {
             sendDatastr += ", ";
         }
         Logger::getInstance().Info("送信データ: " + sendDatastr);
-            
-        std::string test; // 結果を格納する変数
 
-        for (auto& row : sendData) {
-            auto catIt = row.find("categoryID");
-            auto sensorIt = row.find("sensorID");
+        
 
-            if (catIt != row.end() && sensorIt != row.end()) {
-                if (catIt->second == "CATE100" ){
-                    if(sensorIt->second == "AAAA1")
+        // 受信データを確認し、sensorの準備状態を変更する。
+        DataLump* dataLump = getReadySensor(req, sendData);
+
+        if (dataLump != nullptr && dataLump->lumpFull) {
+            // 送信データをPLCへ送信
+            Logger::getInstance().Info("データをサーバへ送信します。");
+            vector<map<string,string>> sendDatacp = dataLump->sendData;
+            gSendDataMap.push_back(sendDatacp);
+            dataLump->allClear();
+        }
+    }
+}
+
+    DataLump* PLCRequestWorker::getReadySensor(const PLCRequestResponseData& req, const vector<map<string,string>>& sendData)
+    {
+        DataLump* dataLump = nullptr;
+
+        // DataLumpの中から、送信間隔が同じものを探す
+        for (auto& row : gDataLump)
+        {
+            if (row.sendIntervalMs == req.sendIntervalMs)
+            {
+                dataLump = &row;
+                break;
+            }
+        }
+
+        // 送信間隔が同じものがなければ、何もしない
+        if (dataLump == nullptr)
+        {
+            return nullptr;
+        }
+
+        // DataLumpにsendDataを格納
+        dataLump->sendData.insert(dataLump->sendData.end(), sendData.begin(), sendData.end());
+
+
+        // sendDtataの中から、sensorIDを探す
+        for (auto& row : sendData)
+        {
+            auto it = row.find("sensorID");
+            if (it != row.end())
+            {
+                // sensorIDを取得
+                string sensorID = it->second;
+                // sensorIDがtempDataLumpの中にあれば、trueにする
+                for (auto& status : dataLump->sensorReadyStatus)
+                {
+                    auto it2 = status.find(sensorID);
+                    if (it2 != status.end())
                     {
-                        dataLumpTest->setAAAA1(row);
+                        it2->second = true;
                     }
-                    else if(sensorIt->second == "AAAA2")
-                    {
-                        dataLumpTest->setAAAA2(row);
-                    }
-                    else if(sensorIt->second == "AAAA4")
-                    {
-                        dataLumpTest->setAAAA4(row);
-                    }
-                    else if(sensorIt->second == "AAAA7")
-                    {
-                        dataLumpTest->setAAAA7(row);
-                    }
-                    else if(sensorIt->second == "AAAA10")
-                    {
-                        dataLumpTest->setAAAA10(row);
-                    }
-                    else if(sensorIt->second == "AAAA99")
-                    {
-                        dataLumpTest->setAAAA99(row);
-                    }
-                }
-                else{
-                    Logger::getInstance().Error("categoryIDがありません。");
                 }
             }
         }
 
-        if (dataLumpTest->isLumpFull()) {
-            // 送信データをPLCへ送信
-            Logger::getInstance().Info("データをサーバへ送信します。");
-            DataLumpBase* copyLump = new DataLumpTest(*dataLumpTest);
-            gDataLumps.push_back(copyLump);
-            dataLumpTest->allClear();
-            dataLumpTest->setLumpFull(false);
+        // sensorReadyStatusの状態を出力
+        for (const auto& status : dataLump->sensorReadyStatus)
+        {
+            for (const auto& [sensorID, ready] : status)
+            {
+                Logger::getInstance().Info("Sensor ID: " + sensorID + ", Ready: " + to_string(ready));
+            }
         }
 
 
-        // for (int i = 0; i < sendData.size(); i++)
-        // {
-        //     for (int j = 0; j < sendData[i].size(); j++)
-        //     {
-        //         Logger::getInstance().Info("sendData[" + std::to_string(i) + "][" + std::to_string(j) + "]" + sendData[i][j]);
-        //     }
-        // }
-        // sendData確認
+        // LumpFullを確認
+        dataLump->isLumpFull();
 
-        // gSendDataに格納
-        // {
-        //     std::lock_guard<std::mutex> lock(gSendDataMutex);
-        //     for (int i = 0; i < sendData.size(); i++)
-        //     {
-        //         gSendData.push_back(sendData[i]);
-        //     }
-        // }
+        Logger::getInstance().Info("LumpFull: " + to_string(dataLump->lumpFull));
+
+        return dataLump;
     }
-}

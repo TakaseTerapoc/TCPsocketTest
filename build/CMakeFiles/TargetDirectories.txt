@@ -1,3 +1,0 @@
-/home/takase/TCPsocketTest/build/CMakeFiles/NAKANISHI_IOT_SYSTEM_PROTTYPE.dir
-/home/takase/TCPsocketTest/build/CMakeFiles/edit_cache.dir
-/home/takase/TCPsocketTest/build/CMakeFiles/rebuild_cache.dir

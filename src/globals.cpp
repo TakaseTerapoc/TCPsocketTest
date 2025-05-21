@@ -24,3 +24,6 @@ AppController* gAppInstance = nullptr;
 
 // DataLumpのvectorです。
 std::vector<DataLump> gDataLump;
+
+// サーバーへ送信するデータを格納するリスト(map)です。
+vector<vector<map<string, string>>> gSendDataMap;
