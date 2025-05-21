@@ -1,6 +1,6 @@
 #include "ServerConnectionClient.hpp"
 
-ServerConnectionClient::ServerConnectionClient(const std::string& serverIp, int serverPort) 
+ServerConnectionClient::ServerConnectionClient(const string& serverIp, int serverPort) 
 {
     socket_ = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_ < 0) {
@@ -8,7 +8,7 @@ ServerConnectionClient::ServerConnectionClient(const std::string& serverIp, int 
         exit(1);
     }
 
-    std::memset(&serverAddr_, 0, sizeof(serverAddr_));
+    memset(&serverAddr_, 0, sizeof(serverAddr_));
     serverAddr_.sin_family = AF_INET;
     serverAddr_.sin_port = htons(serverPort);
 
@@ -23,7 +23,7 @@ ServerConnectionClient::~ServerConnectionClient()
     close(socket_);
 }
 
-bool ServerConnectionClient::sendMessage(const std::string& message) 
+bool ServerConnectionClient::sendMessage(const string& message) 
 {
     ssize_t sentLen = sendto(socket_, message.c_str(), message.size(), 0,
                              (struct sockaddr*)&serverAddr_, sizeof(serverAddr_));

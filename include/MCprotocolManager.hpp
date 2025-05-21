@@ -14,6 +14,8 @@
 #include "Logger.hpp"
 #include "PLCRequestResponseData.hpp"
 
+using namespace std;
+
 class MCprotocolManager
 {
     public:

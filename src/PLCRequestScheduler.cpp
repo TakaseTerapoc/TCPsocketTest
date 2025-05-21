@@ -8,10 +8,10 @@ PLCRequestScheduler& PLCRequestScheduler::getInstance() {
 
 // スケジューラ開始
 void PLCRequestScheduler::start() {
-    std::lock_guard<std::mutex> lg(mutex_);
+    lock_guard<mutex> lg(mutex_);
     if (running_) return;
     running_ = true;
-    thread_ = std::thread(&PLCRequestScheduler::run, this);
+    thread_ = thread(&PLCRequestScheduler::run, this);
 }
 
 // スケジューラjoin
@@ -24,7 +24,7 @@ void PLCRequestScheduler::join() {
 // スケジューラ停止
 void PLCRequestScheduler::stop() {
     {
-        std::lock_guard<std::mutex> lg(mutex_);
+        lock_guard<mutex> lg(mutex_);
         running_ = false;
     }
     join();
@@ -34,22 +34,22 @@ void PLCRequestScheduler::stop() {
 void PLCRequestScheduler::run() {
     while (true) {
         {
-            std::lock_guard<std::mutex> lg(mutex_);
+            lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
 
-        auto now = std::chrono::steady_clock::now();
+        auto now = chrono::steady_clock::now();
         for (auto& plcr : gRData) {
             if (now >= plcr.nextTime) {
                 {
-                    std::lock_guard<std::mutex> ql(gRequestQueueMutex);
+                    lock_guard<mutex> ql(gRequestQueueMutex);
                     gRequestQueue.push(plcr);
                 }
                 // PLC::cv.notify_one();
-                plcr.nextTime = now + std::chrono::milliseconds(plcr.sendIntervalMs);
+                plcr.nextTime = now + chrono::milliseconds(plcr.sendIntervalMs);
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        this_thread::sleep_for(chrono::milliseconds(10));
     }
 }

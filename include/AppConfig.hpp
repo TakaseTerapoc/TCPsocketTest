@@ -3,6 +3,8 @@
 #include "../external/SimpleIni/SimpleIni.h"
 #include <string>
 
+using namespace std;
+
 class AppConfig {
 public:
     // 唯一のインスタンスを取得

@@ -1,7 +1,5 @@
 #include "ServerRequestWorker.hpp"
 
-using namespace std;
-
 // シングルトンインスタンス取得
 ServerRequestWorker& ServerRequestWorker::getInstance(ServerConnectionClient& serverClient) {
     static ServerRequestWorker instance;
@@ -105,46 +103,3 @@ string ServerRequestWorker::shapeSendData(const vector<map<string,string>>& send
 
     return shapedSendData;
 }
-
-
-// string ServerRequestWorker::shapeSendData2(const DataLumpBase* sendData) 
-// {
-//     string shapedSendData;
-//     string timeStamp = Logger::getInstance().GetCurrentTimestampString();
-//     vector<map<string,string>> members;
-//     vector<string> sendDataVector;
-
-//     // タイムスタンプ整形
-//     timeStamp.erase(timeStamp.size() - 4);
-
-//     shapedSendData += timeStamp + ",";
-
-//     // DataLumpBaseのメンバーを送信する文字列に整形する処理
-//     members = sendData->getMembers();
-//     bool cateFrag = false;
-//     for (auto& member : members) {
-//         vector<string> tempvector;
-//         for (auto& pair : member) {
-//             if (pair.first == "categoryID" || pair.first == "sensorID" || pair.first == "device" || pair.first == "data") {
-//                 tempvector.push_back(pair.second + ",");
-//                 continue;
-//             }
-//         }
-//         // 並び替え
-//         swap(tempvector[1], tempvector[3]);
-//         sendDataVector.insert(sendDataVector.end(), tempvector.begin(), tempvector.end());
-//     }
-
-//     // sendDataVectorをstringに変換
-//     for (int i = 0; i < sendDataVector.size(); i++) {
-//         shapedSendData += sendDataVector[i];
-//     }
-
-//     // 末尾のカンマを削除
-//     shapedSendData.pop_back();
-
-//     // 確認用
-//     Logger::getInstance().Info("整形したデータ: " + shapedSendData);
-
-//     return shapedSendData;
-// }

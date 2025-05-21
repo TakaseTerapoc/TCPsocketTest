@@ -9,6 +9,8 @@
 #include "PLCRequestResponseData.hpp"
 #include "globals.hpp"
 
+using namespace std;
+
 /**
  * @brief PLCRequestDataを格納されているインターバルのタイミングでキューに格納するクラスです。
  */

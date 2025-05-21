@@ -11,8 +11,8 @@
 #include "MCprotocolManager.hpp"
 #include "../external/fmt/format.h"
 #include "DataLump.hpp"
-#include "DataLumpTest.hpp"
 
+using namespace std;
 
 /**
  * @brief PLCRequestDataが格納されているキューを監視し、２００ms秒ごとにTCPへリクエストを送るクラスです。
@@ -47,11 +47,11 @@ class PLCRequestWorker
         // sensorReadyStatusにsensorIDの状態を格納する関数
         DataLump* getReadySensor(const PLCRequestResponseData& req, const vector<map<string,string>>& sendData);
 
-        std::thread      thread_;                   // 実行スレッド
+        thread      thread_;                   // 実行スレッド
         
         bool             running_{false};           // 実行中フラグ
 
-        std::mutex       mutex_;                    // running_ の排他制御
+        mutex       mutex_;                    // running_ の排他制御
 
         PLCConnectionClient pLCConnectionClient_;   // PLCConnectionClientのインスタンス
 };

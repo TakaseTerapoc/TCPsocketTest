@@ -9,9 +9,7 @@
 #include "globals.hpp"
 #include "DataLump.hpp"
 
-const int SeparateIntarbal = 60; // データの分離間隔
 using namespace std;
-
 
 /**
 * @param CSVファイルの読み書きを行うクラスです。

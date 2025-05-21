@@ -11,16 +11,18 @@
 
 #include "Logger.hpp"
 
+using namespace std;
+
 /**
  * @brief サーバーとのUDPを管理するクラスです。
 */
 class ServerConnectionClient {
 public:
     ServerConnectionClient() = default;
-    ServerConnectionClient(const std::string& serverIp, int serverPort);
+    ServerConnectionClient(const string& serverIp, int serverPort);
     ~ServerConnectionClient();
 
-    bool sendMessage(const std::string& message);
+    bool sendMessage(const string& message);
 
 private:
     int socket_;

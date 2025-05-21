@@ -11,19 +11,19 @@ AppConfig& AppConfig::getInstance() {
 }
 
 // 設定ファイルの読み込み
-bool AppConfig::LoadFile(const std::string& filename) {
+bool AppConfig::LoadFile(const string& filename) {
     SI_Error rc = ini.LoadFile(filename.c_str());
     return rc >= 0;
 }
 
 // PLCConfig セクションから文字列を取得
-std::string AppConfig::GetPLCConfig(const std::string& key) {
+string AppConfig::GetPLCConfig(const string& key) {
     const char* pVal = ini.GetValue("PLCConfig", key.c_str(), "（未定義）");
-    return std::string(pVal);
+    return string(pVal);
 }
 
 // serverConfig セクションから文字列を取得
-std::string AppConfig::GetServerConfig(const std::string& key) {
+string AppConfig::GetServerConfig(const string& key) {
     const char* pVal = ini.GetValue("serverConfig", key.c_str(), "（未定義）");
-    return std::string(pVal);
+    return string(pVal);
 }

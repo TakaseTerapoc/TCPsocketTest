@@ -1,10 +1,5 @@
 #include "PLCRequestWorker.hpp"
 
-// まとめて送信するデータを格納するリスト
-DataLumpTest* dataLumpTest = new DataLumpTest();
-
-using namespace std;
-
 // シングルトンインスタンス取得
 PLCRequestWorker& PLCRequestWorker::getInstance(PLCConnectionClient& plcclient) {
     static PLCRequestWorker instance;
@@ -58,7 +53,7 @@ void PLCRequestWorker::run() {
         auto now = chrono::steady_clock::now();
         auto dur = now.time_since_epoch();
         auto ms = chrono::duration_cast<chrono::milliseconds>(dur).count();
-        Logger::getInstance().Info("キューから取り出しました。" + req.serialNumber + "【時間】" + to_string(ms));
+        Logger::getInstance().Debug("キューから取り出しました。" + req.serialNumber + "【時間】" + to_string(ms));
 
         // TCPリクエスト 
         pLCConnectionClient_.SendRequest(req.protocolbuf.data(), req.protocolbuf.size());

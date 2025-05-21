@@ -1,6 +1,6 @@
 #include "MCprotocolManager.hpp"
 
-std::vector<char> readPLCwithBit = 
+vector<char> readPLCwithBit = 
 {
     (char)0x00,                                     // サブヘッダ 0番目
     (char)0xff,                                     // PC番号（アクセス経路）1番目
@@ -11,7 +11,7 @@ std::vector<char> readPLCwithBit =
     (char)0x00,                                     // 終点 11番目
 };
 
-std::vector<char> readPLCwithWord = 
+vector<char> readPLCwithWord = 
 {
     (char)0x01,                                     // サブヘッダ 0番目
     (char)0xff,                                     // PC番号（アクセス経路）1番目
@@ -23,7 +23,7 @@ std::vector<char> readPLCwithWord =
 };
 
 
-std::vector<char> startPLC = 
+vector<char> startPLC = 
 {
     (char)0x13,                // サブヘッダ
     (char)0xff,                // PC番号（アクセス経路）
@@ -31,7 +31,7 @@ std::vector<char> startPLC =
     (char)0x00,
 };
 
-std::vector<char> stopPLC = 
+vector<char> stopPLC = 
 {
     (char)0x14,                // サブヘッダ
     (char)0xff,                // PC番号（アクセス経路）
@@ -40,7 +40,7 @@ std::vector<char> stopPLC =
 };
 
 
-std::vector<char> getPLCName = 
+vector<char> getPLCName = 
 {
     (char)0x15,                // サブヘッダ
     (char)0xff,                // PC番号（アクセス経路）
@@ -48,7 +48,7 @@ std::vector<char> getPLCName =
     (char)0x00,
 };
 
-std::vector<char> test = 
+vector<char> test = 
 {
     (char)0x16,                                     // サブヘッダ
     (char)0xFF,                                     // PC番号（アクセス経路）
@@ -56,12 +56,12 @@ std::vector<char> test =
     (char)0x03,(char)0x01,(char)0x02,(char)0x03     // テストデータ
 };
 
-void MCprotocolManager::covertToMCprotocolData2(std::vector<PLCRequestResponseData>& gRData)
+void MCprotocolManager::covertToMCprotocolData2(vector<PLCRequestResponseData>& gRData)
 {
     for (auto& data : gRData)
     {
-        std::string code;
-        std::string address;
+        string code;
+        string address;
         int firstNumber = 0;
         int lastNumber = 0;
 
@@ -78,20 +78,20 @@ void MCprotocolManager::covertToMCprotocolData2(std::vector<PLCRequestResponseDa
                     makeCommand2(row, data, code, address);
                     makeTopDeviceNumber(data.protocolbuf, address);
                     makeDeviceCode(data.protocolbuf, code);
-                    firstNumber = std::stoi(row.at("ASCII"));
+                    firstNumber = stoi(row.at("ASCII"));
                 } 
                 else if (i == (data.mapdata).size() - 1)
                 {
-                    lastNumber = std::stoi(row.at("ASCII"));
+                    lastNumber = stoi(row.at("ASCII"));
                 }
             }
             makeDevicePoint(data, firstNumber, lastNumber);
 
             // 確認用
-            std::cout << "【シリアルナンバー】" << data.serialNumber << " 【間隔】" << data.sendIntervalMs << "ミリ秒" <<std::endl;
-            for (std::size_t i = 0; i < data.protocolbuf.size(); ++i) {
+            cout << "【シリアルナンバー】" << data.serialNumber << " 【間隔】" << data.sendIntervalMs << "ミリ秒" <<endl;
+            for (size_t i = 0; i < data.protocolbuf.size(); ++i) {
                 uint8_t byte = static_cast<uint8_t>(data.protocolbuf[i]);
-                std::printf("readPLCwithWord[%2zu] = 0x%02X\n", i, byte);
+                printf("readPLCwithWord[%2zu] = 0x%02X\n", i, byte);
             }
 
         }
@@ -114,7 +114,7 @@ void MCprotocolManager::covertToMCprotocolData2(std::vector<PLCRequestResponseDa
     }
 }
 
-void MCprotocolManager::makeCommand2(std::map<std::string,std::string>& row, PLCRequestResponseData& data, std::string& code, std::string& address)
+void MCprotocolManager::makeCommand2(map<string,string>& row, PLCRequestResponseData& data, string& code, string& address)
 {
     address = row.at("ASCII").substr((row.at("ASCII")).size() - 4);
     code = row.at("ASCII").substr(0, (row.at("ASCII")).size() - 4);
@@ -139,10 +139,10 @@ void MCprotocolManager::makeCommand2(std::map<std::string,std::string>& row, PLC
     data.deviceCode = code;
 }
 
-std::vector<std::map<std::string,std::string>> MCprotocolManager::convertResponseDataToSendData2(char* text, int len, PLCRequestResponseData& req) {
-    std::string responseData;
-    std::string format;
-    std::vector<std::map<std::string,std::string>> sendData;
+vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(char* text, int len, PLCRequestResponseData& req) {
+    string responseData;
+    string format;
+    vector<map<string,string>> sendData;
 
     for (int i = 0; i < len; ++i)
     {
@@ -161,7 +161,7 @@ std::vector<std::map<std::string,std::string>> MCprotocolManager::convertRespons
 
     for (int i = 0; i < req.mapdata.size(); i++)
     {
-        std::string data;
+        string data;
         if (req.deviceCode == "77")
         {
             
@@ -171,7 +171,7 @@ std::vector<std::map<std::string,std::string>> MCprotocolManager::convertRespons
             }
             else
             {
-                int startPosition = std::stoi(req.mapdata[i]["ASCII"]) - std::stoi(req.mapdata[i - 1]["ASCII"]);
+                int startPosition = stoi(req.mapdata[i]["ASCII"]) - stoi(req.mapdata[i - 1]["ASCII"]);
                 data = responseData.substr(startPosition, 1);
             }
         }
@@ -184,7 +184,7 @@ std::vector<std::map<std::string,std::string>> MCprotocolManager::convertRespons
             }
             else
             {
-                int startPosition = (std::stoi(req.mapdata[i]["ASCII"]) - std::stoi(req.mapdata[i - 1]["ASCII"])) * 4;
+                int startPosition = (stoi(req.mapdata[i]["ASCII"]) - stoi(req.mapdata[i - 1]["ASCII"])) * 4;
                 data = convertDecimalString(swapString(responseData.substr(startPosition, 4)));
             }
         }
@@ -196,12 +196,12 @@ std::vector<std::map<std::string,std::string>> MCprotocolManager::convertRespons
 }
 
 
-void MCprotocolManager::covertToMCprotocolData(std::vector<PLCRequestResponseData>& gRData)
+void MCprotocolManager::covertToMCprotocolData(vector<PLCRequestResponseData>& gRData)
 {
     for (auto& data : gRData)
     {
-        std::string code;
-        std::string address;
+        string code;
+        string address;
         int firstNumber = 0;
         int lastNumber = 0;
 
@@ -209,8 +209,8 @@ void MCprotocolManager::covertToMCprotocolData(std::vector<PLCRequestResponseDat
         if (data.command == "read")
         {
             size_t i = 0;
-            std::string code;
-            std::string address;
+            string code;
+            string address;
             for (int i = 0; i < (data.sensorrows).size(); i++)
             {
                 // data.deviceCount++;
@@ -220,20 +220,20 @@ void MCprotocolManager::covertToMCprotocolData(std::vector<PLCRequestResponseDat
                     makeCommand(row, data, code, address);
                     makeTopDeviceNumber(data.protocolbuf, address);
                     makeDeviceCode(data.protocolbuf, code);
-                    firstNumber = std::stoi(row[2]);
+                    firstNumber = stoi(row[2]);
                 } 
                 else if (i == (data.sensorrows).size() - 1)
                 {
-                    lastNumber = std::stoi(row[2]);
+                    lastNumber = stoi(row[2]);
                 }
             }
             makeDevicePoint(data, firstNumber, lastNumber);
 
             // 確認用
-            std::cout << "【シリアルナンバー】" << data.serialNumber << std::endl;
-            for (std::size_t i = 0; i < data.protocolbuf.size(); ++i) {
+            cout << "【シリアルナンバー】" << data.serialNumber << endl;
+            for (size_t i = 0; i < data.protocolbuf.size(); ++i) {
                 uint8_t byte = static_cast<uint8_t>(data.protocolbuf[i]);
-                std::printf("readPLCwithWord[%2zu] = 0x%02X\n", i, byte);
+                printf("readPLCwithWord[%2zu] = 0x%02X\n", i, byte);
             }
 
         }
@@ -256,12 +256,12 @@ void MCprotocolManager::covertToMCprotocolData(std::vector<PLCRequestResponseDat
     }
 }
 
-std::string MCprotocolManager::substrBack(std::string& str, size_t pos, size_t len) {
+string MCprotocolManager::substrBack(string& str, size_t pos, size_t len) {
     const size_t strLen = str.length();
 
     return str.substr(strLen - pos, len);
 }
-void MCprotocolManager::makeCommand(std::vector<std::string>& row, PLCRequestResponseData& data, std::string& code, std::string& address)
+void MCprotocolManager::makeCommand(vector<string>& row, PLCRequestResponseData& data, string& code, string& address)
 {
     address = row[2].substr(row[2].size() - 4);
     code = row[2].substr(0, row[2].size() - 4);
@@ -287,7 +287,7 @@ void MCprotocolManager::makeCommand(std::vector<std::string>& row, PLCRequestRes
     data.deviceCode = code;
 }
 
-void MCprotocolManager::makeDeviceCode(std::vector<char>& buf, std::string& code)
+void MCprotocolManager::makeDeviceCode(vector<char>& buf, string& code)
 {
     if (code == "77")
     {
@@ -301,7 +301,7 @@ void MCprotocolManager::makeDeviceCode(std::vector<char>& buf, std::string& code
     }
 }
 
-void MCprotocolManager::makeTopDeviceNumber(std::vector<char>& buf, std::string& address)
+void MCprotocolManager::makeTopDeviceNumber(vector<char>& buf, string& address)
 {
     auto bytes = decStrToBytes32(address);
     for (int i = 0; i < 4; ++i) {
@@ -310,9 +310,9 @@ void MCprotocolManager::makeTopDeviceNumber(std::vector<char>& buf, std::string&
 }
 
 // 10進文字列を32ビットのリトルエンディアン4バイトに分解する関数      
-std::array<uint8_t,4> MCprotocolManager::decStrToBytes32(const std::string& decStr) 
+array<uint8_t,4> MCprotocolManager::decStrToBytes32(const string& decStr) 
 {
-    unsigned long v = std::stoul(decStr, nullptr, 10);
+    unsigned long v = stoul(decStr, nullptr, 10);
     return {
         static_cast<uint8_t>( v        & 0xFF),
         static_cast<uint8_t>((v >>  8) & 0xFF),
@@ -334,10 +334,10 @@ void MCprotocolManager::makeDevicePoint(PLCRequestResponseData& data, int firstN
     }
 }
 
-std::vector<std::vector<std::string>> MCprotocolManager::convertResponseDataToSendData(char* text, int len, PLCRequestResponseData& req) {
-    std::string responseData;
-    std::string format;
-    std::vector<std::vector<std::string>> sendData;
+vector<vector<string>> MCprotocolManager::convertResponseDataToSendData(char* text, int len, PLCRequestResponseData& req) {
+    string responseData;
+    string format;
+    vector<vector<string>> sendData;
 
     for (int i = 0; i < len; ++i)
     {
@@ -356,7 +356,7 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertResponseDataToSe
 
     for (int i = 0; i < req.sensorrows.size(); i++)
     {
-        std::string data;
+        string data;
         if (req.deviceCode == "77")
         {
             
@@ -366,7 +366,7 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertResponseDataToSe
             }
             else
             {
-                int startPosition = std::stoi(req.sensorrows[i][2]) - std::stoi(req.sensorrows[i - 1][2]);
+                int startPosition = stoi(req.sensorrows[i][2]) - stoi(req.sensorrows[i - 1][2]);
                 data = responseData.substr(startPosition, 1);
             }
         }
@@ -379,12 +379,12 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertResponseDataToSe
             }
             else
             {
-                int startPosition = (std::stoi(req.sensorrows[i][2]) - std::stoi(req.sensorrows[i - 1][2])) * 4;
+                int startPosition = (stoi(req.sensorrows[i][2]) - stoi(req.sensorrows[i - 1][2])) * 4;
                 data = convertDecimalString(swapString(responseData.substr(startPosition, 4)));
             }
         }
         // req.sensorrows[i].push_back(req.receiptTime);
-        // req.sensorrows[i].push_back(std::to_string(req.transmissionIntervalMs));
+        // req.sensorrows[i].push_back(to_string(req.transmissionIntervalMs));
         req.sensorrows[i].push_back(data);
     }
     sendData = req.sensorrows;
@@ -392,13 +392,13 @@ std::vector<std::vector<std::string>> MCprotocolManager::convertResponseDataToSe
     return sendData;
 }
 
-std::string MCprotocolManager::swapString(const std::string& str) {
-    std::string first = str.substr(0, 2);
-    std::string second = str.substr(2, 2);
-    std::string result = second + first;
+string MCprotocolManager::swapString(const string& str) {
+    string first = str.substr(0, 2);
+    string second = str.substr(2, 2);
+    string result = second + first;
     return result; 
 }
 
-std::string MCprotocolManager::convertDecimalString(const std::string& hex) {
-    return std::to_string(strtoul(hex.c_str(), NULL, 16));
+string MCprotocolManager::convertDecimalString(const string& hex) {
+    return to_string(strtoul(hex.c_str(), NULL, 16));
 }

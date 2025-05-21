@@ -46,6 +46,5 @@ class ServerRequestWorker
         bool             running_{false};                           // 実行中フラグ
         mutex       mutex_;                                    // running_ の排他制御
         ServerConnectionClient serverConnectionClient_;             // ServerConnectionClientのインスタンス
-        // string shapeSendData(const DataLumpBase* sendData);          // DataLumpBaseのメンバーを送信する文字列に整形する関数 
         string shapeSendData(const vector<map<string,string>>& sendData);  // DataLumpBaseのメンバーを送信する文字列に整形する関数
 };

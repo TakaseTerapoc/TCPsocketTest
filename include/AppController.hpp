@@ -14,6 +14,8 @@
 #include <atomic>
 #include <thread>
 
+using namespace std;
+
 class AppController {
 public:
     // コンストラクタ・デストラクタ

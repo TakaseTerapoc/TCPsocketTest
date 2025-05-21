@@ -1,7 +1,5 @@
 #include "DataLump.hpp"
 
-using namespace std;
-
 void DataLump::isLumpFull() {
     for (const auto& sensorStatus : sensorReadyStatus) {
         for (const auto& [sensorID, status] : sensorStatus) {

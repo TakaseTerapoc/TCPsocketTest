@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 
+using namespace std;
+
 class DataLumpBase {
 public:
     virtual ~DataLumpBase() = default;

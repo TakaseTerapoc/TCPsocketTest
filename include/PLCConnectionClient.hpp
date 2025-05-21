@@ -14,6 +14,8 @@
 const int TimeoutSec = 5; // タイムアウト秒数
 const int TimeoutUsec = 0; // タイムアウトマイクロ秒数
 
+using namespace std;
+
 class PLCConnectionClient
 {
 private:

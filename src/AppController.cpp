@@ -27,12 +27,12 @@ AppController::~AppController() {
 
 void AppController::run() {
     // 【Ctrl+C】 されたら signalHandler() を呼ぶ
-    std::signal(SIGINT, signalHandler);
+    signal(SIGINT, signalHandler);
 
     // 【kill】 されたら signalHandler() を呼ぶ
     // ただし、kill -9 などの強制終了は捕捉できない
     // 参考: https://www.oreilly.co.jp/books/9784873117980/
-    std::signal(SIGTERM, signalHandler);
+    signal(SIGTERM, signalHandler);
 
     initLogger();
     loadConfig();
@@ -72,7 +72,7 @@ void AppController::setupConnections() {
     //　PLC接続
     plcConnectionClient_ = new PLCConnectionClient(
         AppConfig::getInstance().GetPLCConfig("ipaddress").c_str(),
-        std::stoi(AppConfig::getInstance().GetPLCConfig("port"))
+        stoi(AppConfig::getInstance().GetPLCConfig("port"))
     );
 
     // TODO:PLC接続エラーが起きたときに何度もリトライするようにする。
@@ -83,7 +83,7 @@ void AppController::setupConnections() {
         if (retry++ > 0) {
             Logger::getInstance().Error("PLC接続再試行中...");
         }
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        this_thread::sleep_for(chrono::seconds(1));
     }
     Logger::getInstance().Info("PLC接続に成功しました。");
     
@@ -92,7 +92,7 @@ void AppController::setupConnections() {
     // 現在は接続確認なし
     serverConnectionClient_ = new ServerConnectionClient(
         AppConfig::getInstance().GetServerConfig("ipaddress").c_str(),
-        std::stoi(AppConfig::getInstance().GetServerConfig("port"))
+        stoi(AppConfig::getInstance().GetServerConfig("port"))
     );
 }
 
@@ -108,7 +108,7 @@ void AppController::waitForShutdown() {
     Logger::getInstance().Info("Ctrl+Cまたはkillで終了できます。終了を待機中...");
 
     while (!gShouldExit) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        this_thread::sleep_for(chrono::milliseconds(100));
     }
 
     Logger::getInstance().Info("終了処理を開始します。");

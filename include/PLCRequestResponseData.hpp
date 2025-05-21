@@ -6,6 +6,8 @@
 #include <chrono>
 #include "Logger.hpp"
 
+using namespace std;
+
 class PLCRequestResponseData {
 public:
     // シリアル番号
