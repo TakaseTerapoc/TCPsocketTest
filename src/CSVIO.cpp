@@ -1,44 +1,14 @@
 #include "CSVIO.hpp"
 
-using namespace std;
-
-vector<map<string, string>> CSVIO::readCSVFileToMapVector(const string& fileName)
-{
-    vector<map<string, string>> result;
-    csv::CSVReader reader(fileName);
-    const auto& col_names = reader.get_col_names();
-
-    try {
-        for (csv::CSVRow& row : reader) {
-            map<string, string> rowMap;
-
-            for (const string& col : col_names) {
-                rowMap[col] = row[col].get<>();
-            }
-
-            result.push_back(move(rowMap));
-        }
-        if(result.size() == 0)
-        {
-            Logger::getInstance().Error("CSVファイルのデータがありません。");
-            exit(1);
-        }
-        return result;
-    }
-    catch (const exception& e){
-        Logger::getInstance().Error("CSVファイルの読込に失敗しました。");
-        exit(1);
-    }
-}
-
-vector<PLCRequestResponseData> CSVIO::makeRequestDataFromMapdata(vector<map<string, string>>& mapdata)
+// ★
+vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(vector<map<string, string>>& mapdata)
 {
     map<string, vector<map<string, string>>> groupedIntervalData;
     map<string, vector<vector<map<string, string>>>> groupedAddressData;
 
     addASCIIrow(mapdata);
     sortData(mapdata);
-    groupedIntervalData = groupMapCataByInterval(mapdata);
+    groupedIntervalData = groupMapDataByInterval(mapdata);
 
     // DataLumpを作成する
     makeDataLumpFromIntervalData(groupedIntervalData);
@@ -51,6 +21,7 @@ vector<PLCRequestResponseData> CSVIO::makeRequestDataFromMapdata(vector<map<stri
     // return groupMapDataByASCII(mapdata);
 }
 
+// ★
 void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>> groupedIntervalData)
 {
     vector<DataLump> result;
@@ -70,7 +41,7 @@ void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>
             }
         }
 
-        result.push_back(std::move(lump));
+        result.push_back(move(lump));
     }
 
     // result確認
@@ -86,6 +57,7 @@ void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>
     gDataLump = result;
 }
 
+// ★
 void CSVIO::addASCIIrow(vector<map<string, string>>& mapdata)
 {
     vector<map<string, string>> result;
@@ -97,52 +69,7 @@ void CSVIO::addASCIIrow(vector<map<string, string>>& mapdata)
     mapdata = move(result);
 }
 
-vector<PLCRequestResponseData> CSVIO::readCSVFile(const string& fileName)
-{
-    vector<vector<string>> csvdata;
-
-    try {
-        csv::CSVReader reader(fileName);
-
-        const auto headers = reader.get_col_names();
-
-        bool breakFlag = false;
-        for (auto& row : reader) {    
-            vector<string> rowdata;
-            rowdata.reserve(headers.size());
-            for (int i = 0; i < headers.size(); i++) {
-                auto val = row[i].get<>();
-                if (val.empty()){
-                    breakFlag = true;
-                    break;
-                }
-                rowdata.push_back(val);
-                if (i == 1) { 
-                    // 2列目のデータをASCIIコードに変換する
-                    rowdata.push_back(convertASCIIstring(val));
-                }
-            }
-            if (breakFlag){
-                breakFlag = false;
-                continue;
-            }
-            csvdata.push_back(move(rowdata));
-        }
-        if(csvdata.size() == 0)
-        {
-            Logger::getInstance().Error("CSVファイルのデータがありません。");
-            exit(1);
-        }
-        // 4列目のデータ順に並び替える
-        sortData(csvdata);
-        return convertCSVDataToPLCRequestData(separateCSVData(csvdata));
-    }
-    catch (const exception& e){
-        Logger::getInstance().Error("CSVファイルの読込に失敗しました。");
-        exit(1);
-    }
-}
-
+// ★
 void CSVIO::sortData(vector<map<string, string>>& mapdata)
 {
     sort(mapdata.begin(), mapdata.end(),
@@ -162,6 +89,7 @@ void CSVIO::sortData(vector<vector<string>>& csvdata)
     );
 }
 
+// ★
 string CSVIO::convertASCIIstring(string str)
 {
     string initialcode;
@@ -220,7 +148,8 @@ map<string, vector<map<string, string>>> CSVIO::separateMapData(vector<map<strin
     return separateData;
 }
 
-map<string, vector<map<string, string>>> CSVIO::groupMapCataByInterval(const vector<map<string, string>>& mapdata)
+// ★
+map<string, vector<map<string, string>>> CSVIO::groupMapDataByInterval(const vector<map<string, string>>& mapdata)
 {
     map<string, vector<map<string, string>>> result;
 
@@ -249,6 +178,7 @@ map<string, vector<map<string, string>>> CSVIO::groupMapCataByInterval(const vec
     return result;
 }
 
+// ★
 map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
     map<string, vector<map<string, string>>>& intervalGroups)
 {
@@ -299,15 +229,16 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
     return finalGroups;
 }
 
-vector<PLCRequestResponseData> CSVIO::makeRequestDataFromMapdata(
+// ★
+vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(
     const map<string, vector<vector<map<string, string>>>>& groupedData)
 {
-    vector<PLCRequestResponseData> result;
+    vector<PLCTransactionData> result;
     size_t serialCounter = 1;
 
     for (const auto& [interval, groups] : groupedData) {
         for (const auto& group : groups) {
-            PLCRequestResponseData data;
+            PLCTransactionData data;
             if (!group.empty()) {
                 data.sendIntervalMs = atoi(group[0].at("sendIntervalMS").c_str()) * 1000;
                 data.serialNumber = to_string(serialCounter++);
@@ -336,6 +267,7 @@ vector<PLCRequestResponseData> CSVIO::makeRequestDataFromMapdata(
     return result;
 }
 
+// ★
 // TODO：どこかにワード数、点数の定数を定義する必要がある。
 // TODO：後日全てのイニシャルを準備する。今はDとMだけ
 int CSVIO::getInterval(string ASCIIstr) {
@@ -351,6 +283,7 @@ int CSVIO::getInterval(string ASCIIstr) {
     }
 }
 
+// ★
 int CSVIO::getASCIIValue(const map<string, string>& row) {
 
     auto it = row.find("ASCII");
@@ -358,130 +291,4 @@ int CSVIO::getASCIIValue(const map<string, string>& row) {
         return stoi(it->second);
     }
     return -1; // エラー扱い
-}
-
-vector<PLCRequestResponseData> CSVIO::groupMapDataByASCII(
-    const vector<map<string, string>>& mapdata)
-{
-    vector<PLCRequestResponseData> result;
-
-    // コピーしてソート対象にする
-    vector<map<string, string>> sorted = mapdata;
-
-    PLCRequestResponseData currentGroup;
-    long prevASCII = -999999;
-    long preInterval = -999999;
-    int serialCounter = 1;
-
-    map<string, string> tempMemory;
-
-    size_t i = 0;
-    for (const auto& row : sorted) {
-        long currentASCII = stol(row.at("ASCII"));
-        long currentInterval = stoi(row.at("sendIntervalMS"));
-        if (i == 0)
-        {
-            preInterval = currentInterval;
-        }
-
-        if ((!currentGroup.mapdata.empty() && (currentASCII - prevASCII > SeparateIntarbal))//1つのまとまりを作るデータ間隔を60にする
-            || (currentInterval != preInterval)) // 送信間隔が変わった場合 
-        {
-            // 一つのまとまりとして完了 → 結果に追加
-            currentGroup.serialNumber = to_string(serialCounter++);
-            currentGroup.sendIntervalMs = row.at("sendIntervalMS").empty() ? 0 : stoi(row.at("sendIntervalMS")) * 1000;
-            result.push_back(move(currentGroup));
-            currentGroup = PLCRequestResponseData(); // 新しいグループ
-        }
-
-        currentGroup.mapdata.push_back(row);
-        prevASCII = currentASCII;
-        preInterval = currentInterval;
-        if (i == sorted.size() - 1)
-        {
-            tempMemory = row;
-        }
-        i++;
-    }
-
-    // 最後のグループを追加
-    if (!currentGroup.mapdata.empty()) {
-        currentGroup.serialNumber = to_string(serialCounter++);
-        currentGroup.sendIntervalMs = tempMemory.at("sendIntervalMS").empty() ? 0 : stoi(tempMemory.at("sendIntervalMS")) * 1000;
-        result.push_back(move(currentGroup));
-    }
-
-    return result;
-}
-
-map<string, vector<vector<string>>> CSVIO::separateCSVData(vector<vector<string>>& csvdata)
-{
-    map<string, vector<vector<string>>> separateData;
-
-    for (auto& row : csvdata) {
-        string addresscode = row[2];
-        string initialstring = addresscode.erase(addresscode.size() - 4);
-        separateData[initialstring].push_back(row);
-    }
-
-    return separateData;
-}
-
-vector<PLCRequestResponseData> CSVIO::convertCSVDataToPLCRequestData(const map<string, vector<vector<string>>>& csvdata)
-{
-    vector<PLCRequestResponseData> gRData;
-    int serialNumber = 1;
-    for (auto& [prefix, rows] : csvdata) {
-        PLCRequestResponseData current;
-        int prevValue = 0;
-        bool firstRow = true;  
-
-        // 行を順にチェック
-        for (auto& row : rows) {
-            int value = stoi(row[2]);
-            // 1行目はそのまま current に追加
-            if (!firstRow && value - prevValue > SeparateIntarbal) {
-                // ここまでの current を確定して gRData に追加
-                current.serialNumber = to_string(serialNumber++);
-                gRData.push_back(move(current));
-
-                // 新しいグループ用にリセット
-                current = PLCRequestResponseData{};
-                firstRow = true;
-            }
-
-            // current にこの行を追加
-            current.sensorrows.push_back(row);
-            prevValue = value;
-            firstRow = false;
-        }
-
-        // 最後に残った current を追加
-        if (!current.sensorrows.empty()) {
-            current.serialNumber = to_string(serialNumber++);
-            gRData.push_back(move(current));
-        }
-    }
-
-    // データ間隔算出
-    for (auto& data : gRData) {
-        for (size_t i = 0; i < data.sensorrows.size(); ++i) {
-            if (i > 0) {
-                int prevValue = stoi(data.sensorrows[i - 1][2]);
-                int currentValue = stoi(data.sensorrows[i][2]);
-                data.dataInterval.push_back(currentValue - prevValue);
-                cout << "データ間隔: " << data.dataInterval.back() << endl;
-            }
-        }
-    }
-
-    // 確認出力
-    for (auto& data : gRData) {
-        cout << "----- serial = " << data.serialNumber << " -----\n";
-        for (auto& row : data.sensorrows) {
-            for (auto& col : row) cout << col << " ";
-            cout << "\n";
-        }
-    }
-    return gRData;
 }

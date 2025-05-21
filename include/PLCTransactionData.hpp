@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class PLCRequestResponseData {
+class PLCTransactionData {
 public:
     // シリアル番号
     std::string serialNumber;
@@ -57,5 +57,5 @@ public:
     std::vector<std::vector<std::string>> sendData;
 
     // コンストラクタ
-    PLCRequestResponseData() = default;
+    PLCTransactionData() = default;
 };

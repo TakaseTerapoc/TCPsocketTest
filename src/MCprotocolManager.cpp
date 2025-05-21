@@ -56,7 +56,7 @@ vector<char> test =
     (char)0x03,(char)0x01,(char)0x02,(char)0x03     // テストデータ
 };
 
-void MCprotocolManager::covertToMCprotocolData2(vector<PLCRequestResponseData>& gRData)
+void MCprotocolManager::covertToMCprotocolData2(vector<PLCTransactionData>& gRData)
 {
     for (auto& data : gRData)
     {
@@ -114,7 +114,7 @@ void MCprotocolManager::covertToMCprotocolData2(vector<PLCRequestResponseData>& 
     }
 }
 
-void MCprotocolManager::makeCommand2(map<string,string>& row, PLCRequestResponseData& data, string& code, string& address)
+void MCprotocolManager::makeCommand2(map<string,string>& row, PLCTransactionData& data, string& code, string& address)
 {
     address = row.at("ASCII").substr((row.at("ASCII")).size() - 4);
     code = row.at("ASCII").substr(0, (row.at("ASCII")).size() - 4);
@@ -139,7 +139,7 @@ void MCprotocolManager::makeCommand2(map<string,string>& row, PLCRequestResponse
     data.deviceCode = code;
 }
 
-vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(char* text, int len, PLCRequestResponseData& req) {
+vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(char* text, int len, PLCTransactionData& req) {
     string responseData;
     string format;
     vector<map<string,string>> sendData;
@@ -196,7 +196,7 @@ vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(cha
 }
 
 
-void MCprotocolManager::covertToMCprotocolData(vector<PLCRequestResponseData>& gRData)
+void MCprotocolManager::covertToMCprotocolData(vector<PLCTransactionData>& gRData)
 {
     for (auto& data : gRData)
     {
@@ -261,7 +261,7 @@ string MCprotocolManager::substrBack(string& str, size_t pos, size_t len) {
 
     return str.substr(strLen - pos, len);
 }
-void MCprotocolManager::makeCommand(vector<string>& row, PLCRequestResponseData& data, string& code, string& address)
+void MCprotocolManager::makeCommand(vector<string>& row, PLCTransactionData& data, string& code, string& address)
 {
     address = row[2].substr(row[2].size() - 4);
     code = row[2].substr(0, row[2].size() - 4);
@@ -322,7 +322,7 @@ array<uint8_t,4> MCprotocolManager::decStrToBytes32(const string& decStr)
 }
 
 // デバイス点数を作成する関数
-void MCprotocolManager::makeDevicePoint(PLCRequestResponseData& data, int firstNumber, int lastNumber)
+void MCprotocolManager::makeDevicePoint(PLCTransactionData& data, int firstNumber, int lastNumber)
 {
     if ( lastNumber == 0)
     {
@@ -334,7 +334,7 @@ void MCprotocolManager::makeDevicePoint(PLCRequestResponseData& data, int firstN
     }
 }
 
-vector<vector<string>> MCprotocolManager::convertResponseDataToSendData(char* text, int len, PLCRequestResponseData& req) {
+vector<vector<string>> MCprotocolManager::convertResponseDataToSendData(char* text, int len, PLCTransactionData& req) {
     string responseData;
     string format;
     vector<vector<string>> sendData;

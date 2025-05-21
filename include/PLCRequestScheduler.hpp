@@ -6,7 +6,7 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include "PLCRequestResponseData.hpp"
+#include "PLCTransactionData.hpp"
 #include "globals.hpp"
 
 using namespace std;

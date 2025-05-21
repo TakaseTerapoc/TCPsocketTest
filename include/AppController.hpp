@@ -2,6 +2,7 @@
 
 #include "Logger.hpp"
 #include "AppConfig.hpp"
+#include "CsvReader.hpp"
 #include "CSVIO.hpp"
 #include "MCprotocolManager.hpp"
 #include "PLCConnectionClient.hpp"

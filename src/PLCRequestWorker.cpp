@@ -38,7 +38,7 @@ void PLCRequestWorker::run() {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
-        PLCRequestResponseData req;
+        PLCTransactionData req;
         {
             unique_lock<mutex> lock(gRequestQueueMutex);
             if (gRequestQueue.empty()) {
@@ -101,7 +101,7 @@ void PLCRequestWorker::run() {
     }
 }
 
-    DataLump* PLCRequestWorker::getReadySensor(const PLCRequestResponseData& req, const vector<map<string,string>>& sendData)
+    DataLump* PLCRequestWorker::getReadySensor(const PLCTransactionData& req, const vector<map<string,string>>& sendData)
     {
         DataLump* dataLump = nullptr;
 

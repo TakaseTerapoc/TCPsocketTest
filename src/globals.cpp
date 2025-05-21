@@ -1,10 +1,10 @@
 #include "globals.hpp"
 
 // PLCのリクエストを格納するリストです。
-vector<PLCRequestResponseData> gRData;
+vector<PLCTransactionData> gRData;
 
 // PLCへのリクエストを格納するキューです。
-queue<PLCRequestResponseData> gRequestQueue;
+queue<PLCTransactionData> gRequestQueue;
 
 // gRequestQueueのミューテックスです。
 mutex gRequestQueueMutex;

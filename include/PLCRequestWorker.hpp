@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "globals.hpp"
-#include "PLCRequestResponseData.hpp"
+#include "PLCTransactionData.hpp"
 #include "MCprotocolManager.hpp"
 #include "../external/fmt/format.h"
 #include "DataLump.hpp"
@@ -45,7 +45,7 @@ class PLCRequestWorker
         void run();
 
         // sensorReadyStatusにsensorIDの状態を格納する関数
-        DataLump* getReadySensor(const PLCRequestResponseData& req, const vector<map<string,string>>& sendData);
+        DataLump* getReadySensor(const PLCTransactionData& req, const vector<map<string,string>>& sendData);
 
         thread      thread_;                   // 実行スレッド
         

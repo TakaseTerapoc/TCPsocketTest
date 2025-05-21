@@ -59,7 +59,7 @@ void AppController::loadConfig() {
 void AppController::prepareRequestData() {
     Logger::getInstance().Info("PLCリクエストデータの準備を開始します。");
 
-    auto mapdata = CSVIO::readCSVFileToMapVector("../request/testdataDemo.csv");
+    auto mapdata = CsvReader::readCSVFileToMapVector("../request/testdataDemo.csv");
     gRData = CSVIO::makeRequestDataFromMapdata(mapdata);
 
     MCprotocolManager::covertToMCprotocolData2(gRData);

@@ -4,7 +4,7 @@
 #include <queue>
 #include <mutex>
 #include <atomic>
-#include "PLCRequestResponseData.hpp"
+#include "PLCTransactionData.hpp"
 #include "DataLumpBase.hpp"
 #include "AppController.hpp"
 #include "PLCConnectionClient.hpp"
@@ -19,13 +19,13 @@ using namespace std;
 class AppController;
 
 // PLCへのリクエストを格納するキューです。
-extern queue<PLCRequestResponseData> gRequestQueue;
+extern queue<PLCTransactionData> gRequestQueue;
 
 // requestQueueのミューテックスです。
 extern mutex gRequestQueueMutex;
 
 // PLCのリクエストを格納するリストです。
-extern vector<PLCRequestResponseData> gRData;
+extern vector<PLCTransactionData> gRData;
 
 // サーバーへ送信するデータを格納するリスト<map>です。
 extern vector<vector<map<string, string>>> gSendDataMap;

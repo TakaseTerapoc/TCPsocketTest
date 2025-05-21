@@ -12,7 +12,7 @@
 #include <iomanip>
 
 #include "Logger.hpp"
-#include "PLCRequestResponseData.hpp"
+#include "PLCTransactionData.hpp"
 
 using namespace std;
 
@@ -23,19 +23,19 @@ class MCprotocolManager
         MCprotocolManager() = delete;
 
         //【新】MCプロトコルデータを変換する関数
-        static void covertToMCprotocolData2(std::vector<PLCRequestResponseData>& gRData);
+        static void covertToMCprotocolData2(std::vector<PLCTransactionData>& gRData);
 
-        static void makeCommand2(std::map<std::string,std::string>& row, PLCRequestResponseData& data, std::string& code, std::string& address);
+        static void makeCommand2(std::map<std::string,std::string>& row, PLCTransactionData& data, std::string& code, std::string& address);
 
-        static std::vector<std::map<std::string,std::string>> convertResponseDataToSendData2(char* text, int len, PLCRequestResponseData& req);
+        static std::vector<std::map<std::string,std::string>> convertResponseDataToSendData2(char* text, int len, PLCTransactionData& req);
 
 
         //【旧】MCプロトコルデータを変換する関数
         // PLCRequestDataの各種メンバーからMCプロトコルデータに変換する関数
-        static void covertToMCprotocolData(std::vector<PLCRequestResponseData>& gRData);
+        static void covertToMCprotocolData(std::vector<PLCTransactionData>& gRData);
 
         // コマンドを作成する関数
-        static void makeCommand(std::vector<std::string>& row, PLCRequestResponseData& data,std::string& code, std::string& address);
+        static void makeCommand(std::vector<std::string>& row, PLCTransactionData& data,std::string& code, std::string& address);
 
         // デバイスコードを作成する関数
         static void makeDeviceCode(std::vector<char>& buf, std::string& code);
@@ -47,13 +47,13 @@ class MCprotocolManager
         static std::array<uint8_t,4> decStrToBytes32(const std::string& decStr);
 
         // デバイス点数を作成する関数
-        static void makeDevicePoint(PLCRequestResponseData& data, int firstNumber, int lastNumber);
+        static void makeDevicePoint(PLCTransactionData& data, int firstNumber, int lastNumber);
 
         // 後ろからsubstringする関数
         static std::string substrBack(std::string& str, size_t pos, size_t len);
 
         // レスポンスデータ(１６進数)を10進数に変換して算出する関数
-        static std::vector<std::vector<std::string>> convertResponseDataToSendData(char* text, int len, PLCRequestResponseData& req);
+        static std::vector<std::vector<std::string>> convertResponseDataToSendData(char* text, int len, PLCTransactionData& req);
 
         // レスポンス文字列を正しい順番に並び替える。
         static std::string swapString(const std::string& str);
