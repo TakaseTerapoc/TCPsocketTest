@@ -192,16 +192,30 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
 
         vector<vector<map<string, string>>> groups;
         vector<map<string, string>> currentGroup;
-        int prevASCII = -1;
+        int prevASCII = 0;
+        int maxASCII = 0;
+        bool initflag = false;
+        int initASCII = 0;
+
+        size_t i = 0;
 
         for (const auto& row : rows) {
+            if (i == 0) {
+                prevASCII = getASCIIValue(row);
+                initASCII = prevASCII;
+                initflag = true;
+            }
+            
             int ascii = getASCIIValue(row);
-            if (!currentGroup.empty() && (ascii - prevASCII > getInterval(row.at("ASCII")))) {
+            
+            if (!currentGroup.empty() && (ascii - initASCII > getInterval(row.at("ASCII")))) {
                 groups.push_back(currentGroup);
                 currentGroup.clear();
+                initASCII = ascii;
             }
             currentGroup.push_back(row);
             prevASCII = ascii;
+            i++;
         }
 
         if (!currentGroup.empty()) {
