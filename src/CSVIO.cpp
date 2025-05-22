@@ -192,18 +192,14 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
 
         vector<vector<map<string, string>>> groups;
         vector<map<string, string>> currentGroup;
-        int prevASCII = 0;
-        int maxASCII = 0;
-        bool initflag = false;
-        int initASCII = 0;
 
+        int initASCII = 0;
+ 
         size_t i = 0;
 
         for (const auto& row : rows) {
             if (i == 0) {
-                prevASCII = getASCIIValue(row);
-                initASCII = prevASCII;
-                initflag = true;
+                initASCII = getASCIIValue(row);
             }
             
             int ascii = getASCIIValue(row);
@@ -214,7 +210,6 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
                 initASCII = ascii;
             }
             currentGroup.push_back(row);
-            prevASCII = ascii;
             i++;
         }
 
@@ -287,10 +282,10 @@ vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(
 int CSVIO::getInterval(string ASCIIstr) {
     string initialstring = ASCIIstr.erase(ASCIIstr.size() - 4);
     if (initialstring == "68") { //D
-        return 64; //64ワード
+        return 4; //4ワード
     }
-    else if (initialstring == "77") {
-        return 256; //256点
+    else if (initialstring == "77") {//M
+        return 12; //256点
     }
     else {
         return 0; // 不明な場合は0を返す

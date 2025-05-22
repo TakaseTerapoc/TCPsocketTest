@@ -86,8 +86,6 @@ void PLCRequestWorker::run() {
         }
         Logger::getInstance().Info("送信データ: " + sendDatastr);
 
-        
-
         // 受信データを確認し、sensorの準備状態を変更する。
         DataLump* dataLump = getReadySensor(req, sendData);
 

@@ -20,6 +20,9 @@ public:
     // コンストラクタ
     DataLump() = default;
 
+    // シリアルナンバー
+    string serialNumber = "";
+
     // 送信間隔
     int sendIntervalMs = 0;
 

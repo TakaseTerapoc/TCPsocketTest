@@ -29,6 +29,7 @@ class MCprotocolManager
 
         static std::vector<std::map<std::string,std::string>> convertResponseDataToSendData2(char* text, int len, PLCTransactionData& req);
 
+        static string convertBytesCharToString(char& bytes);
 
         //【旧】MCプロトコルデータを変換する関数
         // PLCRequestDataの各種メンバーからMCプロトコルデータに変換する関数

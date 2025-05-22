@@ -148,16 +148,16 @@ vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(cha
     {
         if (i > 1)
         {
-            responseData += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
+            responseData += convertBytesCharToString(text[i]);
 
         }
         else
         {
-            format += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
+            format += convertBytesCharToString(text[i]);
         }
     }
 
-    Logger::getInstance().Info("【シリアルナンバー】" + req.serialNumber + "【フォーマット】"+ format +"【受信データ(2進数)】" + responseData);
+    Logger::getInstance().Info("【シリアルナンバー】" + req.serialNumber + "【フォーマット】"+ format +"【受信データ(16進数)】" + responseData);
 
     for (int i = 0; i < req.mapdata.size(); i++)
     {
@@ -193,6 +193,11 @@ vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(cha
     sendData = req.mapdata;
 
     return sendData;
+}
+
+string MCprotocolManager::convertBytesCharToString(char& bytes) {
+    
+    return fmt::format("{:02X}", static_cast<unsigned char>(bytes));
 }
 
 
