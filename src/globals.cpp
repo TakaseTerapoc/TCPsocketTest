@@ -4,7 +4,7 @@
 vector<PLCTransactionData> gRData;
 
 // PLCへのリクエストを格納するキューです。
-queue<PLCTransactionData> gRequestQueue;
+deque<PLCTransactionData> gRequestQueue;
 
 // gRequestQueueのミューテックスです。
 mutex gRequestQueueMutex;

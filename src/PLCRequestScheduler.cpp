@@ -37,6 +37,11 @@ void PLCRequestScheduler::run() {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
+        if (!gPLconnectFlag)
+        {
+            this_thread::sleep_for(chrono::milliseconds(50));
+            continue;
+        }
 
         auto now = chrono::steady_clock::now();
         for (auto& plcr : gRData) {

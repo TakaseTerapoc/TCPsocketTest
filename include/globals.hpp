@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <deque>
 #include <queue>
 #include <mutex>
 #include <atomic>
@@ -19,7 +20,7 @@ using namespace std;
 class AppController;
 
 // PLCへのリクエストを格納するキューです。
-extern queue<PLCTransactionData> gRequestQueue;
+extern deque<PLCTransactionData> gRequestQueue;
 
 // requestQueueのミューテックスです。
 extern mutex gRequestQueueMutex;
@@ -39,3 +40,6 @@ extern AppController* gAppInstance;
 
 // DataLumpのvectorです。
 extern vector<DataLump> gDataLump;
+
+// PLCとの通信が再開した時のフラグです。
+extern atomic<bool> gPLconnectFlag;

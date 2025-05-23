@@ -34,6 +34,7 @@ void PLCRequestWorker::stop() {
 // キューから出し、PLCへのTCPリクエストを依頼する。
 void PLCRequestWorker::run() {
     while (true) {
+        gPLconnectFlag = true; // PLC接続フラグをtrueにする
         {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
@@ -48,15 +49,9 @@ void PLCRequestWorker::run() {
             req = gRequestQueue.front();
             gRequestQueue.pop();
         }
+        Logger::getInstance().Info("キューから取り出しました。");
 
-        // 確認やつ
-        auto now = chrono::steady_clock::now();
-        auto dur = now.time_since_epoch();
-        auto ms = chrono::duration_cast<chrono::milliseconds>(dur).count();
-        Logger::getInstance().Info("キューから取り出しました。" + req.serialNumber + "【時間】" + to_string(ms));
-
-        // TCPリクエスト 
-        
+        // TCPリクエスト        
         Logger::getInstance().Info("PLCにリクエストを送ります。");
         for (int i = 0; i < req.protocolbuf.size(); ++i)
         {
@@ -104,17 +99,18 @@ void PLCRequestWorker::run() {
                 // 5回送信しても失敗した場合、ソケットを閉じて再接続する。
                 pLCConnectionClient_.close();
                 pLCConnectionClient_.makeSocket();
+                gPLconnectFlag = false; // PLC接続フラグをfalseにする
+                // キューをロックして空にする。
+                {
+                    unique_lock<mutex> lock(gRequestQueueMutex);
+                    gRequestQueue.clear(); 
+                }
                 while(pLCConnectionClient_.Connect() < 0)
                 {
                     Logger::getInstance().Error("PLC接続再試行中...");
                     this_thread::sleep_for(chrono::seconds(1));
                 }
                 resetFlag = true;
-                // キューをロックする
-                {
-                    unique_lock<mutex> lock(gRequestQueueMutex);
-                    gRequestQueue.clear(); // 復帰した場合、キューをクリアする。   
-                }
                 recvTryTimes = 0; // 再接続後、送信試行回数をリセット
                 break;
             }
