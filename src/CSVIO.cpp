@@ -1,4 +1,5 @@
 #include "CSVIO.hpp"
+#include "MCprotocolConfig.hpp"
 
 // ★
 vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(vector<map<string, string>>& mapdata)
@@ -282,10 +283,10 @@ vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(
 int CSVIO::getInterval(string ASCIIstr) {
     string initialstring = ASCIIstr.erase(ASCIIstr.size() - 4);
     if (initialstring == "68") { //D
-        return 4; //4ワード
+        return MCprotocolConfig::D_WORD_MAX_READ_SIZE; //4ワード
     }
-    else if (initialstring == "77") {//M
-        return 12; //256点
+    else if (initialstring == "77" || initialstring == "88") {//M
+        return MCprotocolConfig::M_X_Y_S_T_C_BIT_MAX_READ_SIZE; //12点
     }
     else {
         return 0; // 不明な場合は0を返す

@@ -148,12 +148,12 @@ vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(cha
     {
         if (i > 1)
         {
-            responseData += convertBytesCharToString(text[i]);
+            responseData += convertBytesToHexString(text[i]);
 
         }
         else
         {
-            format += convertBytesCharToString(text[i]);
+            format += convertBytesToHexString(text[i]);
         }
     }
 
@@ -162,7 +162,7 @@ vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(cha
     for (int i = 0; i < req.mapdata.size(); i++)
     {
         string data;
-        if (req.deviceCode == "77")
+        if (req.deviceCode == "77" || req.deviceCode == "88")
         {
             
             if (i == 0)
@@ -195,101 +195,15 @@ vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(cha
     return sendData;
 }
 
-string MCprotocolManager::convertBytesCharToString(char& bytes) {
+string MCprotocolManager::convertBytesToHexString(char& bytes) {
     
     return fmt::format("{:02X}", static_cast<unsigned char>(bytes));
-}
-
-
-void MCprotocolManager::covertToMCprotocolData(vector<PLCTransactionData>& gRData)
-{
-    for (auto& data : gRData)
-    {
-        string code;
-        string address;
-        int firstNumber = 0;
-        int lastNumber = 0;
-
-        // コマンドに応じてMCプロトコルを変換
-        if (data.command == "read")
-        {
-            size_t i = 0;
-            string code;
-            string address;
-            for (int i = 0; i < (data.sensorrows).size(); i++)
-            {
-                // data.deviceCount++;
-                auto& row = data.sensorrows[i];
-                if(i == 0)
-                {
-                    makeCommand(row, data, code, address);
-                    makeTopDeviceNumber(data.protocolbuf, address);
-                    makeDeviceCode(data.protocolbuf, code);
-                    firstNumber = stoi(row[2]);
-                } 
-                else if (i == (data.sensorrows).size() - 1)
-                {
-                    lastNumber = stoi(row[2]);
-                }
-            }
-            makeDevicePoint(data, firstNumber, lastNumber);
-
-            // 確認用
-            cout << "【シリアルナンバー】" << data.serialNumber << endl;
-            for (size_t i = 0; i < data.protocolbuf.size(); ++i) {
-                uint8_t byte = static_cast<uint8_t>(data.protocolbuf[i]);
-                printf("readPLCwithWord[%2zu] = 0x%02X\n", i, byte);
-            }
-
-        }
-        else if (data.command == "write")
-        {
-            // data.protocolbuf = bufM00Write;
-        }
-        else if (data.command == "start")
-        {
-            data.protocolbuf = startPLC;
-        }
-        else if (data.command == "stop")
-        {
-            data.protocolbuf = stopPLC;
-        }
-        else if (data.command == "getname")
-        {
-            data.protocolbuf = getPLCName;
-        }
-    }
 }
 
 string MCprotocolManager::substrBack(string& str, size_t pos, size_t len) {
     const size_t strLen = str.length();
 
     return str.substr(strLen - pos, len);
-}
-void MCprotocolManager::makeCommand(vector<string>& row, PLCTransactionData& data, string& code, string& address)
-{
-    address = row[2].substr(row[2].size() - 4);
-    code = row[2].substr(0, row[2].size() - 4);
-    if (code == "77" || code == "88")
-    {
-        data.sendIntervalMs = 60000;
-        data.protocolbuf = readPLCwithBit;
-        makeDeviceCode(data.protocolbuf, code);
-    }
-    else if (code == "68")
-    {
-        data.sendIntervalMs = 60000;
-        data.protocolbuf = readPLCwithWord;
-        makeDeviceCode(data.protocolbuf, code);
-    }
-    else
-    {
-        // TODO:後で要修正
-        // data.protocolbuf = bufD100;
-    }
-
-    // デバイスコードを入れる。
-    data.deviceCode = code;
 }
 
 void MCprotocolManager::makeDeviceCode(vector<char>& buf, string& code)
@@ -303,6 +217,15 @@ void MCprotocolManager::makeDeviceCode(vector<char>& buf, string& code)
     {
         buf[8] = (char)0x20;
         buf[9] = (char)0x44;
+    }
+    else if (code == "88")
+    {
+        buf[8] = (char)0x20;
+        buf[9] = (char)0x58;
+    }
+    else
+    {
+        Logger::getInstance().Error("デバイスコードが不正です。");
     }
 }
 
@@ -337,64 +260,6 @@ void MCprotocolManager::makeDevicePoint(PLCTransactionData& data, int firstNumbe
     {
         data.protocolbuf[10] = (char)((lastNumber - firstNumber + 1) & 0xFF);
     }
-}
-
-vector<vector<string>> MCprotocolManager::convertResponseDataToSendData(char* text, int len, PLCTransactionData& req) {
-    string responseData;
-    string format;
-    vector<vector<string>> sendData;
-
-    for (int i = 0; i < len; ++i)
-    {
-        if (i > 1)
-        {
-            responseData += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
-
-        }
-        else
-        {
-            format += fmt::format("{:02X}", static_cast<unsigned char>(text[i]));
-        }
-    }
-
-    Logger::getInstance().Info("【シリアルナンバー】" + req.serialNumber + "【フォーマット】"+ format +"【受信データ(2進数)】" + responseData);
-
-    for (int i = 0; i < req.sensorrows.size(); i++)
-    {
-        string data;
-        if (req.deviceCode == "77")
-        {
-            
-            if (i == 0)
-            {
-                data = responseData.substr(0, 1);
-            }
-            else
-            {
-                int startPosition = stoi(req.sensorrows[i][2]) - stoi(req.sensorrows[i - 1][2]);
-                data = responseData.substr(startPosition, 1);
-            }
-        }
-        else if (req.deviceCode == "68")
-        {
-            if (i == 0)
-            {
-                data = convertDecimalString(swapString(responseData.substr(0, 4)));
-
-            }
-            else
-            {
-                int startPosition = (stoi(req.sensorrows[i][2]) - stoi(req.sensorrows[i - 1][2])) * 4;
-                data = convertDecimalString(swapString(responseData.substr(startPosition, 4)));
-            }
-        }
-        // req.sensorrows[i].push_back(req.receiptTime);
-        // req.sensorrows[i].push_back(to_string(req.transmissionIntervalMs));
-        req.sensorrows[i].push_back(data);
-    }
-    sendData = req.sensorrows;
-
-    return sendData;
 }
 
 string MCprotocolManager::swapString(const string& str) {

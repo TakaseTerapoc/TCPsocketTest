@@ -19,24 +19,17 @@ using namespace std;
 class MCprotocolManager
 {
     public:
-        //コンストラクタ
+        // コンストラクタ
         MCprotocolManager() = delete;
 
-        //【新】MCプロトコルデータを変換する関数
+        // MCプロトコルデータを変換する関数
         static void covertToMCprotocolData2(std::vector<PLCTransactionData>& gRData);
 
         static void makeCommand2(std::map<std::string,std::string>& row, PLCTransactionData& data, std::string& code, std::string& address);
 
         static std::vector<std::map<std::string,std::string>> convertResponseDataToSendData2(char* text, int len, PLCTransactionData& req);
 
-        static string convertBytesCharToString(char& bytes);
-
-        //【旧】MCプロトコルデータを変換する関数
-        // PLCRequestDataの各種メンバーからMCプロトコルデータに変換する関数
-        static void covertToMCprotocolData(std::vector<PLCTransactionData>& gRData);
-
-        // コマンドを作成する関数
-        static void makeCommand(std::vector<std::string>& row, PLCTransactionData& data,std::string& code, std::string& address);
+        static string convertBytesToHexString(char& bytes);
 
         // デバイスコードを作成する関数
         static void makeDeviceCode(std::vector<char>& buf, std::string& code);
@@ -52,9 +45,6 @@ class MCprotocolManager
 
         // 後ろからsubstringする関数
         static std::string substrBack(std::string& str, size_t pos, size_t len);
-
-        // レスポンスデータ(１６進数)を10進数に変換して算出する関数
-        static std::vector<std::vector<std::string>> convertResponseDataToSendData(char* text, int len, PLCTransactionData& req);
 
         // レスポンス文字列を正しい順番に並び替える。
         static std::string swapString(const std::string& str);
