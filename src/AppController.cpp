@@ -4,7 +4,7 @@
 void signalHandler(int signal) {
     if (signal == SIGINT || signal == SIGTERM) {
         Logger::getInstance().Info("終了シグナルを受信しました。終了処理を行います。");
-        gShouldExit = true;
+        // gShouldExit = true;
 
         if (gAppInstance != nullptr) {
             gAppInstance->stop();
@@ -19,7 +19,7 @@ AppController::AppController()
 }
 
 AppController::~AppController() {
-    stop();
+    // stop();
     delete plcConnectionClient_;
     delete serverConnectionClient_;
     gAppInstance = nullptr;
@@ -33,6 +33,10 @@ void AppController::run() {
     // ただし、kill -9 などの強制終了は捕捉できない
     // 参考: https://www.oreilly.co.jp/books/9784873117980/
     signal(SIGTERM, signalHandler);
+
+    // SIGPIPEを無視する
+    signal(SIGPIPE,SIG_IGN);
+
 
     initLogger();
     loadConfig();
@@ -80,9 +84,7 @@ void AppController::setupConnections() {
     int result = -1;
     size_t retry = 0;
     while ((result = plcConnectionClient_->Connect()) < 0) {
-        if (retry++ > 0) {
-            Logger::getInstance().Error("PLC接続再試行中...");
-        }
+        Logger::getInstance().Error("PLC接続再試行中...");
         this_thread::sleep_for(chrono::seconds(1));
     }
     Logger::getInstance().Info("PLC接続に成功しました。");
@@ -107,11 +109,10 @@ void AppController::startWorkers() {
 void AppController::waitForShutdown() {
     Logger::getInstance().Info("Ctrl+Cまたはkillで終了できます。終了を待機中...");
 
-    while (!gShouldExit) {
-        this_thread::sleep_for(chrono::milliseconds(100));
-    }
+    // while (!gShouldExit) {
+    //     this_thread::sleep_for(chrono::milliseconds(100));
+    // }
 
-    Logger::getInstance().Info("終了処理を開始します。");
     PLCRequestWorker::getInstance(*plcConnectionClient_).join();
     PLCRequestScheduler::getInstance().join();
     ServerRequestWorker::getInstance(*serverConnectionClient_).join();
@@ -128,4 +129,9 @@ void AppController::stop() {
     if (serverConnectionClient_) {
         ServerRequestWorker::getInstance(*serverConnectionClient_).stop();
     }
+
+    delete plcConnectionClient_;
+    delete serverConnectionClient_;
+    gAppInstance = nullptr;
+    exit(0);
 }

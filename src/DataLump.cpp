@@ -3,16 +3,16 @@
 void DataLump::isLumpFull() {
     for (const auto& sensorStatus : sensorReadyStatus) {
         for (const auto& [sensorID, status] : sensorStatus) {
-            lumpFull = true;
+            isSendReady = true;
             if (!status) {
-                lumpFull = false;
+                isSendReady = false;
             }
         }
     }
 }
 
 void DataLump::allClear() {
-        lumpFull = false;
+        isSendReady = false;
         sendData.clear();
         
         // センサーの準備状況をクリア

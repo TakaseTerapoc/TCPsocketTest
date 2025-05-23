@@ -63,19 +63,25 @@ void PLCRequestWorker::run() {
         char text[256];
         int len = pLCConnectionClient_.RecvResponse(text);
         req.receiptTime = Logger::getInstance().timestamp;
-        if (len > 0)
+
+        // 受信データを確認。異常がない場合は3つ以上のデータが入っている。
+        if (len > 2)
         {
             Logger::getInstance().Info("【デバイスコード】" + req.deviceCode );
         }
+        else if (len <= 0)
+        {
+            Logger::getInstance().Error("接続エラーです。");
+            exit(1);
+        }
         else
         {
-            Logger::getInstance().Error("レスポンス受信に失敗しました。");
-            continue;
+            Logger::getInstance().Error("受信データが異常です。");
+            exit(1);
         }
 
         // 送信データ作成
         Logger::getInstance().Info("送信データを作成します");
-        // vector<vector<string>> sendData = MCprotocolManager::convertResponseDataToSendData(text, len, req);
         vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, len, req);
         string sendDatastr;
         for (size_t i = 0; i < sendData.size(); ++i) {
@@ -89,7 +95,7 @@ void PLCRequestWorker::run() {
         // 受信データを確認し、sensorの準備状態を変更する。
         DataLump* dataLump = getReadySensor(req, sendData);
 
-        if (dataLump != nullptr && dataLump->lumpFull) {
+        if (dataLump != nullptr && dataLump->isSendReady) {
             // 送信データをPLCへ送信
             Logger::getInstance().Info("データをサーバへ送信します。");
             vector<map<string,string>> sendDatacp = dataLump->sendData;
@@ -156,7 +162,7 @@ void PLCRequestWorker::run() {
         // LumpFullを確認
         dataLump->isLumpFull();
 
-        Logger::getInstance().Info("LumpFull: " + to_string(dataLump->lumpFull));
+        Logger::getInstance().Info("LumpFull: " + to_string(dataLump->isSendReady));
 
         return dataLump;
     }

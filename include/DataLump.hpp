@@ -27,7 +27,7 @@ public:
     int sendIntervalMs = 0;
 
     // データが満杯かどうか
-    bool lumpFull = false;
+    bool isSendReady = false;
 
     // 各センサーの準備状況を保持する
     vector<map<string,bool>> sensorReadyStatus;

@@ -56,10 +56,10 @@ void PLCConnectionClient::SendRequest(const char* text, int len)
     };
 }
 
-ssize_t PLCConnectionClient::RecvResponse(char* text)
+int PLCConnectionClient::RecvResponse(char* text)
 {
     Logger::getInstance().Info("受信開始します。"); 
-    ssize_t recvSize = recv(socket_, text, sizeof(text), 0);
+    int recvSize = recv(socket_, text, sizeof(text), 0);
     Logger::getInstance().Info("受信しました。"+ std::to_string(recvSize) + "byte");
     return recvSize;
 }

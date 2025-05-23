@@ -29,7 +29,7 @@ public:
     int Connect();
     void getConnInfo(const char* serverIpAddress, int serverPortNumber);
     void SendRequest(const char* text, int len);
-    ssize_t RecvResponse(char* text);
+    int RecvResponse(char* text);
 
     struct timeval timeout;
 };

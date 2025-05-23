@@ -13,7 +13,7 @@ mutex gRequestQueueMutex;
 mutex gSendDataMutex;
 
 // シグナル制御・管理するための変数です。
-atomic<bool> gShouldExit = false;
+// atomic<bool> gShouldExit = false;
 AppController* gAppInstance = nullptr;
 
 // DataLumpのvectorです。
