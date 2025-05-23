@@ -53,36 +53,89 @@ void PLCRequestWorker::run() {
         auto now = chrono::steady_clock::now();
         auto dur = now.time_since_epoch();
         auto ms = chrono::duration_cast<chrono::milliseconds>(dur).count();
-        Logger::getInstance().Debug("キューから取り出しました。" + req.serialNumber + "【時間】" + to_string(ms));
+        Logger::getInstance().Info("キューから取り出しました。" + req.serialNumber + "【時間】" + to_string(ms));
 
         // TCPリクエスト 
-        pLCConnectionClient_.SendRequest(req.protocolbuf.data(), req.protocolbuf.size());
+        
+        Logger::getInstance().Info("PLCにリクエストを送ります。");
+        for (int i = 0; i < req.protocolbuf.size(); ++i)
+        {
+            printf("%02X ", req.protocolbuf[i]);
+        }
+        printf("\n");
+        int sendLen = 0;
+        int sendTryTimes = 0;
+        while(pLCConnectionClient_.sendRequest(req.protocolbuf.data(), req.protocolbuf.size(), sendLen) <= 0)
+        {
+            Logger::getInstance().Error("PLCへの送信が失敗しました。");
+            if (sendTryTimes > 4)
+            {
+                Logger::getInstance().Error("試行規定回数に達しました。ソケットを閉じて再接続します。");
+                
+                // 3回送信しても失敗した場合、ソケットを閉じて再接続する。
+                pLCConnectionClient_.close();
+                pLCConnectionClient_.makeSocket();
+                while(pLCConnectionClient_.Connect() < 0)
+                {
+                    Logger::getInstance().Error("PLC接続再試行中...");
+                    this_thread::sleep_for(chrono::seconds(1));
+                }
+                sendTryTimes = 0; // 再接続後、送信試行回数をリセット
+            }
+            // 送信エラーが発生した場合、再送信を試みる。
+            Logger::getInstance().Error("再送信します。");
+            this_thread::sleep_for(chrono::milliseconds(50));
+            sendTryTimes++;
+        }
         Logger::getInstance().Info("RecvResponseを動かします。");
 
         // レスポンス受信
         char text[256];
-        int len = pLCConnectionClient_.RecvResponse(text);
+        int recvLen = 0;
+        int recvTryTimes = 0;
+        bool resetFlag = false;
+        while(pLCConnectionClient_.recvResponse(text, recvLen) <= 0)
+        {
+            Logger::getInstance().Error("受信が失敗しました。");
+            if (recvTryTimes > 4)
+            {
+                Logger::getInstance().Error("試行規定回数に達しました。ソケットを閉じて再接続します。");
+                
+                // 5回送信しても失敗した場合、ソケットを閉じて再接続する。
+                pLCConnectionClient_.close();
+                pLCConnectionClient_.makeSocket();
+                while(pLCConnectionClient_.Connect() < 0)
+                {
+                    Logger::getInstance().Error("PLC接続再試行中...");
+                    this_thread::sleep_for(chrono::seconds(1));
+                }
+                resetFlag = true;
+                // キューをロックする
+                {
+                    unique_lock<mutex> lock(gRequestQueueMutex);
+                    gRequestQueue.clear(); // 復帰した場合、キューをクリアする。   
+                }
+                recvTryTimes = 0; // 再接続後、送信試行回数をリセット
+                break;
+            }
+            if (resetFlag)
+            {
+                break;
+            }
+            // 送信エラーが発生した場合、再送信を試みる。
+            Logger::getInstance().Error("再受信します。");
+            this_thread::sleep_for(chrono::milliseconds(50));
+            recvTryTimes++;
+        }
+        if (resetFlag)
+        {
+            continue;
+        }
         req.receiptTime = Logger::getInstance().timestamp;
-
-        // 受信データを確認。異常がない場合は3つ以上のデータが入っている。
-        if (len > 2)
-        {
-            Logger::getInstance().Info("【デバイスコード】" + req.deviceCode );
-        }
-        else if (len <= 0)
-        {
-            Logger::getInstance().Error("接続エラーです。");
-            exit(1);
-        }
-        else
-        {
-            Logger::getInstance().Error("受信データが異常です。");
-            exit(1);
-        }
 
         // 送信データ作成
         Logger::getInstance().Info("送信データを作成します");
-        vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, len, req);
+        vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, recvLen, req);
         string sendDatastr;
         for (size_t i = 0; i < sendData.size(); ++i) {
             for (const auto& [key, value] : sendData[i]) {

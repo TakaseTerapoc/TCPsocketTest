@@ -6,25 +6,10 @@ PLCConnectionClient::PLCConnectionClient(const char* serverIpAddress, int server
     serverAddress_.sin_port = htons(serverPortNumber);
     serverAddress_.sin_family = AF_INET; // AF_INET：IPV4アドレスを使う
 
-    socket_ = socket(AF_INET, SOCK_STREAM, 0);
+    socket_ = makeSocket();
     if (socket_ < 0) 
     {
         Logger::getInstance().Error("ソケット作成に失敗しました。");
-    }
-    
-    // ソケットのオプション設定
-    // 受信タイムアウトの設定
-    timeout.tv_sec = TimeoutSec;
-    timeout.tv_usec = TimeoutUsec;
-    if (setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
-        Logger::getInstance().Error("ソケット作成に失敗しました。");
-        close(socket_);
-    }
-
-    // 送信タイムアウトの設定
-    if (setsockopt(socket_, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) < 0) {
-        Logger::getInstance().Error("ソケット作成に失敗しました。");
-        close(socket_);
     }
 }
 
@@ -35,31 +20,40 @@ void PLCConnectionClient::getConnInfo(const char* serverIpAddress, int serverPor
     serverAddress_.sin_family = AF_INET; // AF_INET：IPV4アドレスを使う
 }
 
+int PLCConnectionClient::makeSocket()
+{
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) 
+    {
+        Logger::getInstance().Error("ソケット作成に失敗しました。");
+        exit(1);
+    }
+    return sock;
+}
+
 int PLCConnectionClient::Connect()
 {
     int result = connect(socket_, (sockaddr *)&serverAddress_, sizeof(serverAddress_));
     return result;
 }
 
-void PLCConnectionClient::SendRequest(const char* text, int len)
+int PLCConnectionClient::close()
 {
-    Logger::getInstance().Info("PLCにリクエストを送ります。");
-    for (int i = 0; i < len; ++i)
-    {
-        printf("%02X ", text[i]);
-    }
-    printf("\n");
-
-    if (send(socket_, text, len, 0) < 0)
-    {
-        Logger::getInstance().Error("PLCへのリクエスト送信に失敗しました。");
-    };
+    int result = ::close(socket_);
+    return result;
 }
 
-int PLCConnectionClient::RecvResponse(char* text)
+int PLCConnectionClient::sendRequest(const char* text, int len, int& sendLen)
+{
+    Logger::getInstance().Info("送信開始します。"); 
+    sendLen = send(socket_, text, len, 0);
+    return sendLen;
+}
+
+int PLCConnectionClient::recvResponse(char* text, int& recvLen)
 {
     Logger::getInstance().Info("受信開始します。"); 
-    int recvSize = recv(socket_, text, sizeof(text), 0);
-    Logger::getInstance().Info("受信しました。"+ std::to_string(recvSize) + "byte");
-    return recvSize;
+    recvLen = recv(socket_, text, sizeof(text), 0);
+    return recvLen;
 }
+

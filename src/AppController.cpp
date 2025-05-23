@@ -83,7 +83,7 @@ void AppController::setupConnections() {
     // 現在は未完成
     int result = -1;
     size_t retry = 0;
-    while ((result = plcConnectionClient_->Connect()) < 0) {
+    while ((plcConnectionClient_->Connect()) < 0) {
         Logger::getInstance().Error("PLC接続再試行中...");
         this_thread::sleep_for(chrono::seconds(1));
     }
