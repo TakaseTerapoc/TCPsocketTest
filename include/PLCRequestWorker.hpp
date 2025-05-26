@@ -11,6 +11,7 @@
 #include "MCprotocolManager.hpp"
 #include "../external/fmt/format.h"
 #include "DataLump.hpp"
+#include "Utilities.hpp"
 
 using namespace std;
 
@@ -45,11 +46,14 @@ class PLCRequestWorker
         void run();
 
         // sensorReadyStatusにsensorIDの状態を格納する関数
-        DataLump* getReadySensor(const PLCTransactionData& req, const vector<map<string,string>>& sendData);
+        DataLump* getReadySensor(DataLump* dataLump, const vector<map<string,string>> sendData);
+
+        // DataLumpを取得する関数
+        DataLump* getDataLump(PLCTransactionData& req);
 
         thread      thread_;                   // 実行スレッド
         
-        bool             running_{false};           // 実行中フラグ
+        bool        running_{false};           // 実行中フラグ
 
         mutex       mutex_;                    // running_ の排他制御
 

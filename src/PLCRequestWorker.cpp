@@ -34,11 +34,15 @@ void PLCRequestWorker::stop() {
 // キューから出し、PLCへのTCPリクエストを依頼する。
 void PLCRequestWorker::run() {
     while (true) {
-        gPLCconnectFlag = true; // PLC接続フラグをtrueにする
+        // PLC接続フラグをtrueにする
+        gPLCconnectFlag = true; 
+
         {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
+
+        // キューからTransactionDataを取り出す
         PLCTransactionData req;
         {
             unique_lock<mutex> lock(gRequestQueueMutex);
@@ -49,30 +53,30 @@ void PLCRequestWorker::run() {
             req = gRequestQueue.front();
             gRequestQueue.pop_front();
         }
-        Logger::getInstance().Info("キューから取り出しました。");
+        Logger::getInstance().Info("キューから取り出しました。\n 【MCプロトコル】" + Utilities::convertBytesToHexString(req.protocolbuf));
 
-        // TCPリクエスト        
+        // LumpDataを取得
+        DataLump* dataLump = getDataLump(req);
+
+        // PLCへリクエストを送信        
         Logger::getInstance().Info("PLCにリクエストを送ります。");
-        for (int i = 0; i < req.protocolbuf.size(); ++i)
-        {
-            printf("%02X ", req.protocolbuf[i]);
-        }
-        printf("\n");
+
+        // 送信リクエストをPLCへ送信
         int sendLen = 0;
         int sendTryTimes = 0;
         bool resetFlag = false;
-
-        // 送信リクエストをPLCへ送信
-        while(pLCConnectionClient_.sendRequest(req.protocolbuf.data(), req.protocolbuf.size(), sendLen) <= 0)
+        
+        while(pLCConnectionClient_.sendRequest(req.protocolbuf.data(), req.protocolbuf.size(), sendLen) < 0)
         {
             Logger::getInstance().Error("PLCへの送信が失敗しました。");
-            if (sendTryTimes > 4)
+            if (sendTryTimes > 2)
             {
                 Logger::getInstance().Error("試行規定回数に達しました。ソケットを閉じて再接続します。");
                 
                 // 5回送信しても失敗した場合、ソケットを閉じて再接続する。
                 pLCConnectionClient_.close();
                 pLCConnectionClient_.makeSocket();
+                dataLump->allClear(); // DataLumpをクリア
                 Logger::getInstance().Error("スケジューラのキュープッシュを停止します。");
                 gPLCconnectFlag = false; // PLC接続フラグをfalseにする
                 // キューをロックして空にする。
@@ -87,12 +91,9 @@ void PLCRequestWorker::run() {
                     Logger::getInstance().Error("PLC接続再試行中...");
                     this_thread::sleep_for(chrono::seconds(1));
                 }
+                Logger::getInstance().Error("PLC接続に成功しました。");
                 resetFlag = true;
                 sendTryTimes = 0; // 再接続後、送信試行回数をリセット
-                break;
-            }
-            if (resetFlag)
-            {
                 break;
             }
             // 送信エラーが発生した場合、再送信を試みる。
@@ -100,29 +101,30 @@ void PLCRequestWorker::run() {
             this_thread::sleep_for(chrono::milliseconds(50));
             sendTryTimes++;
         }
-        if (resetFlag)
-        {
-            continue;
-        }
+        if (resetFlag) continue;
+
+        Logger::getInstance().Info("送信データをPLCへ送信しました。");
         resetFlag = false; // リセットフラグをfalseにする
         gPLCconnectFlag = true; // PLC接続フラグをtrueにする
         gClearQueueFlag = false; // キューを空にするフラグをfalseにする
-        Logger::getInstance().Info("送信データをPLCへ送信しました。");
+        
+
 
         // PLCからのレスポンス受信
         char text[256];
         int recvLen = 0;
         int recvTryTimes = 0;
-        while(pLCConnectionClient_.recvResponse(text, recvLen) <= 0)
+        while(pLCConnectionClient_.recvResponse(text, recvLen) < 0)
         {
             Logger::getInstance().Error("受信が失敗しました。");
-            if (recvTryTimes > 4)
+            if (recvTryTimes > 2)
             {
                 Logger::getInstance().Error("試行規定回数に達しました。ソケットを閉じて再接続します。");
                 
                 // 5回送信しても失敗した場合、ソケットを閉じて再接続する。
                 pLCConnectionClient_.close();
                 pLCConnectionClient_.makeSocket();
+                dataLump->allClear(); // DataLumpをクリア
                 Logger::getInstance().Error("スケジューラのキュープッシュを停止します。");
                 gPLCconnectFlag = false; // PLC接続フラグをfalseにする
                 // キューをロックして空にする。
@@ -142,40 +144,27 @@ void PLCRequestWorker::run() {
                 recvTryTimes = 0; // 再接続後、送信試行回数をリセット
                 break;
             }
-            if (resetFlag)
-            {
-                break;
-            }
             // 受信エラーが発生した場合、再受信を試みる。
             Logger::getInstance().Error("再受信します。");
             this_thread::sleep_for(chrono::milliseconds(50));
             recvTryTimes++;
         }
-        if (resetFlag)
-        {
-            continue;
-        }
+        if (resetFlag) continue;
+
+        Logger::getInstance().Info("受信データを受け取りました。");
         resetFlag = false; // リセットフラグをfalseにする
         gPLCconnectFlag = true; // PLC接続フラグをtrueにする
         gClearQueueFlag = false; // キューを空にするフラグをfalseにする
 
-        Logger::getInstance().Info("受信データを受け取りました。");
-        req.receiptTime = Logger::getInstance().timestamp;
+        // req.receiptTime = Logger::getInstance().timestamp;
 
         // 送信データ作成
         Logger::getInstance().Info("送信データを作成します");
         vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, recvLen, req);
-        string sendDatastr;
-        for (size_t i = 0; i < sendData.size(); ++i) {
-            for (const auto& [key, value] : sendData[i]) {
-                    sendDatastr += key + ": " + value + " | ";
-                }
-            sendDatastr += ", ";
-        }
-        Logger::getInstance().Info("送信データ: " + sendDatastr);
+        Logger::getInstance().Info("送信データ: " + Utilities::convertVectorMapToString(sendData));
 
         // 受信データを確認し、sensorの準備状態を変更する。
-        DataLump* dataLump = getReadySensor(req, sendData);
+        dataLump = getReadySensor(dataLump, sendData);
 
         if (dataLump != nullptr && dataLump->isSendReady) {
             // 送信データをPLCへ送信
@@ -187,64 +176,69 @@ void PLCRequestWorker::run() {
     }
 }
 
-    DataLump* PLCRequestWorker::getReadySensor(const PLCTransactionData& req, const vector<map<string,string>>& sendData)
+DataLump* PLCRequestWorker::getDataLump(PLCTransactionData& req)
+{
+    DataLump* dataLump = nullptr;
+
+    // DataLumpの中から、送信間隔が同じものを探す
+    for (auto& row : gDataLump)
     {
-        DataLump* dataLump = nullptr;
-
-        // DataLumpの中から、送信間隔が同じものを探す
-        for (auto& row : gDataLump)
+        if (row.sendIntervalMs == req.sendIntervalMs)
         {
-            if (row.sendIntervalMs == req.sendIntervalMs)
-            {
-                dataLump = &row;
-                break;
-            }
+            dataLump = &row;
+            break;
         }
+    }
+    return dataLump;
+}
 
-        // 送信間隔が同じものがなければ、何もしない
-        if (dataLump == nullptr)
+
+DataLump* PLCRequestWorker::getReadySensor(DataLump* dataLump, const vector<map<string,string>> sendDataNow)
+{
+    // 送信間隔が同じものがなければ、何もしない
+    if (dataLump == nullptr)
+    {
+        return nullptr;
+    }
+
+    // DataLumpにsendDataを格納
+    dataLump->sendData.insert(dataLump->sendData.end(), sendDataNow.begin(), sendDataNow.end());
+
+
+    // sendDtataの中から、sensorIDを探す
+    for (auto& row : sendDataNow)
+    {
+        auto it = row.find("sensorID");
+        if (it != row.end())
         {
-            return nullptr;
-        }
-
-        // DataLumpにsendDataを格納
-        dataLump->sendData.insert(dataLump->sendData.end(), sendData.begin(), sendData.end());
-
-
-        // sendDtataの中から、sensorIDを探す
-        for (auto& row : sendData)
-        {
-            auto it = row.find("sensorID");
-            if (it != row.end())
+            // sensorIDを取得
+            string sensorID = it->second;
+            // sensorIDがtempDataLumpの中にあれば、trueにする
+            for (auto& status : dataLump->sensorReadyStatus)
             {
-                // sensorIDを取得
-                string sensorID = it->second;
-                // sensorIDがtempDataLumpの中にあれば、trueにする
-                for (auto& status : dataLump->sensorReadyStatus)
+                auto it2 = status.find(sensorID);
+                if (it2 != status.end())
                 {
-                    auto it2 = status.find(sensorID);
-                    if (it2 != status.end())
-                    {
-                        it2->second = true;
-                    }
+                    it2->second = true;
                 }
             }
         }
-
-        // sensorReadyStatusの状態を出力
-        for (const auto& status : dataLump->sensorReadyStatus)
-        {
-            for (const auto& [sensorID, ready] : status)
-            {
-                Logger::getInstance().Info("Sensor ID: " + sensorID + ", Ready: " + to_string(ready));
-            }
-        }
-
-
-        // LumpFullを確認
-        dataLump->isLumpFull();
-
-        Logger::getInstance().Info("LumpFull: " + to_string(dataLump->isSendReady));
-
-        return dataLump;
     }
+
+    // sensorReadyStatusの状態を出力
+    for (const auto& status : dataLump->sensorReadyStatus)
+    {
+        for (const auto& [sensorID, ready] : status)
+        {
+            Logger::getInstance().Info("Sensor ID: " + sensorID + ", Ready: " + to_string(ready));
+        }
+    }
+
+
+    // LumpFullを確認
+    dataLump->isLumpFull();
+
+    Logger::getInstance().Info("LumpFull: " + to_string(dataLump->isSendReady));
+
+    return dataLump;
+}
