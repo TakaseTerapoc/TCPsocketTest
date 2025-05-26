@@ -42,4 +42,7 @@ extern AppController* gAppInstance;
 extern vector<DataLump> gDataLump;
 
 // PLCとの通信が再開した時のフラグです。
-extern atomic<bool> gPLconnectFlag;
+extern atomic<bool> gPLCconnectFlag;
+
+// キューを空にするためのフラグです。
+extern atomic<bool> gClearQueueFlag;

@@ -11,8 +11,8 @@
 #include "Logger.hpp"
 #include "../external/fmt/format.h"
 
-const int TimeoutSec = 1; // タイムアウト秒数
-const int TimeoutUsec = 0; // タイムアウトマイクロ秒数
+const int TimeoutSec = 0; // タイムアウト秒数
+const int TimeoutUsec = 500000; // タイムアウトマイクロ秒数
 
 using namespace std;
 
@@ -27,6 +27,7 @@ public:
     PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
 
     int makeSocket();
+    void setTimeout(int sec, int usec);
     int Connect();
     int close();
     void getConnInfo(const char* serverIpAddress, int serverPortNumber);

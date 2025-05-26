@@ -6,11 +6,11 @@ PLCConnectionClient::PLCConnectionClient(const char* serverIpAddress, int server
     serverAddress_.sin_port = htons(serverPortNumber);
     serverAddress_.sin_family = AF_INET; // AF_INET：IPV4アドレスを使う
 
+    // ソケットの作成
     socket_ = makeSocket();
-    if (socket_ < 0) 
-    {
-        Logger::getInstance().Error("ソケット作成に失敗しました。");
-    }
+
+    // タイムアウトの設定
+    setTimeout(TimeoutSec, TimeoutUsec); 
 }
 
 void PLCConnectionClient::getConnInfo(const char* serverIpAddress, int serverPortNumber)
@@ -29,6 +29,23 @@ int PLCConnectionClient::makeSocket()
         exit(1);
     }
     return sock;
+}
+
+void PLCConnectionClient::setTimeout(int sec, int usec)
+{
+    // 受信タイムアウトの設定
+    timeout.tv_sec = sec;
+    timeout.tv_usec = usec;
+    if (setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        Logger::getInstance().Error("ソケット作成に失敗しました。");
+        exit(1);
+    }
+
+    // 送信タイムアウトの設定
+    if (setsockopt(socket_, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) < 0) {
+        Logger::getInstance().Error("ソケット作成に失敗しました。");
+        exit(1);
+    }
 }
 
 int PLCConnectionClient::Connect()

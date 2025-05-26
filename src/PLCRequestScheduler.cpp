@@ -37,9 +37,10 @@ void PLCRequestScheduler::run() {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
-        if (!gPLconnectFlag)
+        if (!gPLCconnectFlag)
         {
             this_thread::sleep_for(chrono::milliseconds(50));
+            gClearQueueFlag = true;
             continue;
         }
 
@@ -48,7 +49,7 @@ void PLCRequestScheduler::run() {
             if (now >= plcr.nextTime) {
                 {
                     lock_guard<mutex> ql(gRequestQueueMutex);
-                    gRequestQueue.push(plcr);
+                    gRequestQueue.push_back(plcr);
                 }
                 // PLC::cv.notify_one();
                 plcr.nextTime = now + chrono::milliseconds(plcr.sendIntervalMs);

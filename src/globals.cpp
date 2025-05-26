@@ -21,3 +21,9 @@ vector<DataLump> gDataLump;
 
 // サーバーへ送信するデータを格納するリスト(map)です。
 vector<vector<map<string, string>>> gSendDataMap;
+
+// PLCとの通信が再開した時のフラグです。
+atomic<bool> gPLCconnectFlag = true;
+
+// キューを空にするためのフラグです。
+atomic<bool> gClearQueueFlag = false;

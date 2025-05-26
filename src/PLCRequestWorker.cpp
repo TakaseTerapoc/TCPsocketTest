@@ -34,7 +34,7 @@ void PLCRequestWorker::stop() {
 // キューから出し、PLCへのTCPリクエストを依頼する。
 void PLCRequestWorker::run() {
     while (true) {
-        gPLconnectFlag = true; // PLC接続フラグをtrueにする
+        gPLCconnectFlag = true; // PLC接続フラグをtrueにする
         {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
@@ -47,7 +47,7 @@ void PLCRequestWorker::run() {
                 continue;
             }
             req = gRequestQueue.front();
-            gRequestQueue.pop();
+            gRequestQueue.pop_front();
         }
         Logger::getInstance().Info("キューから取り出しました。");
 
@@ -60,6 +60,9 @@ void PLCRequestWorker::run() {
         printf("\n");
         int sendLen = 0;
         int sendTryTimes = 0;
+        bool resetFlag = false;
+
+        // 送信リクエストをPLCへ送信
         while(pLCConnectionClient_.sendRequest(req.protocolbuf.data(), req.protocolbuf.size(), sendLen) <= 0)
         {
             Logger::getInstance().Error("PLCへの送信が失敗しました。");
@@ -67,28 +70,49 @@ void PLCRequestWorker::run() {
             {
                 Logger::getInstance().Error("試行規定回数に達しました。ソケットを閉じて再接続します。");
                 
-                // 3回送信しても失敗した場合、ソケットを閉じて再接続する。
+                // 5回送信しても失敗した場合、ソケットを閉じて再接続する。
                 pLCConnectionClient_.close();
                 pLCConnectionClient_.makeSocket();
+                Logger::getInstance().Error("スケジューラのキュープッシュを停止します。");
+                gPLCconnectFlag = false; // PLC接続フラグをfalseにする
+                // キューをロックして空にする。
+                {
+                    unique_lock<mutex> lock(gRequestQueueMutex);
+                    while(!gClearQueueFlag){}
+                    gRequestQueue.clear(); 
+                    Logger::getInstance().Error("キューを空にしました。");
+                }
                 while(pLCConnectionClient_.Connect() < 0)
                 {
                     Logger::getInstance().Error("PLC接続再試行中...");
                     this_thread::sleep_for(chrono::seconds(1));
                 }
+                resetFlag = true;
                 sendTryTimes = 0; // 再接続後、送信試行回数をリセット
+                break;
+            }
+            if (resetFlag)
+            {
+                break;
             }
             // 送信エラーが発生した場合、再送信を試みる。
             Logger::getInstance().Error("再送信します。");
             this_thread::sleep_for(chrono::milliseconds(50));
             sendTryTimes++;
         }
-        Logger::getInstance().Info("RecvResponseを動かします。");
+        if (resetFlag)
+        {
+            continue;
+        }
+        resetFlag = false; // リセットフラグをfalseにする
+        gPLCconnectFlag = true; // PLC接続フラグをtrueにする
+        gClearQueueFlag = false; // キューを空にするフラグをfalseにする
+        Logger::getInstance().Info("送信データをPLCへ送信しました。");
 
-        // レスポンス受信
+        // PLCからのレスポンス受信
         char text[256];
         int recvLen = 0;
         int recvTryTimes = 0;
-        bool resetFlag = false;
         while(pLCConnectionClient_.recvResponse(text, recvLen) <= 0)
         {
             Logger::getInstance().Error("受信が失敗しました。");
@@ -99,17 +123,21 @@ void PLCRequestWorker::run() {
                 // 5回送信しても失敗した場合、ソケットを閉じて再接続する。
                 pLCConnectionClient_.close();
                 pLCConnectionClient_.makeSocket();
-                gPLconnectFlag = false; // PLC接続フラグをfalseにする
+                Logger::getInstance().Error("スケジューラのキュープッシュを停止します。");
+                gPLCconnectFlag = false; // PLC接続フラグをfalseにする
                 // キューをロックして空にする。
                 {
                     unique_lock<mutex> lock(gRequestQueueMutex);
+                    while(!gClearQueueFlag){}
                     gRequestQueue.clear(); 
+                    Logger::getInstance().Error("キューを空にしました。");
                 }
                 while(pLCConnectionClient_.Connect() < 0)
                 {
                     Logger::getInstance().Error("PLC接続再試行中...");
                     this_thread::sleep_for(chrono::seconds(1));
                 }
+                Logger::getInstance().Error("PLC接続に成功しました。");
                 resetFlag = true;
                 recvTryTimes = 0; // 再接続後、送信試行回数をリセット
                 break;
@@ -118,7 +146,7 @@ void PLCRequestWorker::run() {
             {
                 break;
             }
-            // 送信エラーが発生した場合、再送信を試みる。
+            // 受信エラーが発生した場合、再受信を試みる。
             Logger::getInstance().Error("再受信します。");
             this_thread::sleep_for(chrono::milliseconds(50));
             recvTryTimes++;
@@ -127,6 +155,11 @@ void PLCRequestWorker::run() {
         {
             continue;
         }
+        resetFlag = false; // リセットフラグをfalseにする
+        gPLCconnectFlag = true; // PLC接続フラグをtrueにする
+        gClearQueueFlag = false; // キューを空にするフラグをfalseにする
+
+        Logger::getInstance().Info("受信データを受け取りました。");
         req.receiptTime = Logger::getInstance().timestamp;
 
         // 送信データ作成
