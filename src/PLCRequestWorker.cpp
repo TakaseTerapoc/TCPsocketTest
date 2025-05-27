@@ -91,11 +91,8 @@ void PLCRequestWorker::run() {
                     Logger::getInstance().Error("PLC接続再試行中...");
                     this_thread::sleep_for(chrono::seconds(1));
                 }
-                // // 終了信号を受け取ったときの処理
-                // if (gShouldExit) {
-                //     Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
-                //     gAppInstance->stop();
-                // }
+                // 終了信号を受け取ったときの処理
+                if (gShouldExit) break;
 
                 Logger::getInstance().Error("PLC接続に成功しました。");
                 resetFlag = true;
@@ -108,11 +105,11 @@ void PLCRequestWorker::run() {
             sendTryTimes++;
         }
         
-        // // 終了信号を受け取ったときの処理
-        // if (gShouldExit) {
-        //     Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
-        //     gAppInstance->stop(); // アプリケーションを停止
-        // }
+        // 終了信号を受け取ったときの処理
+        if (gShouldExit) {
+            Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
+            break;
+        }
 
         // リセットフラグが経っていたらループを最初から
         if (resetFlag) continue;
@@ -154,11 +151,8 @@ void PLCRequestWorker::run() {
                     this_thread::sleep_for(chrono::seconds(1));
                 }
 
-                // // 終了信号を受け取ったときの処理
-                // if (gShouldExit) {
-                //     Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
-                //     gAppInstance->stop(); // アプリケーションを停止
-                // }
+                // 終了信号を受け取ったときの処理
+                if (gShouldExit) break;
 
                 Logger::getInstance().Error("PLC接続に成功しました。");
                 resetFlag = true;
@@ -171,37 +165,33 @@ void PLCRequestWorker::run() {
             recvTryTimes++;
         }
 
-        // // 終了信号を受け取ったときの処理
-        // if (gShouldExit) {
-        //     Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
-        //     gAppInstance->stop(); // アプリケーションを停止
-        // }
+        // 終了信号を受け取ったときの処理
+        if (gShouldExit) break;
 
+        // リセットフラグが立っていたらループを最初から
         if (resetFlag) continue;
-        if (!gShouldExit)
-        {
-            Logger::getInstance().Info("受信データを受け取りました。");
-            resetFlag = false; // リセットフラグをfalseにする
-            gPLCconnectFlag = true; // PLC接続フラグをtrueにする
-            gClearQueueFlag = false; // キューを空にするフラグをfalseにする
 
-            // req.receiptTime = Logger::getInstance().timestamp;
+        Logger::getInstance().Info("受信データを受け取りました。");
+        resetFlag = false; // リセットフラグをfalseにする
+        gPLCconnectFlag = true; // PLC接続フラグをtrueにする
+        gClearQueueFlag = false; // キューを空にするフラグをfalseにする
 
-            // 送信データ作成
-            Logger::getInstance().Info("送信データを作成します");
-            vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, recvLen, req);
-            Logger::getInstance().Info("送信データ: " + Utilities::convertVectorMapToString(sendData));
+        // req.receiptTime = Logger::getInstance().timestamp;
 
-            // 受信データを確認し、sensorの準備状態を変更する。
-            dataLump = getReadySensor(dataLump, sendData);
+        // 送信データ作成
+        Logger::getInstance().Info("送信データを作成します");
+        vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, recvLen, req);
+        Logger::getInstance().Info("送信データ: " + Utilities::convertVectorMapToString(sendData));
 
-            if (dataLump != nullptr && dataLump->isSendReady) {
-                // 送信データをPLCへ送信
-                Logger::getInstance().Info("データをサーバへ送信します。");
-                vector<map<string,string>> sendDatacp = dataLump->sendData;
-                gSendDataMap.push_back(sendDatacp);
-                dataLump->allClear();
-            }
+        // 受信データを確認し、sensorの準備状態を変更する。
+        dataLump = getReadySensor(dataLump, sendData);
+
+        if (dataLump != nullptr && dataLump->isSendReady) {
+            // 送信データをPLCへ送信
+            Logger::getInstance().Info("データをサーバへ送信します。");
+            vector<map<string,string>> sendDatacp = dataLump->sendData;
+            gSendDataMap.push_back(sendDatacp);
+            dataLump->allClear();
         }
     }
 }
