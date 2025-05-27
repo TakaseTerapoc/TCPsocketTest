@@ -40,7 +40,7 @@ private:
     void prepareRequestData();
 
     // PLCおよびサーバーへの接続
-    void setupConnections();
+    bool setupConnections();
 
     // スケジューラとワーカーの起動
     void startWorkers();

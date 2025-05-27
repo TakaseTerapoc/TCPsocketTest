@@ -33,7 +33,7 @@ void PLCRequestWorker::stop() {
 
 // キューから出し、PLCへのTCPリクエストを依頼する。
 void PLCRequestWorker::run() {
-    while (true) {
+    while (!gShouldExit) {
         // PLC接続フラグをtrueにする
         gPLCconnectFlag = true; 
 
@@ -66,7 +66,7 @@ void PLCRequestWorker::run() {
         int sendTryTimes = 0;
         bool resetFlag = false;
         
-        while(pLCConnectionClient_.sendRequest(req.protocolbuf.data(), req.protocolbuf.size(), sendLen) < 0)
+        while(pLCConnectionClient_.sendRequest(req.protocolbuf.data(), req.protocolbuf.size(), sendLen) < 0 && !gShouldExit)
         {
             Logger::getInstance().Error("PLCへの送信が失敗しました。");
             if (sendTryTimes > 2)
@@ -86,11 +86,17 @@ void PLCRequestWorker::run() {
                     gRequestQueue.clear(); 
                     Logger::getInstance().Error("キューを空にしました。");
                 }
-                while(pLCConnectionClient_.Connect() < 0)
+                while(pLCConnectionClient_.Connect() < 0 && !gShouldExit)
                 {
                     Logger::getInstance().Error("PLC接続再試行中...");
                     this_thread::sleep_for(chrono::seconds(1));
                 }
+                // // 終了信号を受け取ったときの処理
+                // if (gShouldExit) {
+                //     Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
+                //     gAppInstance->stop();
+                // }
+
                 Logger::getInstance().Error("PLC接続に成功しました。");
                 resetFlag = true;
                 sendTryTimes = 0; // 再接続後、送信試行回数をリセット
@@ -101,6 +107,14 @@ void PLCRequestWorker::run() {
             this_thread::sleep_for(chrono::milliseconds(50));
             sendTryTimes++;
         }
+        
+        // // 終了信号を受け取ったときの処理
+        // if (gShouldExit) {
+        //     Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
+        //     gAppInstance->stop(); // アプリケーションを停止
+        // }
+
+        // リセットフラグが経っていたらループを最初から
         if (resetFlag) continue;
 
         Logger::getInstance().Info("送信データをPLCへ送信しました。");
@@ -114,7 +128,7 @@ void PLCRequestWorker::run() {
         char text[256];
         int recvLen = 0;
         int recvTryTimes = 0;
-        while(pLCConnectionClient_.recvResponse(text, recvLen) < 0)
+        while(pLCConnectionClient_.recvResponse(text, recvLen) < 0 && !gShouldExit)
         {
             Logger::getInstance().Error("受信が失敗しました。");
             if (recvTryTimes > 2)
@@ -134,11 +148,18 @@ void PLCRequestWorker::run() {
                     gRequestQueue.clear(); 
                     Logger::getInstance().Error("キューを空にしました。");
                 }
-                while(pLCConnectionClient_.Connect() < 0)
+                while(pLCConnectionClient_.Connect() < 0 && !gShouldExit)
                 {
                     Logger::getInstance().Error("PLC接続再試行中...");
                     this_thread::sleep_for(chrono::seconds(1));
                 }
+
+                // // 終了信号を受け取ったときの処理
+                // if (gShouldExit) {
+                //     Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
+                //     gAppInstance->stop(); // アプリケーションを停止
+                // }
+
                 Logger::getInstance().Error("PLC接続に成功しました。");
                 resetFlag = true;
                 recvTryTimes = 0; // 再接続後、送信試行回数をリセット
@@ -149,29 +170,38 @@ void PLCRequestWorker::run() {
             this_thread::sleep_for(chrono::milliseconds(50));
             recvTryTimes++;
         }
+
+        // // 終了信号を受け取ったときの処理
+        // if (gShouldExit) {
+        //     Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
+        //     gAppInstance->stop(); // アプリケーションを停止
+        // }
+
         if (resetFlag) continue;
+        if (!gShouldExit)
+        {
+            Logger::getInstance().Info("受信データを受け取りました。");
+            resetFlag = false; // リセットフラグをfalseにする
+            gPLCconnectFlag = true; // PLC接続フラグをtrueにする
+            gClearQueueFlag = false; // キューを空にするフラグをfalseにする
 
-        Logger::getInstance().Info("受信データを受け取りました。");
-        resetFlag = false; // リセットフラグをfalseにする
-        gPLCconnectFlag = true; // PLC接続フラグをtrueにする
-        gClearQueueFlag = false; // キューを空にするフラグをfalseにする
+            // req.receiptTime = Logger::getInstance().timestamp;
 
-        // req.receiptTime = Logger::getInstance().timestamp;
+            // 送信データ作成
+            Logger::getInstance().Info("送信データを作成します");
+            vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, recvLen, req);
+            Logger::getInstance().Info("送信データ: " + Utilities::convertVectorMapToString(sendData));
 
-        // 送信データ作成
-        Logger::getInstance().Info("送信データを作成します");
-        vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, recvLen, req);
-        Logger::getInstance().Info("送信データ: " + Utilities::convertVectorMapToString(sendData));
+            // 受信データを確認し、sensorの準備状態を変更する。
+            dataLump = getReadySensor(dataLump, sendData);
 
-        // 受信データを確認し、sensorの準備状態を変更する。
-        dataLump = getReadySensor(dataLump, sendData);
-
-        if (dataLump != nullptr && dataLump->isSendReady) {
-            // 送信データをPLCへ送信
-            Logger::getInstance().Info("データをサーバへ送信します。");
-            vector<map<string,string>> sendDatacp = dataLump->sendData;
-            gSendDataMap.push_back(sendDatacp);
-            dataLump->allClear();
+            if (dataLump != nullptr && dataLump->isSendReady) {
+                // 送信データをPLCへ送信
+                Logger::getInstance().Info("データをサーバへ送信します。");
+                vector<map<string,string>> sendDatacp = dataLump->sendData;
+                gSendDataMap.push_back(sendDatacp);
+                dataLump->allClear();
+            }
         }
     }
 }
