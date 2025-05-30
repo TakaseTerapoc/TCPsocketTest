@@ -14,6 +14,8 @@
 
 using namespace std;
 
+#define LOG_ERROR(msg) SPDLOG_LOGGER_ERROR(spdlog::default_logger_raw(), spdlog::source_loc{__FILE__, __LINE__, __FUNCTION__}, msg)
+
 /**
  * @brief ロガークラスです。
 */
