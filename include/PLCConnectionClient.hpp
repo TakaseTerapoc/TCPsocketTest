@@ -12,7 +12,7 @@
 #include "../external/fmt/format.h"
 
 const int TimeoutSec = 0; // タイムアウト秒数
-const int TimeoutUsec = 500000; // タイムアウトマイクロ秒数
+const int TimeoutUsec = 250000; // タイムアウトマイクロ秒数
 
 using namespace std;
 

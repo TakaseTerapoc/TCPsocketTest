@@ -1,4 +1,5 @@
 #include "MCprotocolManager.hpp"
+#include "MCprotocolConfig.hpp"
 
 vector<char> readPLCwithBit = 
 {
@@ -119,20 +120,30 @@ void MCprotocolManager::makeCommand2(map<string,string>& row, PLCTransactionData
     address = row.at("ASCII").substr((row.at("ASCII")).size() - 4);
     code = row.at("ASCII").substr(0, (row.at("ASCII")).size() - 4);
 
-    if (code == "77" || code == "88")
+    if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("M") 
+        || code == MCprotocolConfig::deviceCodeToASCIIMap.at("X")
+        || code == MCprotocolConfig::deviceCodeToASCIIMap.at("Y")
+        || code == MCprotocolConfig::deviceCodeToASCIIMap.at("S")
+        || code == MCprotocolConfig::deviceCodeToASCIIMap.at("TS")
+        || code == MCprotocolConfig::deviceCodeToASCIIMap.at("CS")
+        )
     {
         data.protocolbuf = readPLCwithBit;
         makeDeviceCode(data.protocolbuf, code);
     }
-    else if (code == "68")
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("D")
+    || code == MCprotocolConfig::deviceCodeToASCIIMap.at("R")
+    || code == MCprotocolConfig::deviceCodeToASCIIMap.at("TN")
+    || code == MCprotocolConfig::deviceCodeToASCIIMap.at("CN")
+    )
     {
         data.protocolbuf = readPLCwithWord;
         makeDeviceCode(data.protocolbuf, code);
     }
     else
     {
-        // TODO:後で他のコマンドも追加する。
-        // data.protocolbuf = bufD100;
+        Logger::getInstance().Error("デバイスコードが不正です。");
+        exit(1);
     }
 
     // デバイスコードを入れる。
@@ -162,9 +173,14 @@ vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(cha
     for (int i = 0; i < req.mapdata.size(); i++)
     {
         string data;
-        if (req.deviceCode == "77" || req.deviceCode == "88")
+        if (req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("M") 
+            || req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("X")
+            || req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("Y")
+            || req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("S")
+            || req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("TS")
+            || req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("CS")
+        )
         {
-            
             if (i == 0)
             {
                 data = responseData.substr(0, 1);
@@ -175,7 +191,11 @@ vector<map<string,string>> MCprotocolManager::convertResponseDataToSendData2(cha
                 data = responseData.substr(startPosition, 1);
             }
         }
-        else if (req.deviceCode == "68")
+        else if (req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("D")
+            || req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("R")
+            || req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("TN")
+            || req.deviceCode == MCprotocolConfig::deviceCodeToASCIIMap.at("CN")
+        )
         {
             if (i == 0)
             {
@@ -208,24 +228,60 @@ string MCprotocolManager::substrBack(string& str, size_t pos, size_t len) {
 
 void MCprotocolManager::makeDeviceCode(vector<char>& buf, string& code)
 {
-    if (code == "77")
+    if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("M"))
     {
         buf[8] = (char)0x20;
         buf[9] = (char)0x4D;
     }
-    else if (code == "68")
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("D"))
     {
         buf[8] = (char)0x20;
         buf[9] = (char)0x44;
     }
-    else if (code == "88")
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("X"))
     {
         buf[8] = (char)0x20;
         buf[9] = (char)0x58;
     }
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("Y"))
+    {
+        buf[8] = (char)0x20;
+        buf[9] = (char)0x59;
+    }
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("CN"))
+    {
+        buf[8] = (char)0x4E;
+        buf[9] = (char)0x43;
+    }
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("CS"))
+    {
+        buf[8] = (char)0x53;
+        buf[9] = (char)0x43;
+    }
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("TN"))
+    {
+        buf[8] = (char)0x4E;
+        buf[9] = (char)0x54;
+    }
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("TS"))
+    {
+        buf[8] = (char)0x53;
+        buf[9] = (char)0x54;
+    }
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("S"))
+    {
+        buf[8] = (char)0x20;
+        buf[9] = (char)0x53;
+    }
+    else if (code == MCprotocolConfig::deviceCodeToASCIIMap.at("R"))
+    {
+        buf[8] = (char)0x20;
+        buf[9] = (char)0x52;
+    }
     else
     {
         Logger::getInstance().Error("デバイスコードが不正です。");
+        exit(1);
     }
 }
 

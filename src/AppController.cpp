@@ -49,6 +49,7 @@ void AppController::run() {
 void AppController::initLogger() {
     Logger::getInstance().Init();
     Logger::getInstance().Info("ロガー初期化完了");
+    Logger::getInstance().Info("アプリが起動しました。");
 }
 
 void AppController::loadConfig() {

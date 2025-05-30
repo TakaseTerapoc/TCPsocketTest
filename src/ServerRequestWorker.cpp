@@ -58,13 +58,14 @@ void ServerRequestWorker::run() {
         // UDPリクエスト 
         if(!serverConnectionClient_.sendMessage(shapedSendData))
         {
-            Logger::getInstance().Error("サーバーへのリクエスト送信に失敗しました。");
+            shapedSendData = "【サーバー送信失敗】" + shapedSendData;
+            Logger::getInstance().Error("サーバーへの送信に失敗しました。");
         }
         else
         {
-            Logger::getInstance().Sensor(shapedSendData);
-            Logger::getInstance().Info("サーバーへのリクエスト送信に成功しました。");
+            Logger::getInstance().Info("サーバーへの送信に成功しました。");
         }
+        Logger::getInstance().Sensor(shapedSendData);
     }
 }
 string ServerRequestWorker::shapeSendData(const vector<map<string,string>>& sendData) 

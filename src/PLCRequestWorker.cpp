@@ -127,7 +127,7 @@ void PLCRequestWorker::run() {
         int recvTryTimes = 0;
         while(pLCConnectionClient_.recvResponse(text, recvLen) < 0 && !gShouldExit)
         {
-            Logger::getInstance().Error("受信が失敗しました。");
+            Logger::getInstance().Error("PLCからのデータ受信が失敗しました。");
             if (recvTryTimes > 2)
             {
                 Logger::getInstance().Error("試行規定回数に達しました。ソケットを閉じて再接続します。");
