@@ -193,10 +193,11 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
             string asciistr = to_string(ascii);
             string initialstring = asciistr.erase((row.at("ASCII")).size() - ADDRESSLENGTH);
             
+            // グループ分けをするための処理
             if ((!currentGroup.empty() && (ascii - initASCII > getInterval(row.at("ASCII")))) // 最大読取範囲を超えたときにグループを分ける必要がある。
-                // || (!currentGroup.empty() && (initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("CN") && ascii > )) // CS/CN199とCS/CN200の間。同じグループ内であっても分ける必要がある。
-                // || (!currentGroup.empty() && (initialstring == "D7999" || initialstring == "D8000")) // CS/CN199とCS/CN200の間。同じグループ内であっても分ける必要がある。
-                // || (!currentGroup.empty() && ()) // D7999とD8000の間。同じグループ内であっても分ける必要がある。
+                || (!currentGroup.empty() && (preASCII >= 678300000 && preASCII < 678300200  && ascii >= 678300200)) // CS199とCS200の間。同じグループ内であっても分ける必要がある。
+                || (!currentGroup.empty() && (preASCII >= 677800000 && preASCII < 677800200  && ascii >= 677800200)) // CN199とCN200の間。同じグループ内であっても分ける必要がある。
+                || (!currentGroup.empty() && (preASCII >= 6800000 && preASCII < 6808000  && ascii >= 6808000)) // D7999とD8000の間。同じグループ内であっても分ける必要がある。
             ) 
             {
                 groups.push_back(currentGroup);
@@ -204,6 +205,7 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
                 initASCII = ascii;
             }
             currentGroup.push_back(row);
+            preASCII = ascii;
             i++;
         }
 

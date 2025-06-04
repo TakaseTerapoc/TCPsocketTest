@@ -15,7 +15,7 @@ class MCprotocolConfigData {
         static constexpr int WORD_MAX_READ_SIZE = 4;
 
         // 頭文字がM・X・Y・S・T・Cのデバイスコードの最大読取点数(bit読み取り時)
-        static constexpr int BIT_MAX_READ_SIZE = 200; //なぜか12までしか読めない
+        static constexpr int BIT_MAX_READ_SIZE = 200;
 
         inline static const map<string,string> deviceCodeToASCIIMap = {
             {"CN", "6778"},
