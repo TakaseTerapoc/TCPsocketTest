@@ -1,8 +1,6 @@
 #include "CSVIO.hpp"
 #include "MCprotocolConfigData.hpp"
 
-const int ADDRESSLENGTH = 4; // アドレスコードの長さ
-
 vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(vector<map<string, string>>& mapdata)
 {
     map<string, vector<map<string, string>>> groupedIntervalData;
@@ -19,8 +17,6 @@ vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(vector<map<string, 
     groupedAddressData = groupGroupDataByASCII(groupedIntervalData);
 
     return  makeRequestDataFromMapdata(groupedAddressData);
-
-    // return groupMapDataByASCII(mapdata);
 }
 
 void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>> groupedIntervalData)
@@ -123,7 +119,7 @@ string CSVIO::convertASCIIstring(string str)
         }        
         i++;
     }
-    // 文字列の長さが4未満の場合、0を追加する
+    // 文字列の長さがADDRESSLENGTH未満の場合、0を追加する
     if (codenumber.length() < ADDRESSLENGTH)
     {
         codenumber.insert(codenumber.begin(), ADDRESSLENGTH - codenumber.length(), '0');

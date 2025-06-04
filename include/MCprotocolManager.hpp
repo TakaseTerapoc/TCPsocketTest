@@ -13,6 +13,7 @@
 
 #include "Logger.hpp"
 #include "PLCTransactionData.hpp"
+#include "globals.hpp"
 
 using namespace std;
 

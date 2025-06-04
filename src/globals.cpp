@@ -27,3 +27,6 @@ atomic<bool> gPLCconnectFlag = true;
 
 // キューを空にするためのフラグです。
 atomic<bool> gClearQueueFlag = false;
+
+// アドレスコードの長さ
+const int ADDRESSLENGTH = 5; 

@@ -71,9 +71,9 @@ void MCprotocolManager::covertToMCprotocolData(vector<PLCTransactionData>& gRDat
 
 void MCprotocolManager::getAddressAndCodeFromASCIIRow(map<string,string> row, string& code, string& address) {
     // ASCIIコードの最後の4文字をアドレスとして取得
-    address = row.at("ASCII").substr((row.at("ASCII")).size() - 4);
+    address = row.at("ASCII").substr((row.at("ASCII")).size() - ADDRESSLENGTH);
     // 残りの部分をデバイスコードとして取得
-    code = row.at("ASCII").substr(0, (row.at("ASCII")).size() - 4);
+    code = row.at("ASCII").substr(0, (row.at("ASCII")).size() - ADDRESSLENGTH);
 }
 
 void MCprotocolManager::setSubheader(map<string,string>& row, PLCTransactionData& data, string& code, string& address)
@@ -98,7 +98,7 @@ void MCprotocolManager::setSubheader(map<string,string>& row, PLCTransactionData
     }
     else
     {
-        Logger::getInstance().Error("デバイスコードが不正です。");
+        Logger::getInstance().Error("setSubheader：デバイスコードが不正です。");
         exit(1);
     }
 
@@ -169,7 +169,7 @@ void MCprotocolManager::setDeviceCode(vector<char>& protocolbuf, string& code)
     }
     else
     {
-        Logger::getInstance().Error("デバイスコードが不正です。");
+        Logger::getInstance().Error("setTopDeviceNumber：デバイスコードが不正です。");
         exit(1);
     }
 }
