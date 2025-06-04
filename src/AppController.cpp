@@ -36,9 +36,13 @@ void AppController::run() {
 
     signal(SIGPIPE,SIG_IGN);
 
+    // アプリケーションの起動時に必要な初期化処理を行う
     initLogger();
     loadConfig();
     prepareRequestData();
+
+    // PLC接続とサーバー接続の設定を行う・接続ができない場合は、if内の処理は行わない。
+    // TODO:サーバーとのハンドシェイク処理を追加する。
     if(setupConnections())
     {
         startWorkers();
@@ -64,10 +68,10 @@ void AppController::loadConfig() {
 void AppController::prepareRequestData() {
     Logger::getInstance().Info("PLCリクエストデータの準備を開始します。");
 
-    auto mapdata = CsvReader::readCSVFileToMapVector("../request/testdataDemo.csv");
+    auto mapdata = CsvReader::readCSVFileToMapVector("../request/testdataDemo5.csv");
     gRData = CSVIO::makeRequestDataFromMapdata(mapdata);
 
-    MCprotocolManager::covertToMCprotocolData2(gRData);
+    MCprotocolManager::getInstance().covertToMCprotocolData(gRData);
     Logger::getInstance().Info("PLCリクエストデータ準備完了。");
 }
 
@@ -80,8 +84,7 @@ bool AppController::setupConnections() {
         stoi(AppConfig::getInstance().GetPLCConfig("port"))
     );
 
-    // TODO:PLC接続エラーが起きたときに何度もリトライするようにする。
-    // 現在は未完成
+    // PLC接続エラーが起きたときに何度もリトライするようにする。
     int result = -1;
     while ((result = plcConnectionClient_->Connect()) < 0 && !gShouldExit) {
         Logger::getInstance().Error("PLC接続再試行中...");

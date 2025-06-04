@@ -67,10 +67,10 @@ int PLCConnectionClient::sendRequest(const char* text, int len, int& sendLen)
     return sendLen;
 }
 
-int PLCConnectionClient::recvResponse(char* text, int& recvLen)
+int PLCConnectionClient::recvResponse(char* text, int textSize, int& recvLen)
 {
     Logger::getInstance().Info("受信開始します。"); 
-    recvLen = recv(socket_, text, sizeof(text), 0);
+    recvLen = recv(socket_, text, textSize, 0);
     return recvLen;
 }
 

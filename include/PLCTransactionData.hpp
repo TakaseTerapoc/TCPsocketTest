@@ -45,7 +45,7 @@ public:
     vector<map<string, string>> mapdata;
 
     // MCプロトコル
-    vector<char> protocolbuf{20};
+    vector<char> protocolbuf;
 
     // PLCレスポンスデータの受信時間です。
     string receiptTime;        

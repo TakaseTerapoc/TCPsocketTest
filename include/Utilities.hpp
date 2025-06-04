@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <algorithm> 
+#include <array>
 
 #include "Logger.hpp"
 
@@ -25,8 +26,33 @@ class Utilities
         static string convertVectorMapToString(const vector<map<string, string>>& m);
 
         // バイト値のvectorを16進数の文字列に変換する関数
-        static string convertBytesToHexString(const vector<char>& bytes);
+        static string convertVectorBytesToHexString(const vector<char>& bytes);
 
+        // バイト値を16進数の文字列に変換する関数
+        static string convertByteToHexString(char& bytes);
 
+        // 既存のvector配列に新しいvectorを追加する関数
+        template<typename T>
+        static void appendVectorElements(vector<T>& dest, const vector<T>& src)
+        {
+            dest.insert(dest.end(), src.begin(), src.end());
+        }
 
+        // 16進数の文字列を10進数の文字列に変換する関数
+        static std::string convertDecimalString(const std::string& hex);
+
+        // 10進文字列を32ビットのリトルエンディアン4バイトに分解する関数
+        static vector<char> decStrToBytes32(const string& decStr);
+
+        // 後ろからsubstringする関数
+        static string substrBack(std::string& str, size_t pos, size_t len);
+
+        // レスポンス文字列を正しい順番に並び替える。
+        static string swapString(const std::string& str);
+
+        // map<string, string>からキーの値をint型で取得する関数
+        static int getMapValueByInt(const map<string, string>& row, string keystr);
+
+        // map<string, string>からキーの値をstring型で取得する関数
+        static string getMapValueByString(const map<string, string>& row, string keystr);
 };

@@ -39,6 +39,8 @@ class PLCRequestWorker
 
         // デストラクタ
         ~PLCRequestWorker() = default; 
+
+        // コピー禁止
         PLCRequestWorker(const PLCRequestWorker&) = delete;
         PLCRequestWorker& operator=(const PLCRequestWorker&) = delete;
 
@@ -58,4 +60,6 @@ class PLCRequestWorker
         mutex       mutex_;                    // running_ の排他制御
 
         PLCConnectionClient pLCConnectionClient_;   // PLCConnectionClientのインスタンス
+
+        const int recvBufferSize = 1024; // レスポンス受信バッファサイズ
 };

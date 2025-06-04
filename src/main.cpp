@@ -4,7 +4,6 @@
 
 int main() 
 {
-    // アプリケーションコントローラーのインスタンスを作成
     AppController app;
     app.run();
     return 0;

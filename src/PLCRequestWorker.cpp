@@ -1,4 +1,5 @@
 #include "PLCRequestWorker.hpp"
+#include "Utilities.hpp"
 
 // シングルトンインスタンス取得
 PLCRequestWorker& PLCRequestWorker::getInstance(PLCConnectionClient& plcclient) {
@@ -53,7 +54,7 @@ void PLCRequestWorker::run() {
             req = gRequestQueue.front();
             gRequestQueue.pop_front();
         }
-        Logger::getInstance().Info("キューから取り出しました。\n 【MCプロトコル】" + Utilities::convertBytesToHexString(req.protocolbuf));
+        Logger::getInstance().Info("キューから取り出しました。\n 【MCプロトコル】" + Utilities::convertVectorBytesToHexString(req.protocolbuf));
 
         // LumpDataを取得
         DataLump* dataLump = getDataLump(req);
@@ -122,10 +123,10 @@ void PLCRequestWorker::run() {
 
 
         // PLCからのレスポンス受信
-        char text[256];
+        char text[recvBufferSize];
         int recvLen = 0;
         int recvTryTimes = 0;
-        while(pLCConnectionClient_.recvResponse(text, recvLen) < 0 && !gShouldExit)
+        while(pLCConnectionClient_.recvResponse(text, recvBufferSize, recvLen) < 0 && !gShouldExit)
         {
             Logger::getInstance().Error("PLCからのデータ受信が失敗しました。");
             if (recvTryTimes > 2)
@@ -180,7 +181,7 @@ void PLCRequestWorker::run() {
 
         // 送信データ作成
         Logger::getInstance().Info("送信データを作成します");
-        vector<map<string,string>> sendData = MCprotocolManager::convertResponseDataToSendData2(text, recvLen, req);
+        vector<map<string,string>> sendData = MCprotocolManager::getInstance().convertResponseDataToSendData(text, recvLen, req);
         Logger::getInstance().Info("送信データ: " + Utilities::convertVectorMapToString(sendData));
 
         // 受信データを確認し、sensorの準備状態を変更する。
@@ -222,8 +223,7 @@ DataLump* PLCRequestWorker::getReadySensor(DataLump* dataLump, const vector<map<
     }
 
     // DataLumpにsendDataを格納
-    dataLump->sendData.insert(dataLump->sendData.end(), sendDataNow.begin(), sendDataNow.end());
-
+    Utilities::appendVectorElements(dataLump->sendData, sendDataNow);
 
     // sendDtataの中から、sensorIDを探す
     for (auto& row : sendDataNow)

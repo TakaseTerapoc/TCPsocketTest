@@ -12,7 +12,7 @@
 #include "../external/fmt/format.h"
 
 const int TimeoutSec = 0; // タイムアウト秒数
-const int TimeoutUsec = 250000; // タイムアウトマイクロ秒数
+const int TimeoutUsec = 500000; // タイムアウトマイクロ秒数
 
 using namespace std;
 
@@ -32,7 +32,7 @@ public:
     int close();
     void getConnInfo(const char* serverIpAddress, int serverPortNumber);
     int sendRequest(const char* text, int len, int& sendLen);
-    int recvResponse(char* text, int& recvLen);
+    int recvResponse(char* text, int textSize, int& recvLen);
     
 
     struct timeval timeout;

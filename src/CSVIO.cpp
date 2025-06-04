@@ -1,7 +1,8 @@
 #include "CSVIO.hpp"
-#include "MCprotocolConfig.hpp"
+#include "MCprotocolConfigData.hpp"
 
-// ★
+const int ADDRESSLENGTH = 4; // アドレスコードの長さ
+
 vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(vector<map<string, string>>& mapdata)
 {
     map<string, vector<map<string, string>>> groupedIntervalData;
@@ -22,7 +23,6 @@ vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(vector<map<string, 
     // return groupMapDataByASCII(mapdata);
 }
 
-// ★
 void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>> groupedIntervalData)
 {
     vector<DataLump> result;
@@ -58,7 +58,6 @@ void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>
     gDataLump = result;
 }
 
-// ★
 void CSVIO::addASCIIrow(vector<map<string, string>>& mapdata)
 {
     vector<map<string, string>> result;
@@ -70,7 +69,6 @@ void CSVIO::addASCIIrow(vector<map<string, string>>& mapdata)
     mapdata = move(result);
 }
 
-// ★
 void CSVIO::sortData(vector<map<string, string>>& mapdata)
 {
     sort(mapdata.begin(), mapdata.end(),
@@ -90,7 +88,6 @@ void CSVIO::sortData(vector<vector<string>>& csvdata)
     );
 }
 
-// ★
 string CSVIO::convertASCIIstring(string str)
 {
     string initialcode;
@@ -127,9 +124,9 @@ string CSVIO::convertASCIIstring(string str)
         i++;
     }
     // 文字列の長さが4未満の場合、0を追加する
-    if (codenumber.length() < 4)
+    if (codenumber.length() < ADDRESSLENGTH)
     {
-        codenumber.insert(codenumber.begin(), 4 - codenumber.length(), '0');
+        codenumber.insert(codenumber.begin(), ADDRESSLENGTH - codenumber.length(), '0');
     }
 
     addressscode = initialcode + codenumber;
@@ -142,14 +139,13 @@ map<string, vector<map<string, string>>> CSVIO::separateMapData(vector<map<strin
 
     for (auto& row : mapdata) {
         string addresscode = row["ASCII"];
-        string initialstring = addresscode.erase(addresscode.size() - 4);
+        string initialstring = addresscode.erase(addresscode.size() - ADDRESSLENGTH);
         separateData[initialstring].push_back(row);
     }
 
     return separateData;
 }
 
-// ★
 map<string, vector<map<string, string>>> CSVIO::groupMapDataByInterval(const vector<map<string, string>>& mapdata)
 {
     map<string, vector<map<string, string>>> result;
@@ -179,23 +175,17 @@ map<string, vector<map<string, string>>> CSVIO::groupMapDataByInterval(const vec
     return result;
 }
 
-// ★
 map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
     map<string, vector<map<string, string>>>& intervalGroups)
 {
     map<string, vector<vector<map<string, string>>>> finalGroups;
 
-    for (auto& [interval, rows] : intervalGroups) {
-        // ASCII順にソート
-        sort(rows.begin(), rows.end(), [](const auto& a, const auto& b) {
-            return getASCIIValue(a) < getASCIIValue(b);
-        });
-
+    for (auto& [interval, rows] : intervalGroups) 
+    {
         vector<vector<map<string, string>>> groups;
         vector<map<string, string>> currentGroup;
-
         int initASCII = 0;
- 
+        int preASCII = 0;
         size_t i = 0;
 
         for (const auto& row : rows) {
@@ -204,8 +194,15 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
             }
             
             int ascii = getASCIIValue(row);
+            string asciistr = to_string(ascii);
+            string initialstring = asciistr.erase((row.at("ASCII")).size() - ADDRESSLENGTH);
             
-            if (!currentGroup.empty() && (ascii - initASCII > getInterval(row.at("ASCII")))) {
+            if ((!currentGroup.empty() && (ascii - initASCII > getInterval(row.at("ASCII")))) // 最大読取範囲を超えたときにグループを分ける必要がある。
+                // || (!currentGroup.empty() && (initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("CN") && ascii > )) // CS/CN199とCS/CN200の間。同じグループ内であっても分ける必要がある。
+                // || (!currentGroup.empty() && (initialstring == "D7999" || initialstring == "D8000")) // CS/CN199とCS/CN200の間。同じグループ内であっても分ける必要がある。
+                // || (!currentGroup.empty() && ()) // D7999とD8000の間。同じグループ内であっても分ける必要がある。
+            ) 
+            {
                 groups.push_back(currentGroup);
                 currentGroup.clear();
                 initASCII = ascii;
@@ -239,7 +236,6 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
     return finalGroups;
 }
 
-// ★
 vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(
     const map<string, vector<vector<map<string, string>>>>& groupedData)
 {
@@ -277,23 +273,34 @@ vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(
     return result;
 }
 
-// ★
 // TODO：どこかにワード数、点数の定数を定義する必要がある。
 // TODO：後日全てのイニシャルを準備する。今はDとMだけ
 int CSVIO::getInterval(string ASCIIstr) {
-    string initialstring = ASCIIstr.erase(ASCIIstr.size() - 4);
-    if (initialstring == "68") { //D
-        return MCprotocolConfig::D_WORD_MAX_READ_SIZE; //4ワード
+    string initialstring = ASCIIstr.erase(ASCIIstr.size() - ADDRESSLENGTH);
+    if (initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("D")
+        || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("R") 
+        || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("TN")
+        || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("CN") 
+    ) 
+    {
+        return MCprotocolConfigData::WORD_MAX_READ_SIZE;
     }
-    else if (initialstring == "77" || initialstring == "88") {//M
-        return MCprotocolConfig::M_X_Y_S_T_C_BIT_MAX_READ_SIZE; //12点
+    else if (initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("X") 
+        || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("Y")
+        || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("M")
+        || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("TS")
+        || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("CS")
+        || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("S")
+        ) 
+    {
+        return MCprotocolConfigData::BIT_MAX_READ_SIZE;
     }
-    else {
+    else 
+    {
         return 0; // 不明な場合は0を返す
     }
 }
 
-// ★
 int CSVIO::getASCIIValue(const map<string, string>& row) {
 
     auto it = row.find("ASCII");
