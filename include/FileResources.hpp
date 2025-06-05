@@ -10,9 +10,12 @@ using namespace std;
 
 class FileResources {
     public:
-        // 設定ファイルのパス
-        static const string PLC_CONFIG_FILE = "../ini/config.ini";
+        // 各ファイルのパスを記載したファイルのパス
+        inline static const string FILEPATHCONFIGFILE = "../ini/filepathconfig.ini";
 
-        // リクエストファイルのパス
-        static const string REQUEST_FILE = "../request/testdataDemo5.csv";
+        inline static const string FILEPATH = "filePath";
+
+        inline static const string CONFIGFILEPATH = "configFilePath";
+
+        inline static const string REQUESTFILEPATH = "requestFilePath"; 
 };

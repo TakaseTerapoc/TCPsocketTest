@@ -11,6 +11,7 @@
 #include "PLCRequestScheduler.hpp"
 #include "PLCRequestWorker.hpp"
 #include "ServerRequestWorker.hpp"
+#include "FileResources.hpp"
 
 #include <csignal>
 #include <atomic>

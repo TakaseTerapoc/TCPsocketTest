@@ -57,8 +57,10 @@ void AppController::initLogger() {
 }
 
 void AppController::loadConfig() {
+    
     Logger::getInstance().Info("設定ファイルを読み込みます。");
-    if (!AppConfig::getInstance().LoadFile("../ini/config.ini")) {
+    
+    if (!AppConfig::getInstance().LoadFiles(FileResources::FILEPATHCONFIGFILE)) {
         Logger::getInstance().Error("設定ファイルの読込に失敗しました。");
         exit(1);
     }
@@ -68,7 +70,7 @@ void AppController::loadConfig() {
 void AppController::prepareRequestData() {
     Logger::getInstance().Info("PLCリクエストデータの準備を開始します。");
 
-    auto mapdata = CsvReader::readCSVFileToMapVector("../request/testdataDemo4.csv");
+    auto mapdata = CsvReader::readCSVFileToMapVector(AppConfig::getInstance().requestFilePath);
     gRData = PLCTransactionDataBuilder::makeRequestDataFromMapdata(mapdata);
 
     MCprotocolSendDataManager::getInstance().covertToMCprotocolData(gRData);
