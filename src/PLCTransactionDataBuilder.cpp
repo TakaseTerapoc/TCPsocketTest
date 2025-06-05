@@ -1,7 +1,6 @@
-#include "CSVIO.hpp"
-#include "MCprotocolConfigData.hpp"
+#include "PLCTransactionDataBuilder.hpp"
 
-vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(vector<map<string, string>>& mapdata)
+vector<PLCTransactionData> PLCTransactionDataBuilder::makeRequestDataFromMapdata(vector<map<string, string>>& mapdata)
 {
     map<string, vector<map<string, string>>> groupedIntervalData;
     map<string, vector<vector<map<string, string>>>> groupedAddressData;
@@ -19,7 +18,7 @@ vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(vector<map<string, 
     return  makeRequestDataFromMapdata(groupedAddressData);
 }
 
-void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>> groupedIntervalData)
+void PLCTransactionDataBuilder::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>> groupedIntervalData)
 {
     vector<DataLump> result;
 
@@ -54,7 +53,7 @@ void CSVIO::makeDataLumpFromIntervalData(map<string, vector<map<string, string>>
     gDataLump = result;
 }
 
-void CSVIO::addASCIIrow(vector<map<string, string>>& mapdata)
+void PLCTransactionDataBuilder::addASCIIrow(vector<map<string, string>>& mapdata)
 {
     vector<map<string, string>> result;
     for (auto& row : mapdata) {
@@ -65,7 +64,7 @@ void CSVIO::addASCIIrow(vector<map<string, string>>& mapdata)
     mapdata = move(result);
 }
 
-void CSVIO::sortData(vector<map<string, string>>& mapdata)
+void PLCTransactionDataBuilder::sortData(vector<map<string, string>>& mapdata)
 {
     sort(mapdata.begin(), mapdata.end(),
         [](const auto& a, const auto& b) {
@@ -74,7 +73,7 @@ void CSVIO::sortData(vector<map<string, string>>& mapdata)
     );
 }
 
-void CSVIO::sortData(vector<vector<string>>& csvdata)
+void PLCTransactionDataBuilder::sortData(vector<vector<string>>& csvdata)
 {
         sort(csvdata.begin(), csvdata.end(),
         [](auto &a, auto &b) {
@@ -84,8 +83,9 @@ void CSVIO::sortData(vector<vector<string>>& csvdata)
     );
 }
 
-string CSVIO::convertASCIIstring(string str)
+string PLCTransactionDataBuilder::convertASCIIstring(string str)
 {
+    MCprotocolValidationHelper mcpValidationHelper;
     string initialcode;
     string codenumber;
     string addressscode;
@@ -124,12 +124,16 @@ string CSVIO::convertASCIIstring(string str)
     {
         codenumber.insert(codenumber.begin(), ADDRESSLENGTH - codenumber.length(), '0');
     }
-
+    // アドレスコードの最大値を超えていないかチェックする
+    if (!mcpValidationHelper.checkDeviceAddressMaxSize(initialcode, codenumber)) {
+        Logger::getInstance().Error("アドレスコードの最大値を超えています。");
+        exit(1);
+    }
     addressscode = initialcode + codenumber;
     return addressscode;
 }
 
-map<string, vector<map<string, string>>> CSVIO::separateMapData(vector<map<string, string>>& mapdata)
+map<string, vector<map<string, string>>> PLCTransactionDataBuilder::separateMapData(vector<map<string, string>>& mapdata)
 {
     map<string, vector<map<string, string>>> separateData;
 
@@ -142,7 +146,7 @@ map<string, vector<map<string, string>>> CSVIO::separateMapData(vector<map<strin
     return separateData;
 }
 
-map<string, vector<map<string, string>>> CSVIO::groupMapDataByInterval(const vector<map<string, string>>& mapdata)
+map<string, vector<map<string, string>>> PLCTransactionDataBuilder::groupMapDataByInterval(const vector<map<string, string>>& mapdata)
 {
     map<string, vector<map<string, string>>> result;
 
@@ -171,7 +175,7 @@ map<string, vector<map<string, string>>> CSVIO::groupMapDataByInterval(const vec
     return result;
 }
 
-map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
+map<string, vector<vector<map<string, string>>>> PLCTransactionDataBuilder::groupGroupDataByASCII(
     map<string, vector<map<string, string>>>& intervalGroups)
 {
     map<string, vector<vector<map<string, string>>>> finalGroups;
@@ -234,7 +238,7 @@ map<string, vector<vector<map<string, string>>>> CSVIO::groupGroupDataByASCII(
     return finalGroups;
 }
 
-vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(
+vector<PLCTransactionData> PLCTransactionDataBuilder::makeRequestDataFromMapdata(
     const map<string, vector<vector<map<string, string>>>>& groupedData)
 {
     vector<PLCTransactionData> result;
@@ -273,7 +277,7 @@ vector<PLCTransactionData> CSVIO::makeRequestDataFromMapdata(
 
 // TODO：どこかにワード数、点数の定数を定義する必要がある。
 // TODO：後日全てのイニシャルを準備する。今はDとMだけ
-int CSVIO::getInterval(string ASCIIstr) {
+int PLCTransactionDataBuilder::getInterval(string ASCIIstr) {
     string initialstring = ASCIIstr.erase(ASCIIstr.size() - ADDRESSLENGTH);
     if (initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("D")
         || initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("R") 
@@ -299,7 +303,7 @@ int CSVIO::getInterval(string ASCIIstr) {
     }
 }
 
-int CSVIO::getASCIIValue(const map<string, string>& row) {
+int PLCTransactionDataBuilder::getASCIIValue(const map<string, string>& row) {
 
     auto it = row.find("ASCII");
     if (it != row.end()) {

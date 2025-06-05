@@ -17,8 +17,9 @@ using namespace std;
  */
 class DataLump{
 public:
-    // コンストラクタ
+    // コンストラクタ デストラクタ
     DataLump() = default;
+    ~DataLump() = default;
 
     // シリアルナンバー
     string serialNumber = "";

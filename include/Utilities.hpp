@@ -18,8 +18,9 @@ using namespace std;
 class Utilities
 {
     public:
-        // コンストラクタ
+        // コンストラクタ デストラクタ
         Utilities() = delete; // インスタンス化を防ぐためにコンストラクタを削除
+        ~Utilities() = delete;
 
         // vector<map<string, string>>を文字列に変換する関数
         // 例:"{key1: value1, key2: value2}, {key3: value3}"

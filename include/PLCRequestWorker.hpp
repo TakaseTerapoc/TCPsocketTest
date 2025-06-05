@@ -8,7 +8,8 @@
 
 #include "globals.hpp"
 #include "PLCTransactionData.hpp"
-#include "MCprotocolManager.hpp"
+#include "MCprotocolSendDataManager.hpp"
+#include "MCprotocolRecvDataManager.hpp"
 #include "../external/fmt/format.h"
 #include "DataLump.hpp"
 #include "Utilities.hpp"

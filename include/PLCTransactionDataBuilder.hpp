@@ -3,18 +3,21 @@
 #include <vector>
 #include <map>
 #include <string>
+
 #include "../external/csv-parser/csv.hpp"
 #include "Logger.hpp"
 #include "PLCTransactionData.hpp"
 #include "globals.hpp"
 #include "DataLump.hpp"
+#include "MCprotocolConfigData.hpp"
+#include "MCprotocolValidationHelper.hpp"
 
 using namespace std;
 
 /**
 * @param CSVファイルの読み書きを行うクラスです。
 */
-class CSVIO{
+class PLCTransactionDataBuilder{
     public:
         // mapデータからPLCTransactionDataを作成する関数
         static vector<PLCTransactionData> makeRequestDataFromMapdata(vector<map<string, string>>& mapdata);

@@ -18,22 +18,22 @@ using namespace std;
 
 class PLCConnectionClient
 {
-private:
-    int socket_;
-    int sockAddressLen_ = sizeof(struct sockaddr_in);
-    struct sockaddr_in serverAddress_;
-public:
-    PLCConnectionClient(){}
-    PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
+    private:
+        int socket_;
+        int sockAddressLen_ = sizeof(struct sockaddr_in);
+        struct sockaddr_in serverAddress_;
+    public:
+        PLCConnectionClient(){}
+        PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
 
-    int makeSocket();
-    void setTimeout(int sec, int usec);
-    int Connect();
-    int close();
-    void getConnInfo(const char* serverIpAddress, int serverPortNumber);
-    int sendRequest(const char* text, int len, int& sendLen);
-    int recvResponse(char* text, int textSize, int& recvLen);
-    
+        int makeSocket();
+        void setTimeout(int sec, int usec);
+        int Connect();
+        int close();
+        void getConnInfo(const char* serverIpAddress, int serverPortNumber);
+        int sendRequest(const char* text, int len, int& sendLen);
+        int recvResponse(char* text, int textSize, int& recvLen);
+        
 
-    struct timeval timeout;
+        struct timeval timeout;
 };

@@ -3,8 +3,9 @@
 #include "Logger.hpp"
 #include "AppConfig.hpp"
 #include "CsvReader.hpp"
-#include "CSVIO.hpp"
-#include "MCprotocolManager.hpp"
+#include "PLCTransactionDataBuilder.hpp"
+#include "MCprotocolSendDataManager.hpp"
+#include "MCprotocolRecvDataManager.hpp"
 #include "PLCConnectionClient.hpp"
 #include "ServerConnectionClient.hpp"
 #include "PLCRequestScheduler.hpp"
@@ -16,6 +17,7 @@
 #include <thread>
 
 using namespace std;
+using namespace FX3UC;
 
 class AppController {
 public:
