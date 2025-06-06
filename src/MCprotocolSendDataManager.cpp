@@ -1,6 +1,4 @@
 #include "MCprotocolSendDataManager.hpp"
-#include "MCprotocolRecvDataManager.hpp"
-#include "MCprotocolConfigData.hpp"
 #include "Utilities.hpp"
 
 namespace FX3UC
@@ -187,8 +185,7 @@ namespace FX3UC
         if ( lastNumber == 0)
         {
             // デバイスコードがCNまたはCSの場合で、かつアドレス値が200-255の場合、点数を2倍にする。
-            if ((code == MCprotocolConfigData::deviceCodeToASCIIMap.at("CN") 
-                || code == MCprotocolConfigData::deviceCodeToASCIIMap.at("CS"))
+            if ((code == MCprotocolConfigData::deviceCodeToASCIIMap.at("CN") )
                 && ( atoi(address.c_str()) >= CNCS32BitAddressMinValue && atoi(address.c_str()) <= CNCS32BitAddressMaxValue )  
             )
             {
@@ -201,17 +198,19 @@ namespace FX3UC
         }
         else
         {
+            int deviceNum = lastNumber - firstNumber + 1;
+
             // デバイスコードがCNまたはCSの場合で、かつアドレス値が200-255の場合、点数を2倍にする。
             if (code == MCprotocolConfigData::deviceCodeToASCIIMap.at("CN") 
-                || code == MCprotocolConfigData::deviceCodeToASCIIMap.at("CS")
                 && ( atoi(address.c_str()) >= CNCS32BitAddressMinValue && atoi(address.c_str()) <= CNCS32BitAddressMaxValue )
             )
             {
-                protocolbuf.push_back((char)((lastNumber - firstNumber + 1) * 2 & 0xFF));
+                deviceNum % 2 == 0 ? deviceNum : deviceNum++; // 奇数の場合は1を足して偶数にする
+                protocolbuf.push_back((char)((deviceNum) * 2 & 0xFF));
             }
             else
             {
-                protocolbuf.push_back((char)((lastNumber - firstNumber + 1) & 0xFF));
+                protocolbuf.push_back((char)((deviceNum) & 0xFF));
             }
         }
     }
@@ -220,70 +219,5 @@ namespace FX3UC
     {
         // 終点を設定
         protocolbuf.push_back((char)0x00);
-    }
-
-    vector<map<string,string>> MCprotocolSendDataManager::convertResponseDataToSendData(char* text, int len, PLCTransactionData& req) {
-        string responseData;
-        string format;
-        vector<map<string,string>> sendData;
-
-        for (int i = 0; i < len; ++i)
-        {
-            if (i > 1)
-            {
-                responseData += Utilities::convertByteToHexString(text[i]);
-
-            }
-            else
-            {
-                format += Utilities::convertByteToHexString(text[i]);
-            }
-        }
-
-        Logger::getInstance().Info("【シリアルナンバー】" + req.serialNumber + "【フォーマット】"+ format +"【受信データ(16進数)】" + responseData);
-
-        for (int i = 0; i < req.mapdata.size(); i++)
-        {
-            string data;
-            if (req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("M") 
-                || req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("X")
-                || req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("Y")
-                || req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("S")
-                || req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("TS")
-                || req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("CS")
-            )
-            {
-                if (i == 0)
-                {
-                    data = responseData.substr(0, 1);
-                }
-                else
-                {
-                    int startPosition = stoi(req.mapdata[i]["ASCII"]) - stoi(req.mapdata[i - 1]["ASCII"]);
-                    data = responseData.substr(startPosition, 1);
-                }
-            }
-            else if (req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("D")
-                || req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("R")
-                || req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("TN")
-                || req.deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("CN")
-            )
-            {
-                if (i == 0)
-                {
-                    data = Utilities::convertDecimalString(Utilities::swapString(responseData.substr(0, 4)));
-
-                }
-                else
-                {
-                    int startPosition = (stoi(req.mapdata[i]["ASCII"]) - stoi(req.mapdata[i - 1]["ASCII"])) * 4;
-                    data = Utilities::convertDecimalString(Utilities::swapString(responseData.substr(startPosition, 4)));
-                }
-            }
-            req.mapdata[i]["data"] = data;
-        }
-        sendData = req.mapdata;
-
-        return sendData;
     }
 }

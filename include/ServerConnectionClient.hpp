@@ -18,6 +18,7 @@ using namespace std;
 */
 class ServerConnectionClient {
 public:
+    // コンストラクタとデストラクタ
     ServerConnectionClient() = default;
     ServerConnectionClient(const string& serverIp, int serverPort);
     ~ServerConnectionClient();

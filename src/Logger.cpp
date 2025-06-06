@@ -1,4 +1,5 @@
 #include "../include/Logger.hpp"
+# define DEBUG
 
 Logger& Logger::getInstance()
 {

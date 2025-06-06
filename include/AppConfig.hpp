@@ -19,12 +19,6 @@ public:
     // iniファイルから文字列を取得
     string GetString(CSimpleIniA& anyIni, const string& title, const string& key);
 
-    // config セクションから文字列を取得
-    // std::string GetConfigPath();
-
-    // // Request セクションから文字列を取得
-    // std::string GetRequestPath();
-
     // PLCConfig セクションから値を取得
     std::string GetPLCConfig(const std::string& key);
 

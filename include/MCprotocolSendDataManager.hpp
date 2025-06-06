@@ -29,9 +29,6 @@ namespace FX3UC
             // PLCTransactionDataを受け取り、MCプロトコルのデータを作成する関数
             void covertToMCprotocolData(std::vector<PLCTransactionData>& gRData);
 
-            // レスポンスデータを受け取り、送信データに変換する関数
-            std::vector<std::map<std::string,std::string>> convertResponseDataToSendData(char* text, int len, PLCTransactionData& req);
-
         private:
             // コンストラクタとデストラクタ
             MCprotocolSendDataManager() = default;

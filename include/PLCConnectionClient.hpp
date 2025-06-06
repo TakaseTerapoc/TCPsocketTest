@@ -22,6 +22,7 @@ class PLCConnectionClient
         int socket_;
         int sockAddressLen_ = sizeof(struct sockaddr_in);
         struct sockaddr_in serverAddress_;
+        
     public:
         PLCConnectionClient(){}
         PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);

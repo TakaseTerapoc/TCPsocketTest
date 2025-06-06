@@ -46,21 +46,36 @@ vector<char> Utilities::decStrToBytes32(const string& decStr)
     };
 }
 
-// 後ろからsubstringする関数
-// posは後ろからの位置、lenは取得する文字数
-string Utilities::substrBack(string& str, size_t pos, size_t len) 
+// 指定した位置でsubstrする関数
+string Utilities::substrCustom(string& str, size_t len) 
 {
     const size_t strLen = str.length();
 
-    return str.substr(strLen - pos, len);
+    return str.substr(0, strLen - len);
 }
 
-// レスポンス文字列を正しい順番に並び替える関数
-string Utilities::swapString(const string& str) {
+// 指定した位置で後ろからsubstringする関数
+string Utilities::substrBack(string& str, size_t len) 
+{
+    const size_t strLen = str.length();
+
+    return str.substr(strLen - len);
+}
+
+// 16Bitのレスポンス文字列を正しい順番に並び替える関数
+string Utilities::swapString16Bit(const string& str) {
     string first = str.substr(0, 2);
     string second = str.substr(2, 2);
-    string result = second + first;
-    return result; 
+    return second + first;
+}
+
+// 32Bitのレスポンス文字列を正しい順番に並び替える関数
+string Utilities::swapString32Bit(const string& str) {
+    string first = str.substr(0, 2);
+    string second = str.substr(2, 2);
+    string third = str.substr(4, 2);
+    string fourth = str.substr(6, 2);
+    return fourth + third + second + first;
 }
 
 // TODO:数値に変換できない時の例外処理

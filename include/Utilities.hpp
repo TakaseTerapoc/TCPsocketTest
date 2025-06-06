@@ -45,11 +45,17 @@ class Utilities
         // 10進文字列を32ビットのリトルエンディアン4バイトに分解する関数
         static vector<char> decStrToBytes32(const string& decStr);
 
-        // 後ろからsubstringする関数
-        static string substrBack(std::string& str, size_t pos, size_t len);
+        // 指定した位置でsubstrする関数
+        static string substrCustom(std::string& str, size_t len);
 
-        // レスポンス文字列を正しい順番に並び替える。
-        static string swapString(const std::string& str);
+        // 後ろからsubstringする関数
+        static string substrBack(std::string& str, size_t len);
+
+        // 16Bitのレスポンス文字列を正しい順番に並び替える。
+        static string swapString16Bit(const std::string& str);
+
+        // 16Bitのレスポンス文字列を正しい順番に並び替える。
+        static string swapString32Bit(const std::string& str);
 
         // map<string, string>からキーの値をint型で取得する関数
         static int getMapValueByInt(const map<string, string>& row, string keystr);

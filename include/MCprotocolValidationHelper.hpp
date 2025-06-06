@@ -6,6 +6,8 @@
 
 #include "Logger.hpp"
 #include "MCprotocolConfigData.hpp"
+#include "Utilities.hpp"
+#include "globals.hpp"
 
 using namespace std;
 
@@ -19,44 +21,19 @@ namespace FX3UC
             // コンストラクタ デストラクタ
             MCprotocolValidationHelper() = default;
             ~MCprotocolValidationHelper() = default;
+            
+            // このクラスの全てのバリデーションチェック関数を呼び出す関数
+            bool checkValidation(string& deviceASCII);
+
+            // 奇数かチェックする
+            bool checkOddNumber(int devicePoint);
+
+        private:
+        
+            // Mアドレスの読み取り禁止リストに含まれているかチェックする関数
+            bool checkprohibitedReadingAddress(int address);
 
             // デバイスコードのアドレスが最大サイズを超えているかチェックする関数
-            inline bool checkDeviceAddressMaxSize (const string& deviceCode, const string& address) 
-            {
-                int value = atoi(address.c_str());
-
-                if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("X")) {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::X];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("Y")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::Y];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("M")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::M];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("S")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::S];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("TS")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::TS];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("CS")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::CS];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("D")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::D];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("R")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::R];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("TN")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::TN];
-                } else if (deviceCode == MCprotocolConfigData::deviceCodeToASCIIMap.at("CN")) 
-                {
-                    return value <= MCprotocolConfigData::DeviceAddressMaxSize[MCprotocolConfigData::DeviceCodeEnum::CN];
-                }
-                return false;
-            };
-        private:
+            bool checkDeviceAddressMaxSize (const string& deviceCode, const string& address);
     };
 }

@@ -181,7 +181,7 @@ void PLCRequestWorker::run() {
 
         // 送信データ作成
         Logger::getInstance().Info("送信データを作成します");
-        vector<map<string,string>> sendData = MCprotocolSendDataManager::getInstance().convertResponseDataToSendData(text, recvLen, req);
+        vector<map<string,string>> sendData = MCprotocolRecvDataManager::getInstance().convertResponseDataToSendData(text, recvLen, req);
         Logger::getInstance().Info("送信データ: " + Utilities::convertVectorMapToString(sendData));
 
         // 受信データを確認し、sensorの準備状態を変更する。

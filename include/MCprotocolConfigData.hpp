@@ -24,6 +24,21 @@ namespace FX3UC
             // 頭文字がM・X・Y・S・T・Cのデバイスコードの最大読取点数(bit読み取り時)
             static constexpr int BIT_MAX_READ_SIZE = 200;
 
+            // 読込禁止のMアドレスのリスト
+            inline static const vector<int> prohibitedReadingMaddress = {
+                8410, 
+                8412, 
+                8413, 
+                8414, 
+                8415, 
+                8430, 
+                8432, 
+                8433, 
+                8434, 
+                8435
+            };
+            
+            // デバイスコードとASCIIコードのマッピング
             inline static const map<string,string> deviceCodeToASCIIMap = {
                 {"X", "88"},
                 {"Y", "89"},
@@ -37,6 +52,7 @@ namespace FX3UC
                 {"CN", "6778"},
             };
 
+            // デバイスコードのアドレス最大サイズ
             inline static const vector<int> DeviceAddressMaxSize = {
                 377, // X
                 377, // Y
@@ -47,9 +63,10 @@ namespace FX3UC
                 8511, // D
                 32767, // R
                 511, // TN
-                255, // CN
+                254, // CN
             };
 
+            // デバイスコードのバイナリ値のリスト
             inline static const vector<vector<char>> DeviceCodes = {
                 {(char)0x20, (char)0x58}, // X
                 {(char)0x20, (char)0x59}, // Y
@@ -63,6 +80,7 @@ namespace FX3UC
                 {(char)0x4E, (char)0x43}  // CN
             };
 
+            // デバイスコードenum
             enum DeviceCodeEnum{
                 X = 0,
                 Y = 1,
@@ -76,6 +94,7 @@ namespace FX3UC
                 CN = 9,
             };
 
+            // コマンドenum
             enum CommandEnum{
                 READBIT = 0,          // ビット一括読み出し
                 READWORD = 1,         // ワード一括読み出し

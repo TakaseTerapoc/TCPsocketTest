@@ -54,6 +54,7 @@ void AppController::initLogger() {
     Logger::getInstance().Init();
     Logger::getInstance().Info("ロガー初期化完了");
     Logger::getInstance().Info("アプリが起動しました。");
+    Logger::getInstance().Debug("デバッグアプリが起動しました。");
 }
 
 void AppController::loadConfig() {
@@ -68,13 +69,20 @@ void AppController::loadConfig() {
 }
 
 void AppController::prepareRequestData() {
+    PLCTransactionDataBuilder plcTransactionDataBuilder;
+
     Logger::getInstance().Info("PLCリクエストデータの準備を開始します。");
-
+    
+    // CSVファイルを読み込み
     auto mapdata = CsvReader::readCSVFileToMapVector(AppConfig::getInstance().requestFilePath);
-    gRData = PLCTransactionDataBuilder::makeRequestDataFromMapdata(mapdata);
+    
+    // CSVデータをPLCTransactionDataBuilderでPLCTransactionDataに変換
+    gRData = plcTransactionDataBuilder.makeRequestDataFromMapdata(mapdata);
 
+    // 変換したデータをMCプロトコルのデータに変換
     MCprotocolSendDataManager::getInstance().covertToMCprotocolData(gRData);
-    Logger::getInstance().Info("PLCリクエストデータ準備完了。");
+    
+    Logger::getInstance().Info("PLCリクエストデータ準備完了しました。");
 }
 
 bool AppController::setupConnections() {

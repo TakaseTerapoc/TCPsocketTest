@@ -1,4 +1,5 @@
 #include "PLCTransactionDataBuilder.hpp"
+# define DEBUG
 
 vector<PLCTransactionData> PLCTransactionDataBuilder::makeRequestDataFromMapdata(vector<map<string, string>>& mapdata)
 {
@@ -6,6 +7,7 @@ vector<PLCTransactionData> PLCTransactionDataBuilder::makeRequestDataFromMapdata
     map<string, vector<vector<map<string, string>>>> groupedAddressData;
 
     addASCIIrow(mapdata);
+
     sortData(mapdata);
     groupedIntervalData = groupMapDataByInterval(mapdata);
 
@@ -40,6 +42,7 @@ void PLCTransactionDataBuilder::makeDataLumpFromIntervalData(map<string, vector<
         result.push_back(move(lump));
     }
 
+#ifdef DEBUG
     // result確認
     for (const auto& lump : result) {
         cout << "Interval " << lump.sendIntervalMs << "ミリ秒" << endl;
@@ -49,6 +52,7 @@ void PLCTransactionDataBuilder::makeDataLumpFromIntervalData(map<string, vector<
             }
         }
     }
+#endif
 
     gDataLump = result;
 }
@@ -56,9 +60,21 @@ void PLCTransactionDataBuilder::makeDataLumpFromIntervalData(map<string, vector<
 void PLCTransactionDataBuilder::addASCIIrow(vector<map<string, string>>& mapdata)
 {
     vector<map<string, string>> result;
+
+    MCprotocolValidationHelper mCpValidationHelper;
+
+    string tempDeviceASCII;
+
     for (auto& row : mapdata) {
         map<string, string> newRow = row;
-        newRow["ASCII"] = convertASCIIstring(row["device"]);
+        // デバイスコードをASCII文字列に変換
+        tempDeviceASCII = convertDeviceToASCIIstring(row["device"]);
+
+        if (!mCpValidationHelper.checkValidation(tempDeviceASCII) ) {
+            Logger::getInstance().Error("デバイスコードの変換に失敗しました。");
+            exit(1);
+        }
+        newRow["ASCII"] = tempDeviceASCII;
         result.push_back(move(newRow));
     }
     mapdata = move(result);
@@ -83,17 +99,18 @@ void PLCTransactionDataBuilder::sortData(vector<vector<string>>& csvdata)
     );
 }
 
-string PLCTransactionDataBuilder::convertASCIIstring(string str)
+string PLCTransactionDataBuilder::convertDeviceToASCIIstring(string& device)
 {
     MCprotocolValidationHelper mcpValidationHelper;
-    string initialcode;
-    string codenumber;
-    string addressscode;
+
+    string initialDevice;
+    string deviceAddress;
+
     size_t i = 0;
     
     // 最初の英文字をASCIIコードに変換してstringにする。
-    for (char c : str) {
-        if(i == 2 && initialcode.empty())
+    for (char c : device) {
+        if(i == 2 && initialDevice.empty())
         {
             Logger::getInstance().Error("アドレスコードの２文字目までに文字が含まれていません。");
             exit(1);
@@ -101,16 +118,16 @@ string PLCTransactionDataBuilder::convertASCIIstring(string str)
         if (c >= 65 && c <= 90) // A-Z
         { 
             int num = (int)c;
-            initialcode += to_string(num); // 大文字をASCIIコードに変換
+            initialDevice += to_string(num); // 大文字をASCIIコードに変換
         }
         else if (c >= 97 && c <= 122) // a-z
         {
             int num = (int)c - 32; // 小文字を大文字に変換
-            initialcode += to_string(num);
+            initialDevice += to_string(num);
         }
         else if (c >= 48 && c <= 57) // 0-9
         {
-            codenumber += to_string(c - 48); // 数字をそのままstringに追加
+            deviceAddress += to_string(c - 48); // 数字をそのままstringに追加
         }
         else
         {
@@ -119,18 +136,17 @@ string PLCTransactionDataBuilder::convertASCIIstring(string str)
         }        
         i++;
     }
-    // 文字列の長さがADDRESSLENGTH未満の場合、0を追加する
-    if (codenumber.length() < ADDRESSLENGTH)
-    {
-        codenumber.insert(codenumber.begin(), ADDRESSLENGTH - codenumber.length(), '0');
+    // アドレスコードの長さが4文字未満の場合は、0で埋める
+    fillAddressZeros(deviceAddress, ADDRESSLENGTH);
+
+    return initialDevice + deviceAddress;
+}
+
+void PLCTransactionDataBuilder::fillAddressZeros(string& address, size_t length)
+{
+    if (address.length() < length) {
+        address.insert(address.begin(), length - address.length(), '0');
     }
-    // アドレスコードの最大値を超えていないかチェックする
-    if (!mcpValidationHelper.checkDeviceAddressMaxSize(initialcode, codenumber)) {
-        Logger::getInstance().Error("アドレスコードの最大値を超えています。");
-        exit(1);
-    }
-    addressscode = initialcode + codenumber;
-    return addressscode;
 }
 
 map<string, vector<map<string, string>>> PLCTransactionDataBuilder::separateMapData(vector<map<string, string>>& mapdata)
@@ -160,9 +176,10 @@ map<string, vector<map<string, string>>> PLCTransactionDataBuilder::groupMapData
     }
     vector<map<string, bool>> tempMemory;
 
+#ifdef DEBUG
     // 結果の表示（確認用）
     for (const auto& [interval, group] : result) {
-        cout << "Interval: " << interval << "ms\n";
+        cout << "Intervalはこれです: " << interval << "ms\n";
         for (const auto& row : group) {
             cout << "  { ";
             for (const auto& [key, val] : row) {
@@ -171,7 +188,7 @@ map<string, vector<map<string, string>>> PLCTransactionDataBuilder::groupMapData
             cout << "}\n";
         }
     }
-
+#endif
     return result;
 }
 
@@ -220,6 +237,7 @@ map<string, vector<vector<map<string, string>>>> PLCTransactionDataBuilder::grou
         finalGroups[interval] = groups;
     }
 
+#ifdef DEBUG
     // 確認表示
     for (const auto& [interval, groups] : finalGroups) {
         cout << "Interval: " << interval << "ms\n";
@@ -235,6 +253,8 @@ map<string, vector<vector<map<string, string>>>> PLCTransactionDataBuilder::grou
             }
         }
     }
+#endif
+
     return finalGroups;
 }
 
@@ -260,6 +280,7 @@ vector<PLCTransactionData> PLCTransactionDataBuilder::makeRequestDataFromMapdata
         }
     }
 
+#ifdef DEBUG
     // resultを確認
     for (const auto& data : result) {
         cout << "Serial Number: " << data.serialNumber << ", Send Interval: " << data.sendIntervalMs << "ms\n";
@@ -271,12 +292,12 @@ vector<PLCTransactionData> PLCTransactionDataBuilder::makeRequestDataFromMapdata
             cout << "}\n";
         }
     }
+#endif
 
     return result;
 }
 
 // TODO：どこかにワード数、点数の定数を定義する必要がある。
-// TODO：後日全てのイニシャルを準備する。今はDとMだけ
 int PLCTransactionDataBuilder::getInterval(string ASCIIstr) {
     string initialstring = ASCIIstr.erase(ASCIIstr.size() - ADDRESSLENGTH);
     if (initialstring == MCprotocolConfigData::deviceCodeToASCIIMap.at("D")

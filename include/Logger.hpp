@@ -53,9 +53,8 @@ public:
     std::string timestamp;
 
 private:
-    Logger() = default;             // コンストラクタ
-
-    // デストラクタ
+    // コンストラクタとデストラクタ
+    Logger() = default;
     ~Logger() = default;
     
     // コピー禁止
