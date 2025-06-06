@@ -55,7 +55,7 @@ namespace FX3UC
             void setDeviceCode(std::vector<char>& protocolbuf, std::string& code);
 
             // 先頭デバイスナンバーを作成する関数
-            void setTopDeviceNumber(std::vector<char>& protocolbuf, std::string& address);
+            void setTopDeviceNumber(std::vector<char>& protocolbuf, string& code, std::string& address);
 
             // デバイス点数を作成する関数
             void setDevicePoint(vector<char>& protocolbuf, int firstNumber, int lastNumber, string& code, string& address);

@@ -46,6 +46,18 @@ vector<char> Utilities::decStrToBytes32(const string& decStr)
     };
 }
 
+// 8進文字列を32ビットのリトルエンディアン4バイトに分解する関数      
+vector<char> Utilities::octStrToBytes32(const string& octStr) 
+{
+    unsigned long v = stoul(octStr, nullptr, 8);
+    return {
+        static_cast<char>( v        & 0xFF),
+        static_cast<char>((v >>  8) & 0xFF),
+        static_cast<char>((v >> 16) & 0xFF),
+        static_cast<char>((v >> 24) & 0xFF)
+    };
+}
+
 // 指定した位置でsubstrする関数
 string Utilities::substrCustom(string& str, size_t len) 
 {

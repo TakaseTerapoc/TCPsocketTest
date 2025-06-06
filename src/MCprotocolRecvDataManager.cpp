@@ -26,7 +26,7 @@ namespace FX3UC
             }
         }
 
-        Logger::getInstance().Info("【シリアルナンバー】" + req.serialNumber + "【フォーマット】"+ format +"【受信データ(16進数)】" + responseData);
+        Logger::getInstance().Info("【シリアルナンバー】" + req.serialNumber + "【フォーマット】"+ format + "【受信データ(16進数)】" + responseData);
 
         for (int i = 0; i < req.mapdata.size(); i++)
         {

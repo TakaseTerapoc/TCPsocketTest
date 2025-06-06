@@ -45,6 +45,9 @@ class Utilities
         // 10進文字列を32ビットのリトルエンディアン4バイトに分解する関数
         static vector<char> decStrToBytes32(const string& decStr);
 
+        // 8進数の文字列を32ビットのリトルエンディアン4バイトに分解する関数
+        static vector<char> octStrToBytes32(const string& octStr);
+
         // 指定した位置でsubstrする関数
         static string substrCustom(std::string& str, size_t len);
 

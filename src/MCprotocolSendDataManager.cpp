@@ -35,7 +35,7 @@ namespace FX3UC
                         setSubheader(row, data, code, address);
                         setPCNumber(data.protocolbuf);
                         setMonitorTimer(data.protocolbuf);
-                        setTopDeviceNumber(data.protocolbuf, address);
+                        setTopDeviceNumber(data.protocolbuf, code,address);
                         setDeviceCode(data.protocolbuf, code);
                         firstNumber = stoi(row.at("ASCII"));
                     } 
@@ -122,10 +122,20 @@ namespace FX3UC
 
     }
 
-    void MCprotocolSendDataManager::setTopDeviceNumber(vector<char>& protocolbuf, string& address)
+    void MCprotocolSendDataManager::setTopDeviceNumber(vector<char>& protocolbuf, string& code, string& address)
     {
-        // 10進数のアドレスを32ビットのリトルエンディアン4バイトに変換
-        auto bytes = Utilities::decStrToBytes32(address);
+        std::vector<char> bytes;
+        if (code == MCprotocolConfigData::deviceCodeToASCIIMap.at("X")
+            || code == MCprotocolConfigData::deviceCodeToASCIIMap.at("Y")
+        )
+        {
+            bytes = Utilities::octStrToBytes32(address);;
+        }
+        else
+        {
+            // 10進数のアドレスを32ビットのリトルエンディアン4バイトに変換
+            bytes = Utilities::decStrToBytes32(address);
+        }
         // 先頭デバイス番号を設定
         Utilities::appendVectorElements(protocolbuf, bytes);
     }
