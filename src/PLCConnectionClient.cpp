@@ -71,6 +71,11 @@ int PLCConnectionClient::recvResponse(char* text, int textSize, int& recvLen)
 {
     Logger::getInstance().Info("受信開始します。"); 
     recvLen = recv(socket_, text, textSize, 0);
+        if (recvLen < 0) {
+        Logger::getInstance().Error(
+            fmt::format("recvに失敗しました。errno={}, message={}", errno, strerror(errno))
+        );
+    }
     return recvLen;
 }
 
