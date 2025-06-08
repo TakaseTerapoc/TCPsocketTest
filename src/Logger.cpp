@@ -90,10 +90,10 @@ void Logger::Warn(const string& message)
     m_logger->warn("[{}] {}", timestamp, message);
 }
 
-void Logger::Error(const string& message)
+void Logger::Error(const std::string& message, const char* file, int line, const char* func)
 {
     string timestamp = GetCurrentTimestampString();
-    m_logger->error("[{}] {}", timestamp, message);
+    m_logger->error("[{}] {} ({}:{}:{})", timestamp, message, file, line, func);
 }
 
 void Logger::Sensor(const string& message)

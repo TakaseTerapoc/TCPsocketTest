@@ -14,7 +14,7 @@
 
 using namespace std;
 
-#define LOG_ERROR(msg) SPDLOG_LOGGER_ERROR(spdlog::default_logger_raw(), spdlog::source_loc{__FILE__, __LINE__, __FUNCTION__}, msg)
+
 
 /**
  * @brief ロガークラスです。
@@ -38,7 +38,7 @@ public:
     void Warn(const std::string& message);
 
     // エラー用のロガー
-    void Error(const std::string& message);
+    void Error(const std::string& message, const char* file, int line, const char* func);
 
     // センサー情報用のロガー
     void Sensor(const std::string& message);
@@ -64,3 +64,7 @@ private:
     std::shared_ptr<spdlog::logger> m_logger;       // メインロガー
     std::shared_ptr<spdlog::logger> m_sensor_logger;// センサー用ロガー
 };
+
+// Errorログにファイル名・行番号・関数名を自動で含めるマクロ
+#define Error(msg) \
+    Error(msg, __FILE__, __LINE__, __func__)
