@@ -97,7 +97,7 @@ bool AppController::setupConnections() {
     // PLC接続エラーが起きたときに何度もリトライするようにする。
     int result = -1;
     while ((result = plcConnectionClient_->Connect()) < 0 && !gShouldExit) {
-        Logger::getInstance().Error("PLC接続再試行中...");
+        Logger::getInstance().Error2("PLC接続再試行中...",__FILE__, __LINE__, __FUNCTION__);
         this_thread::sleep_for(chrono::seconds(1));
     }
     if (gShouldExit) {
