@@ -75,7 +75,7 @@ void PLCRequestWorker::run() {
                 Logger::getInstance().Error("試行規定回数に達しました。ソケットを閉じて再接続します。");
                 
                 // 5回送信しても失敗した場合、ソケットを閉じて再接続する。
-                pLCConnectionClient_.close();
+                pLCConnectionClient_.Close();
                 pLCConnectionClient_.makeSocket();
                 dataLump->allClear(); // DataLumpをクリア
                 Logger::getInstance().Error("スケジューラのキュープッシュを停止します。");
@@ -107,10 +107,7 @@ void PLCRequestWorker::run() {
         }
         
         // 終了信号を受け取ったときの処理
-        if (gShouldExit) {
-            Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
-            break;
-        }
+        if (gShouldExit) break;
 
         // リセットフラグが経っていたらループを最初から
         if (resetFlag) continue;
@@ -134,7 +131,7 @@ void PLCRequestWorker::run() {
                 Logger::getInstance().Error("試行規定回数に達しました。ソケットを閉じて再接続します。");
                 
                 // 5回送信しても失敗した場合、ソケットを閉じて再接続する。
-                pLCConnectionClient_.close();
+                pLCConnectionClient_.Close();
                 pLCConnectionClient_.makeSocket();
                 dataLump->allClear(); // DataLumpをクリア
                 Logger::getInstance().Error("スケジューラのキュープッシュを停止します。");

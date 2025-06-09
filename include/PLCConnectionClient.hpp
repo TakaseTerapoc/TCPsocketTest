@@ -24,13 +24,19 @@ class PLCConnectionClient
         struct sockaddr_in serverAddress_;
         
     public:
-        PLCConnectionClient(){}
+        // コンストラクタとデストラクタ
+        PLCConnectionClient() = default;
+        ~PLCConnectionClient() { 
+            std::cout << "PLCConnectionClientのデストラクタが呼ばれました。ソケットを開放します。" << std::endl;
+            Close(); 
+        }
+
         PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
 
         int makeSocket();
         void setTimeout(int sec, int usec);
         int Connect();
-        int close();
+        void Close();
         void getConnInfo(const char* serverIpAddress, int serverPortNumber);
         int sendRequest(const char* text, int len, int& sendLen);
         int recvResponse(char* text, int textSize, int& recvLen);

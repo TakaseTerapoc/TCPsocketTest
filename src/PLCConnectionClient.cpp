@@ -66,10 +66,13 @@ int PLCConnectionClient::Connect()
     return result;
 }
 
-int PLCConnectionClient::close()
+void PLCConnectionClient::Close()
 {
-    int result = ::close(socket_);
-    return result;
+    if (socket_ != -1)
+    {
+        close(socket_);
+        socket_ = -1; // ソケットを閉じた後は無効化
+    }
 }
 
 int PLCConnectionClient::sendRequest(const char* text, int len, int& sendLen)
