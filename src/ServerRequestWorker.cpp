@@ -63,7 +63,7 @@ void ServerRequestWorker::run() {
         }
         else
         {
-            Logger::getInstance().Info("サーバーへの送信に成功しました。");
+            Logger::getInstance().Debug("サーバーへの送信に成功しました。");
         }
         Logger::getInstance().Sensor(shapedSendData);
     }
@@ -100,7 +100,7 @@ string ServerRequestWorker::shapeSendData(const vector<map<string,string>>& send
     shapedSendData.pop_back();
 
     // 確認用
-    Logger::getInstance().Info("整形したデータ: " + shapedSendData);
+    Logger::getInstance().Debug("整形したデータ: " + shapedSendData);
 
     return shapedSendData;
 }

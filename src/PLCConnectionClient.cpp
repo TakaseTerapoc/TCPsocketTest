@@ -78,7 +78,7 @@ void PLCConnectionClient::Close()
 
 int PLCConnectionClient::sendRequest(const char* text, int len, int& sendLen)
 {
-    Logger::getInstance().Info("送信開始します。"); 
+    Logger::getInstance().Debug("送信開始します。"); 
     sendLen = send(socket_, text, len, 0);
     if (sendLen < 0) {
         Logger::getInstance().Error(
@@ -90,7 +90,7 @@ int PLCConnectionClient::sendRequest(const char* text, int len, int& sendLen)
 
 int PLCConnectionClient::recvResponse(char* text, int textSize, int& recvLen)
 {
-    Logger::getInstance().Info("受信開始します。"); 
+    Logger::getInstance().Debug("受信開始します。"); 
     recvLen = recv(socket_, text, textSize, 0);
     if (recvLen < 0) {
         Logger::getInstance().Error(

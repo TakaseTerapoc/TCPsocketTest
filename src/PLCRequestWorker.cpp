@@ -54,13 +54,13 @@ void PLCRequestWorker::run() {
             req = gRequestQueue.front();
             gRequestQueue.pop_front();
         }
-        Logger::getInstance().Info("キューから取り出しました。\n 【MCプロトコル】" + Utilities::convertVectorBytesToHexString(req.protocolbuf));
+        Logger::getInstance().Debug("キューから取り出しました。\n 【MCプロトコル】" + Utilities::convertVectorBytesToHexString(req.protocolbuf));
 
         // LumpDataを取得
         DataLump* dataLump = getDataLump(req);
 
         // PLCへリクエストを送信        
-        Logger::getInstance().Info("PLCにリクエストを送ります。");
+        Logger::getInstance().Debug("PLCにリクエストを送ります。");
 
         // 送信リクエストをPLCへ送信
         int sendLen = 0;
@@ -112,7 +112,7 @@ void PLCRequestWorker::run() {
         // リセットフラグが経っていたらループを最初から
         if (resetFlag) continue;
 
-        Logger::getInstance().Info("送信データをPLCへ送信しました。");
+        Logger::getInstance().Debug("送信データをPLCへ送信しました。");
         resetFlag = false; // リセットフラグをfalseにする
         gPLCconnectFlag = true; // PLC接続フラグをtrueにする
         gClearQueueFlag = false; // キューを空にするフラグをfalseにする
@@ -169,7 +169,7 @@ void PLCRequestWorker::run() {
         // リセットフラグが立っていたらループを最初から
         if (resetFlag) continue;
 
-        Logger::getInstance().Info("受信データを受け取りました。");
+        Logger::getInstance().Debug("受信データを受け取りました。");
         resetFlag = false; // リセットフラグをfalseにする
         gPLCconnectFlag = true; // PLC接続フラグをtrueにする
         gClearQueueFlag = false; // キューを空にするフラグをfalseにする
@@ -177,16 +177,16 @@ void PLCRequestWorker::run() {
         // req.receiptTime = Logger::getInstance().timestamp;
 
         // 送信データ作成
-        Logger::getInstance().Info("送信データを作成します");
+        Logger::getInstance().Debug("送信データを作成します");
         vector<map<string,string>> sendData = MCprotocolRecvDataManager::getInstance().convertResponseDataToSendData(text, recvLen, req);
-        Logger::getInstance().Info("送信データ: " + Utilities::convertVectorMapToString(sendData));
+        Logger::getInstance().Debug("送信データ: " + Utilities::convertVectorMapToString(sendData));
 
         // 受信データを確認し、sensorの準備状態を変更する。
         dataLump = getReadySensor(dataLump, sendData);
 
         if (dataLump != nullptr && dataLump->isSendReady) {
             // 送信データをPLCへ送信
-            Logger::getInstance().Info("データをサーバへ送信します。");
+            Logger::getInstance().Debug("データをサーバへ送信します。");
             vector<map<string,string>> sendDatacp = dataLump->sendData;
             gSendDataMap.push_back(sendDatacp);
             dataLump->allClear();
@@ -247,7 +247,7 @@ DataLump* PLCRequestWorker::getReadySensor(DataLump* dataLump, const vector<map<
     {
         for (const auto& [sensorID, ready] : status)
         {
-            Logger::getInstance().Info("Sensor ID: " + sensorID + ", Ready: " + to_string(ready));
+            Logger::getInstance().Debug("Sensor ID: " + sensorID + ", Ready: " + to_string(ready));
         }
     }
 
@@ -255,7 +255,7 @@ DataLump* PLCRequestWorker::getReadySensor(DataLump* dataLump, const vector<map<
     // LumpFullを確認
     dataLump->isLumpFull();
 
-    Logger::getInstance().Info("LumpFull: " + to_string(dataLump->isSendReady));
+    Logger::getInstance().Debug("LumpFull: " + to_string(dataLump->isSendReady));
 
     return dataLump;
 }

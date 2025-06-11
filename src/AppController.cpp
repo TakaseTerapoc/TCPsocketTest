@@ -3,7 +3,7 @@
 // シグナルハンドラ（Ctrl+C / kill の終了に反応）
 void signalHandler(int signal) {
     if (signal == SIGINT || signal == SIGTERM) {
-        Logger::getInstance().Info("終了シグナルを受信しました。終了処理を行います。");
+        Logger::getInstance().Debug("終了シグナルを受信しました。終了処理を行います。");
         gShouldExit = true;
 
         // if (gAppInstance != nullptr) {
@@ -52,26 +52,25 @@ void AppController::run() {
 
 void AppController::initLogger() {
     Logger::getInstance().Init();
-    Logger::getInstance().Info("ロガー初期化完了");
-    Logger::getInstance().Info("アプリが起動しました。");
-    Logger::getInstance().Debug("デバッグアプリが起動しました。");
+    Logger::getInstance().Debug("ロガー初期化完了");
+    Logger::getInstance().Debug("アプリが起動しました。");
 }
 
 void AppController::loadConfig() {
     
-    Logger::getInstance().Info("設定ファイルを読み込みます。");
+    Logger::getInstance().Debug("設定ファイルを読み込みます。");
     
     if (!AppConfig::getInstance().LoadFiles(FileResources::FILEPATHCONFIGFILE)) {
         Logger::getInstance().Error("設定ファイルの読込に失敗しました。");
         exit(1);
     }
-    Logger::getInstance().Info("設定ファイルの読込完了。");
+    Logger::getInstance().Debug("設定ファイルの読込完了。");
 }
 
 void AppController::prepareRequestData() {
     PLCTransactionDataBuilder plcTransactionDataBuilder;
 
-    Logger::getInstance().Info("PLCリクエストデータの準備を開始します。");
+    Logger::getInstance().Debug("PLCリクエストデータの準備を開始します。");
     
     // CSVファイルを読み込み
     auto mapdata = CsvReader::readCSVFileToMapVector(AppConfig::getInstance().requestFilePath);
@@ -82,11 +81,11 @@ void AppController::prepareRequestData() {
     // 変換したデータをMCプロトコルのデータに変換
     MCprotocolSendDataManager::getInstance().covertToMCprotocolData(gRData);
     
-    Logger::getInstance().Info("PLCリクエストデータ準備完了しました。");
+    Logger::getInstance().Debug("PLCリクエストデータ準備完了しました。");
 }
 
 bool AppController::setupConnections() {
-    Logger::getInstance().Info("PLCおよびサーバーに接続を試みます。");
+    Logger::getInstance().Debug("PLCおよびサーバーに接続を試みます。");
 
     //　PLC接続
     plcConnectionClient_ = new PLCConnectionClient(
@@ -101,10 +100,10 @@ bool AppController::setupConnections() {
         this_thread::sleep_for(chrono::seconds(1));
     }
     if (gShouldExit) {
-        Logger::getInstance().Info("終了要求を検出したため、接続処理を中止します。");
+        Logger::getInstance().Debug("終了要求を検出したため、接続処理を中止します。");
         return false;
     }
-    Logger::getInstance().Info("PLC接続に成功しました。");
+    Logger::getInstance().Debug("PLC接続に成功しました。");
 
     // サーバー接続
     // TOdo: サーバー接続確認の実装を追加する
@@ -117,7 +116,7 @@ bool AppController::setupConnections() {
 }
 
 void AppController::startWorkers() {
-    Logger::getInstance().Info("スケジューラとワーカーを起動します。");
+    Logger::getInstance().Debug("スケジューラとワーカーを起動します。");
 
     PLCRequestScheduler::getInstance().start();
     PLCRequestWorker::getInstance(*plcConnectionClient_).start();
@@ -125,7 +124,7 @@ void AppController::startWorkers() {
 }
 
 void AppController::waitForShutdown() {
-    Logger::getInstance().Info("Ctrl+Cまたはkillで終了できます。終了を待機中...");
+    Logger::getInstance().Debug("Ctrl+Cまたはkillで終了できます。終了を待機中...");
 
     while (!gShouldExit) {
         this_thread::sleep_for(chrono::milliseconds(100));
@@ -135,7 +134,7 @@ void AppController::waitForShutdown() {
 }
 
 void AppController::stop() {
-    Logger::getInstance().Info("スレッドにstop信号を送信します。");
+    Logger::getInstance().Debug("スレッドにstop信号を送信します。");
     if (plcConnectionClient_) {
         PLCRequestWorker::getInstance(*plcConnectionClient_).stop();
     }
