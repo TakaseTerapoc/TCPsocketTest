@@ -2,6 +2,7 @@
 /build/
 /build-debug/
 /build-release/
+/shutdown-button/buildarm-shutdown-button/
 /buildarm/
 /buildarm-debug/
 /buildarm-release/

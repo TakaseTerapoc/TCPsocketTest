@@ -4,6 +4,8 @@ RUN apt-get update && apt-get install -y \
     g++-aarch64-linux-gnu \
     cmake \
     ninja-build \
-    build-essential
+    build-essential \
+    libgpiod2 libgpiod-dev libgpiod-doc \
+    gpiod
 
 WORKDIR /build
