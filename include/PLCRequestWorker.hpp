@@ -60,7 +60,7 @@ class PLCRequestWorker
 
         mutex       mutex_;                    // running_ の排他制御
 
-        PLCConnectionClient pLCConnectionClient_;   // PLCConnectionClientのインスタンス
+        PLCConnectionClient* pLCConnectionClient_ = nullptr;   // PLCConnectionClientのインスタンスのポインタ
 
         const int recvBufferSize = 1024; // レスポンス受信バッファサイズ
 };

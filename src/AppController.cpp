@@ -6,9 +6,9 @@ void signalHandler(int signal) {
         Logger::getInstance().Info("終了シグナルを受信しました。終了処理を行います。");
         gShouldExit = true;
 
-        if (gAppInstance != nullptr) {
-            gAppInstance->stop();
-        }
+        // if (gAppInstance != nullptr) {
+        //     gAppInstance->stop();
+        // }
     }
 }
 
@@ -19,7 +19,7 @@ AppController::AppController()
 }
 
 AppController::~AppController() {
-    stop();
+    // stop();
     delete plcConnectionClient_;
     delete serverConnectionClient_;
     gAppInstance = nullptr;
@@ -131,10 +131,7 @@ void AppController::waitForShutdown() {
         this_thread::sleep_for(chrono::milliseconds(100));
     }
 
-    Logger::getInstance().Info("終了処理を開始します。");
-    PLCRequestWorker::getInstance(*plcConnectionClient_).join();
-    PLCRequestScheduler::getInstance().join();
-    ServerRequestWorker::getInstance(*serverConnectionClient_).join();
+    stop();
 }
 
 void AppController::stop() {

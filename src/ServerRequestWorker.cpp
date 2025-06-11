@@ -33,7 +33,7 @@ void ServerRequestWorker::stop() {
 
 // キューから出し、PLCへのTCPリクエストを依頼する。
 void ServerRequestWorker::run() {
-    while (true) {
+    while (!gShouldExit) {
         {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;

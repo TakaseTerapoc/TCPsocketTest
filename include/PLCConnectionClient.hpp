@@ -27,9 +27,14 @@ class PLCConnectionClient
         // コンストラクタとデストラクタ
         PLCConnectionClient() = default;
         ~PLCConnectionClient() { 
-            std::cout << "PLCConnectionClientのデストラクタが呼ばれました。ソケットを開放します。" << std::endl;
+            Logger::getInstance().Debug("PLCConnectionClientのデストラクタが呼ばれました。ソケットを開放します。");
             Close(); 
         }
+
+        // コピー禁止
+        PLCConnectionClient(const PLCConnectionClient&) = delete;
+        PLCConnectionClient& operator=(const PLCConnectionClient&) = delete;
+
 
         PLCConnectionClient(const char* serverIpAddress, int serverPortNumber);
 
