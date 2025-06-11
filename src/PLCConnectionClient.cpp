@@ -71,6 +71,7 @@ void PLCConnectionClient::Close()
     if (socket_ != -1)
     {
         close(socket_);
+        std::cout << "ソケットを閉じました。" << std::endl;
         socket_ = -1; // ソケットを閉じた後は無効化
     }
 }
