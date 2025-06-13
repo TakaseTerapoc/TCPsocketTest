@@ -34,19 +34,20 @@ class Utilities
 
         // 既存のvector配列に新しいvectorを追加する関数
         template<typename T>
-        static void appendVectorElements(vector<T>& dest, const vector<T>& src)
+        static vector<T> appendVectorElements(vector<T>& dest, const vector<T>& src)
         {
             dest.insert(dest.end(), src.begin(), src.end());
+            return dest;
         }
 
         // 16進数の文字列を10進数の文字列に変換する関数
         static std::string convertDecimalString(const std::string& hex);
 
         // 10進文字列を32ビットのリトルエンディアン4バイトに分解する関数
-        static vector<char> decStrToBytes32(const string& decStr);
+        static vector<char> decStrToBytes32ByLittleEndian(const string& decStr);
 
         // 8進数の文字列を32ビットのリトルエンディアン4バイトに分解する関数
-        static vector<char> octStrToBytes32(const string& octStr);
+        static vector<char> octStrToBytes32ByLittleEndian(const string& octStr);
 
         // 指定した位置でsubstrする関数
         static string substrCustom(std::string& str, size_t len);
@@ -65,4 +66,10 @@ class Utilities
 
         // map<string, string>からキーの値をstring型で取得する関数
         static string getMapValueByString(const map<string, string>& row, string keystr);
+
+        // 10進数を16ビットのビッグエンディアン2バイトに変換する関数
+        static vector<char> decToBytes16ByBigEndian(unsigned int dec);
+
+        // stringをvector<char>に変換する関数
+        static vector<char> convertStringToVectorChar(const string& str);
 };

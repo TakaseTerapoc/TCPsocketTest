@@ -12,6 +12,8 @@
 #include "PLCRequestWorker.hpp"
 #include "ServerRequestWorker.hpp"
 #include "FileResources.hpp"
+#include "ServerConstData.hpp"
+#include "ServerSendDataBuilder.hpp"
 
 #include <csignal>
 #include <atomic>

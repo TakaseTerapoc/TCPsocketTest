@@ -35,7 +35,7 @@ string Utilities::convertDecimalString(const string& hex) {
 }
 
 // 10進文字列を32ビットのリトルエンディアン4バイトに分解する関数      
-vector<char> Utilities::decStrToBytes32(const string& decStr) 
+vector<char> Utilities::decStrToBytes32ByLittleEndian(const string& decStr) 
 {
     unsigned long v = stoul(decStr, nullptr, 10);
     return {
@@ -47,7 +47,7 @@ vector<char> Utilities::decStrToBytes32(const string& decStr)
 }
 
 // 8進文字列を32ビットのリトルエンディアン4バイトに分解する関数      
-vector<char> Utilities::octStrToBytes32(const string& octStr) 
+vector<char> Utilities::octStrToBytes32ByLittleEndian(const string& octStr) 
 {
     unsigned long v = stoul(octStr, nullptr, 8);
     return {
@@ -55,6 +55,15 @@ vector<char> Utilities::octStrToBytes32(const string& octStr)
         static_cast<char>((v >>  8) & 0xFF),
         static_cast<char>((v >> 16) & 0xFF),
         static_cast<char>((v >> 24) & 0xFF)
+    };
+}
+
+// 10進数を16ビットのビッグエンディアン2バイトに変換する関数
+vector<char> Utilities::decToBytes16ByBigEndian(unsigned int dec) 
+{
+    return {
+        static_cast<char>((dec >> 8) & 0xFF),       // 上位バイト
+        static_cast<char>( dec       & 0xFF)        // 下位バイト
     };
 }
 
@@ -116,4 +125,10 @@ string Utilities::getMapValueByString(const map<string, string>& row, string key
         Logger::getInstance().Error("キーが見つかりません: " + keystr);
         exit(1); // エラー時はアプリケーションを終了
     }
+}
+
+vector<char> Utilities::convertStringToVectorChar(const string& str) 
+{
+    vector<char> vec(str.begin(), str.end());
+    return vec;
 }

@@ -129,12 +129,12 @@ namespace FX3UC
             || code == MCprotocolConfigData::deviceCodeToASCIIMap.at("Y")
         )
         {
-            bytes = Utilities::octStrToBytes32(address);;
+            bytes = Utilities::octStrToBytes32ByLittleEndian(address);;
         }
         else
         {
             // 10進数のアドレスを32ビットのリトルエンディアン4バイトに変換
-            bytes = Utilities::decStrToBytes32(address);
+            bytes = Utilities::decStrToBytes32ByLittleEndian(address);
         }
         // 先頭デバイス番号を設定
         Utilities::appendVectorElements(protocolbuf, bytes);
