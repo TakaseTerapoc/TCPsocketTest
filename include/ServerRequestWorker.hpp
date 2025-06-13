@@ -49,7 +49,10 @@ class ServerRequestWorker
         void run();  
 
         // 実行スレッド
-        thread      thread_;                                   
+        thread      thread_;
+
+        // recv専用スレッド
+        thread      recvThread_;                                   
         
         // 実行中フラグ
         bool        running_{false};                           

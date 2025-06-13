@@ -15,6 +15,7 @@ void ServerRequestWorker::start() {
     if (running_) return;
     running_ = true;
     thread_ = thread(&ServerRequestWorker::run, this);
+    recvThread_ = thread(&ServerRequestWorker::run, this); // recv専用スレッドも開始
 }
 
 // ワーカjoin
@@ -33,6 +34,40 @@ void ServerRequestWorker::stop() {
     join();
 }
 
+void ServerRequestWorker::stopRecvThread() {
+    {
+        lock_guard<mutex> lock(mutex_);
+        running_ = false;
+    }
+    if (recvThread_.joinable()) {
+        recvThread_.join();
+    }
+}
+
+void ServerRequestWorker::runRecving() {
+    while (!gShouldExit) {
+        {
+            lock_guard<mutex> lg(mutex_);
+            if (!running_) break;
+        }
+        // キューをチェック
+        char* resendData = nullptr;
+        {
+            unique_lock<mutex> lock(gResendQueueMutex);
+            if (gResendQueue.empty()) {
+                // cv.wait(lock);
+                continue;
+            }
+        }
+        // recv処理
+        {
+            unique_lock<mutex> lock(gResendQueueMutex);
+            resendData = gResendQueue.front();
+            gResendQueue.pop_front();
+        }
+    }
+}
+
 // キューから出し、PLCへのTCPリクエストを依頼する。
 void ServerRequestWorker::run() {
     while (!gShouldExit) {
@@ -40,34 +75,51 @@ void ServerRequestWorker::run() {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
-        vector<map<string,string>> sendData;
-        {
-            unique_lock<mutex> lock(gSendDataMutex);
-            if (gSendDataMap.empty()) {
-                // cv.wait(lock);
-                continue;
-            }
-            sendData = gSendDataMap.front();
-
-            // TODO:単純に消すんじゃなくて別のベクターに格納して消す
-            gSendDataMap.erase(gSendDataMap.begin());
-        }
         
-        // 送信データを整形
-        const string shapedSendData = ServerSendDataBuilder::getInstance().shapeSendData(sendData);
+        char* completedData = nullptr;
 
-        // 送信データにヘッダーを追加して、最終的な送信データを作成
-        char* completedData = ServerSendDataBuilder::getInstance().buildPostData(ServerConstData::DATA_TYPE_LITERAL, shapedSendData);
+        // 再送信データがある場合はそれを送信
+        if (!gResendQueue.empty()) {
+            char* resendData = nullptr;
+            {
+                unique_lock<mutex> lock(gResendQueueMutex);
+                resendData = gResendQueue.front();
+                gResendQueue.pop_front();
+            }
+            completedData = resendData;
+        }
+        // 送信データがない場合は、gSendDataMapからデータを取得
+        else
+        {
+            vector<map<string,string>> sendData;
+            {
+                unique_lock<mutex> lock(gSendDataMutex);
+                if (gSendDataMap.empty()) {
+                    // cv.wait(lock);
+                    continue;
+                }
+                sendData = gSendDataMap.front();
 
+                gSendDataMap.erase(gSendDataMap.begin());
+            }
+            
+            // 送信データを整形
+            const string shapedSendData = ServerSendDataBuilder::getInstance().shapeSendData(sendData);
+
+            // 送信データにヘッダーを追加して、最終的な送信データを作成
+            completedData = ServerSendDataBuilder::getInstance().buildPostData(ServerConstData::DATA_TYPE_LITERAL, shapedSendData);
+        }
 #ifdef DEBUG
         string tempStrBinary = buildBinaryHeaderString(completedData);
         string tempStrText = buildTextPayloadString(completedData);
         Logger::getInstance().Debug("サーバーへ送られるデータ" + tempStrBinary + tempStrText);
 #endif
+        string completedDataStr(completedData);
+
         // UDPリクエスト 
         if(!serverConnectionClient_.sendMessage(completedData, ServerSendDataBuilder::getInstance().getDataSize()))
         {
-            string completedDataStr(completedData);
+            
             completedDataStr = "【サーバー送信失敗】" + completedDataStr;
             Logger::getInstance().Error("サーバーへの送信に失敗しました。");
         }
@@ -75,7 +127,13 @@ void ServerRequestWorker::run() {
         {
             Logger::getInstance().Debug("サーバーへの送信に成功しました。");
         }
-        Logger::getInstance().Sensor(shapedSendData);
+        Logger::getInstance().Sensor(completedDataStr);
+
+        // 送信データをキューに登録
+        {
+            lock_guard<mutex> lock(gResendQueueMutex);
+            gResendQueue.push_back(completedData);
+        }
         
         // 送信後にデータを初期化
         ServerSendDataBuilder::getInstance().initializeData();

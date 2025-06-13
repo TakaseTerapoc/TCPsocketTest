@@ -49,3 +49,9 @@ extern atomic<bool> gClearQueueFlag;
 
 // アドレスコードの長さ
 extern const int ADDRESSLENGTH;
+
+// 再送信データを貯めるキュー
+extern deque<char*> gResendQueue;
+
+// 再送信データのミューテックス
+extern mutex gResendQueueMutex;

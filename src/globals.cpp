@@ -30,3 +30,10 @@ atomic<bool> gClearQueueFlag = false;
 
 // アドレスコードの長さ
 const int ADDRESSLENGTH = 5; 
+
+
+// 再送信データを貯めるキュー
+deque<char*> gResendQueue;
+
+// 再送信データのミューテックス
+mutex gResendQueueMutex;
