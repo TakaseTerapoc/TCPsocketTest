@@ -55,7 +55,10 @@ class ServerRequestWorker
         thread      recvThread_;                                   
         
         // 実行中フラグ
-        bool        running_{false};                           
+        atomic<bool>  running_{false};
+
+        // 準備完了フラグ
+        atomic<bool>  recvReady_{false};                           
         
         // running_ の排他制御
         mutex       mutex_;                                    

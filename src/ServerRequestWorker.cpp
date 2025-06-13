@@ -60,11 +60,21 @@ void ServerRequestWorker::runRecving() {
             }
         }
         // recv処理
+
+
+        // キューからの取り出し処理
         {
             unique_lock<mutex> lock(gResendQueueMutex);
             resendData = gResendQueue.front();
             gResendQueue.pop_front();
         }
+        recvReady_ = true; // recvが準備完了
+
+        // recvしたデータとキューから出したデータを照合
+
+        // 合致したデータをキューから削除する。
+
+
     }
 }
 
@@ -77,6 +87,12 @@ void ServerRequestWorker::run() {
         }
         
         char* completedData = nullptr;
+
+        // recvReady_がtrueになるまで待機
+        while(!recvReady_)
+        {
+            this_thread::sleep_for(chrono::milliseconds(50))
+        }
 
         // 再送信データがある場合はそれを送信
         if (!gResendQueue.empty()) {
@@ -134,7 +150,9 @@ void ServerRequestWorker::run() {
             lock_guard<mutex> lock(gResendQueueMutex);
             gResendQueue.push_back(completedData);
         }
-        
+
+        recvReady_ = false; // recvが準備完了ではない状態に戻す
+
         // 送信後にデータを初期化
         ServerSendDataBuilder::getInstance().initializeData();
     }

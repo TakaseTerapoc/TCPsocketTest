@@ -31,7 +31,6 @@ void AppController::run() {
 
     // 【kill】 されたら signalHandler() を呼ぶ
     // ただし、kill -9 などの強制終了は捕捉できない
-    // 参考: https://www.oreilly.co.jp/books/9784873117980/
     signal(SIGTERM, signalHandler);
 
     signal(SIGPIPE,SIG_IGN);
