@@ -132,3 +132,12 @@ vector<char> Utilities::convertStringToVectorChar(const string& str)
     vector<char> vec(str.begin(), str.end());
     return vec;
 }
+
+string Utilities::convertVectorStringToString(const vector<string>& sendDataVector) 
+{
+    string shapedSendData;
+    for (int i = 0; i < sendDataVector.size(); i++) {
+        shapedSendData += sendDataVector[i];
+    }
+    return shapedSendData;
+}

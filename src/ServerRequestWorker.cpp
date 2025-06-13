@@ -1,5 +1,7 @@
 #include "ServerRequestWorker.hpp"
 
+# define DEBUG
+
 // シングルトンインスタンス取得
 ServerRequestWorker& ServerRequestWorker::getInstance(ServerConnectionClient& serverClient) {
     static ServerRequestWorker instance;
@@ -50,15 +52,23 @@ void ServerRequestWorker::run() {
             // TODO:単純に消すんじゃなくて別のベクターに格納して消す
             gSendDataMap.erase(gSendDataMap.begin());
         }
-
-        string shapedSendData;
+        
         // 送信データを整形
-        shapedSendData = shapeSendData(sendData);
+        const string shapedSendData = ServerSendDataBuilder::getInstance().shapeSendData(sendData);
 
+        // 送信データにヘッダーを追加して、最終的な送信データを作成
+        char* completedData = ServerSendDataBuilder::getInstance().buildPostData(ServerConstData::DATA_TYPE_LITERAL, shapedSendData);
+
+#ifdef DEBUG
+        string tempStrBinary = buildBinaryHeaderString(completedData);
+        string tempStrText = buildTextPayloadString(completedData);
+        Logger::getInstance().Debug("サーバーへ送られるデータ" + tempStrBinary + tempStrText);
+#endif
         // UDPリクエスト 
-        if(!serverConnectionClient_.sendMessage(shapedSendData))
+        if(!serverConnectionClient_.sendMessage(completedData, ServerSendDataBuilder::getInstance().getDataSize()))
         {
-            shapedSendData = "【サーバー送信失敗】" + shapedSendData;
+            string completedDataStr(completedData);
+            completedDataStr = "【サーバー送信失敗】" + completedDataStr;
             Logger::getInstance().Error("サーバーへの送信に失敗しました。");
         }
         else
@@ -66,41 +76,24 @@ void ServerRequestWorker::run() {
             Logger::getInstance().Debug("サーバーへの送信に成功しました。");
         }
         Logger::getInstance().Sensor(shapedSendData);
+        
+        // 送信後にデータを初期化
+        ServerSendDataBuilder::getInstance().initializeData();
     }
 }
-string ServerRequestWorker::shapeSendData(const vector<map<string,string>>& sendData) 
-{
-    string shapedSendData;
-    string timeStamp = Logger::getInstance().GetCurrentTimestampString();
-    vector<string> sendDataVector;
 
-    // タイムスタンプ整形
-    timeStamp.erase(timeStamp.size() - 4);
-
-    shapedSendData += timeStamp + ",";
-
-    // sendDataのメンバーを送信する文字列に整形する処理
-    for (auto& row : sendData) {
-        vector<string> tempvector;
-        for (auto& pair : row) {
-            if (pair.first == "categoryID" || pair.first == "sensorID" || pair.first == "device" || pair.first == "data") {
-                tempvector.push_back(pair.second + ",");
-            }
-        }
-        swap(tempvector[1], tempvector[3]);
-        sendDataVector.insert(sendDataVector.end(), tempvector.begin(), tempvector.end());
+std::string ServerRequestWorker::buildBinaryHeaderString(const char* data, size_t headerSize) {
+    std::ostringstream oss;
+    oss << "Header (hex): ";
+    for (size_t i = 0; i < 7; ++i) {
+        oss << std::hex << std::setw(2) << std::setfill('0')
+            << static_cast<unsigned int>(static_cast<unsigned char>(data[i])) << " ";
     }
+    return oss.str();
+}
 
-    // sendDataVectorをstringに変換
-    for (int i = 0; i < sendDataVector.size(); i++) {
-        shapedSendData += sendDataVector[i];
-    }
-
-    // 末尾のカンマを削除
-    shapedSendData.pop_back();
-
-    // 確認用
-    Logger::getInstance().Debug("整形したデータ: " + shapedSendData);
-
-    return shapedSendData;
+std::string ServerRequestWorker::buildTextPayloadString(const char* data, size_t offset) {
+    std::ostringstream oss;
+    oss << "Payload (text): " << (data + offset);
+    return oss.str();
 }

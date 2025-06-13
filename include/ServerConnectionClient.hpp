@@ -23,7 +23,7 @@ public:
     ServerConnectionClient(const string& serverIp, int serverPort);
     ~ServerConnectionClient();
 
-    bool sendMessage(const string& message);
+    bool sendMessage(const char* message, unsigned int messageSize);
 
 private:
     int socket_;

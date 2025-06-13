@@ -23,12 +23,16 @@ ServerConnectionClient::~ServerConnectionClient()
     close(socket_);
 }
 
-bool ServerConnectionClient::sendMessage(const string& message) 
+bool ServerConnectionClient::sendMessage(const char* message, unsigned int messageSize) 
 {
-    ssize_t sentLen = sendto(socket_, message.c_str(), message.size(), 0,
-                             (struct sockaddr*)&serverAddr_, sizeof(serverAddr_));
-    if (sentLen < 0) {
+    if (message == nullptr || messageSize == 0) {
+        Logger::getInstance().Error("送信メッセージが無効です。");
         return false;
     }
+
+    // メッセージを送信
+    ssize_t sentLen = sendto(socket_, message, messageSize, 0,
+                             (struct sockaddr*)&serverAddr_, sizeof(serverAddr_));
+    if (sentLen < 0) return false;
     return true;
 }

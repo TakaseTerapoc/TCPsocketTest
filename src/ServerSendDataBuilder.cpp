@@ -5,7 +5,51 @@ ServerSendDataBuilder& ServerSendDataBuilder::getInstance() {
     return instance;
 }
 
-const char* ServerSendDataBuilder::buildPostData(ServerConstData::DataType type, const string& sendData) 
+string ServerSendDataBuilder::shapeSendData(const vector<map<string,string>>& sendData) 
+{
+    string shapedSendData;
+    string timeStamp = Logger::getInstance().GetCurrentTimestampString();
+    vector<string> sendDataVector;
+
+    // タイムスタンプ整形
+    timeStamp.erase(timeStamp.size() - 4);
+
+    shapedSendData += timeStamp + ",";
+
+    // sendDataのメンバーを送信する文字列に並び替え、整形する処理
+    sendDataVector = shapeSendDataVector(sendData);
+    
+    // 送信データを整形
+    shapedSendData += Utilities::convertVectorStringToString(sendDataVector);
+
+    // 末尾のカンマを削除
+    shapedSendData.pop_back();
+
+    // 確認用
+    Logger::getInstance().Debug("整形したデータ: " + shapedSendData);
+
+    return shapedSendData;
+}
+
+vector<string> ServerSendDataBuilder::shapeSendDataVector(const vector<map<string,string>>& sendData) 
+{
+    vector<string> sendDataVector;
+
+    for (auto& row : sendData) {
+        vector<string> tempvector;
+        for (auto& pair : row) {
+            if (pair.first == "categoryID" || pair.first == "sensorID" || pair.first == "device" || pair.first == "data") {
+                tempvector.push_back(pair.second + ",");
+            }
+        }
+        swap(tempvector[1], tempvector[3]);
+        sendDataVector.insert(sendDataVector.end(), tempvector.begin(), tempvector.end());
+    }
+
+    return sendDataVector;
+}
+
+char* ServerSendDataBuilder::buildPostData(ServerConstData::DataType type, const string& sendData) 
 {
     // referenceNumberが0xFFFFを超えた場合は0にリセット
     if (referenceNumber > 0xFFFF) {
@@ -19,8 +63,8 @@ const char* ServerSendDataBuilder::buildPostData(ServerConstData::DataType type,
 
     // ヘッダーデータとフォーマットデータを結合し、postDataBufに変換
     vector<char>tempPostData = Utilities::appendVectorElements(formatHeader, formatData);
-    string tempString(tempPostData.begin(), tempPostData.end());
-    postDataBuf = tempString.c_str();
+    postDataString.assign(tempPostData.begin(), tempPostData.end());
+    postDataBuf = const_cast<char*>(postDataString.c_str());
     
     return postDataBuf;
 }

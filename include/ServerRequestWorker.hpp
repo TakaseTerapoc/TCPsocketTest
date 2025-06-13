@@ -5,10 +5,14 @@
 #include <mutex>
 #include <condition_variable>
 #include <algorithm> 
+#include <iostream>
+#include <iomanip>
 
 #include "globals.hpp"
 #include "../external/fmt/format.h"
 #include "ServerConnectionClient.hpp"
+
+# define DEBUG
 
 using namespace std;
 
@@ -36,15 +40,30 @@ class ServerRequestWorker
 
         // デストラクタ
         ~ServerRequestWorker() = default; 
+
+        // コピー禁止
         ServerRequestWorker(const ServerRequestWorker&) = delete;
         ServerRequestWorker& operator=(const ServerRequestWorker&) = delete;
 
         // リストから出して、UDP送信を依頼する。
         void run();  
 
-        thread      thread_;                                   // 実行スレッド
-        bool             running_{false};                           // 実行中フラグ
-        mutex       mutex_;                                    // running_ の排他制御
-        ServerConnectionClient serverConnectionClient_;             // ServerConnectionClientのインスタンス
-        string shapeSendData(const vector<map<string,string>>& sendData);  // DataLumpBaseのメンバーを送信する文字列に整形する関数
+        // 実行スレッド
+        thread      thread_;                                   
+        
+        // 実行中フラグ
+        bool        running_{false};                           
+        
+        // running_ の排他制御
+        mutex       mutex_;                                    
+
+        // ServerConnectionClientのインスタンス
+        ServerConnectionClient serverConnectionClient_;
+
+        // serverへの送信ヘッダデータをstringにする関数             
+        string buildBinaryHeaderString(const char* data, size_t headerSize = 7);
+
+        // serverへの送信テキストデータをstringにする関数
+        string buildTextPayloadString(const char* data, size_t offset = 7);
+
 };

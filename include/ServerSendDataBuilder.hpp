@@ -15,11 +15,20 @@ public:
     static ServerSendDataBuilder& getInstance();
 
     // POSTデータを構築する関数
-    const char* buildPostData(ServerConstData::DataType type, const string& sendData = "");
+    char* buildPostData(ServerConstData::DataType type, const string& sendData = "");
+
+    // サーバーに送るデータをstringに整形する関数
+    string shapeSendData(const vector<map<string,string>>& sendData); 
+
+    // データサイズを取得する関数
+    unsigned int getDataSize() const {
+        return dataSize;
+    } 
 
     // 各データを初期化する関数
     void initializeData() {
         postDataBuf = nullptr;
+        postDataString.clear();
         formatHeader.clear();
         formatData.clear();
         dataSize = 0;
@@ -35,7 +44,9 @@ private:
     ServerSendDataBuilder& operator=(const ServerSendDataBuilder&) = delete;
 
     // POSTデータ
-    const char* postDataBuf;
+    char* postDataBuf;
+
+    string postDataString;
 
     // ヘッダーデータ
     vector<char> formatHeader;
@@ -48,6 +59,9 @@ private:
 
     // データサイズ
     unsigned int dataSize = 0;
+
+    //　vector<map<string,string>>を整形して文字列に変換する関数 
+    vector<string> shapeSendDataVector(const vector<map<string,string>>& sendData);
 
     // ヘッダーデータを構築する関数
     void buildHeaderData(ServerConstData::DataType type, const string& sendData);

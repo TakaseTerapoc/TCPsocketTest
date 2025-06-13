@@ -72,4 +72,7 @@ class Utilities
 
         // stringをvector<char>に変換する関数
         static vector<char> convertStringToVectorChar(const string& str);
+
+        // vector<string>をstringに変換する関数
+        static string convertVectorStringToString(const vector<string>& sendDataVector);
 };
