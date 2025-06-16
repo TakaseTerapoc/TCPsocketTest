@@ -1,34 +1,31 @@
 # include "ServerSendDataBuilder.hpp"
 
-ServerSendDataBuilder& ServerSendDataBuilder::getInstance() {
-    static ServerSendDataBuilder instance;
-    return instance;
-}
+// ServerSendDataBuilder& ServerSendDataBuilder::getInstance() {
+//     static ServerSendDataBuilder instance;
+//     return instance;
+// }
 
-string ServerSendDataBuilder::shapeSendData(const vector<map<string,string>>& sendData) 
+void ServerSendDataBuilder::shapeSendData(const vector<map<string,string>>& sendData) 
 {
-    string shapedSendData;
     string timeStamp = Logger::getInstance().GetCurrentTimestampString();
     vector<string> sendDataVector;
 
     // タイムスタンプ整形
     timeStamp.erase(timeStamp.size() - 4);
 
-    shapedSendData += timeStamp + ",";
+    shapedSendDataString += timeStamp + ",";
 
     // sendDataのメンバーを送信する文字列に並び替え、整形する処理
     sendDataVector = shapeSendDataVector(sendData);
     
     // 送信データを整形
-    shapedSendData += Utilities::convertVectorStringToString(sendDataVector);
+    shapedSendDataString += Utilities::convertVectorStringToString(sendDataVector);
 
     // 末尾のカンマを削除
-    shapedSendData.pop_back();
+    shapedSendDataString.pop_back();
 
     // 確認用
-    Logger::getInstance().Debug("整形したデータ: " + shapedSendData);
-
-    return shapedSendData;
+    Logger::getInstance().Debug("整形したデータ: " + shapedSendDataString);
 }
 
 vector<string> ServerSendDataBuilder::shapeSendDataVector(const vector<map<string,string>>& sendData) 
@@ -49,7 +46,7 @@ vector<string> ServerSendDataBuilder::shapeSendDataVector(const vector<map<strin
     return sendDataVector;
 }
 
-char* ServerSendDataBuilder::buildPostData(ServerConstData::DataType type, const string& sendData) 
+void ServerSendDataBuilder::buildPostData(ServerConstData::DataType type, const string& sendData) 
 {
     // referenceNumberが0xFFFFを超えた場合は0にリセット
     if (referenceNumber > 0xFFFF) {
@@ -65,8 +62,6 @@ char* ServerSendDataBuilder::buildPostData(ServerConstData::DataType type, const
     vector<char>tempPostData = Utilities::appendVectorElements(formatHeader, formatData);
     postDataString.assign(tempPostData.begin(), tempPostData.end());
     postDataBuf = const_cast<char*>(postDataString.c_str());
-    
-    return postDataBuf;
 }
 
 void ServerSendDataBuilder::buildHeaderData(ServerConstData::DataType type, const string& sendData) 

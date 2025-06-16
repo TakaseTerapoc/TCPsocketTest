@@ -11,6 +11,7 @@
 #include "globals.hpp"
 #include "../external/fmt/format.h"
 #include "ServerConnectionClient.hpp"
+#include "Utilities.hpp"
 
 # define DEBUG
 
@@ -46,7 +47,13 @@ class ServerRequestWorker
         ServerRequestWorker& operator=(const ServerRequestWorker&) = delete;
 
         // リストから出して、UDP送信を依頼する。
-        void run();  
+        void run();
+
+        // 受信スレッドを実行する関数
+        void runRecving();  
+
+        // リファレンスナンバーを管理する変数
+        int         referenceNumber = 0;
 
         // 実行スレッド
         thread      thread_;
@@ -61,7 +68,13 @@ class ServerRequestWorker
         atomic<bool>  recvReady_{false};                           
         
         // running_ の排他制御
-        mutex       mutex_;                                    
+        mutex       mutex_;
+
+        // condition_variableのmutex
+        mutex       cvMutex_;
+
+        // condition_variable;
+        condition_variable cv_;                                    
 
         // ServerConnectionClientのインスタンス
         ServerConnectionClient serverConnectionClient_;

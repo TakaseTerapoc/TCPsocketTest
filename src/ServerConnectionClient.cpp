@@ -36,3 +36,23 @@ bool ServerConnectionClient::sendMessage(const char* message, unsigned int messa
     if (sentLen < 0) return false;
     return true;
 }
+
+bool ServerConnectionClient::recvMessage(char* buffer, unsigned int bufferSize, unsigned int& recvSize) 
+{
+    if (buffer == nullptr || bufferSize == 0) {
+        Logger::getInstance().Error("受信バッファが無効です。");
+        return false;
+    }
+
+    // メッセージを受信
+    socklen_t addrLen = sizeof(serverAddr_);
+    ssize_t receivedLen = recvfrom(socket_, buffer, bufferSize, 0,
+                                   (struct sockaddr*)&serverAddr_, &addrLen);
+    if (receivedLen < 0) {
+        Logger::getInstance().Error("メッセージの受信に失敗しました。");
+        return false;
+    }
+
+    recvSize = static_cast<unsigned int>(receivedLen);
+    return true;
+}

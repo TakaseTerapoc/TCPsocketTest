@@ -10,6 +10,8 @@
 #include "AppController.hpp"
 #include "PLCConnectionClient.hpp"
 #include "DataLump.hpp"
+#include "BlockingVector.hpp"
+#include "ServerSendDataBuilder.hpp"
 
 using namespace std;
 
@@ -51,7 +53,16 @@ extern atomic<bool> gClearQueueFlag;
 extern const int ADDRESSLENGTH;
 
 // 再送信データを貯めるキュー
-extern deque<char*> gResendQueue;
+extern BlockingVector<char*> gResendVector;
+
+// 再送信データを貯めるヴェクタ
+extern vector<char*> gResendVectorData;
 
 // 再送信データのミューテックス
-extern mutex gResendQueueMutex;
+extern mutex gResendVectorMutex;
+
+// ServerSendDataBuilderのvector
+extern vector<ServerSendDataBuilder> gServerSendDataBuilderVector;
+
+// 再送信データを貯めるServerSendDataBuilderのヴェクタ
+extern BlockingVector<ServerSendDataBuilder> gResendVectorServerSendDataBuilder;

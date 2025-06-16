@@ -4,7 +4,6 @@
 #include <condition_variable>
 #include <optional>
 
-//型のテンプレート宣言
 template<typename T>
 class BlockingQueue {
 public:

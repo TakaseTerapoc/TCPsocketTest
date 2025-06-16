@@ -12,18 +12,42 @@ using namespace std;
 class ServerSendDataBuilder {
 public:
     // シングルトンインスタンス取得
-    static ServerSendDataBuilder& getInstance();
+    // static ServerSendDataBuilder& getInstance();
+
+    // コンストラクタとデストラクタ
+    ServerSendDataBuilder() = default;
+    ServerSendDataBuilder(int Number) 
+    {
+        referenceNumber = Number;
+    }
+
+    ~ServerSendDataBuilder() = default;
 
     // POSTデータを構築する関数
-    char* buildPostData(ServerConstData::DataType type, const string& sendData = "");
+    void buildPostData(ServerConstData::DataType type, const string& sendData = "");
 
     // サーバーに送るデータをstringに整形する関数
-    string shapeSendData(const vector<map<string,string>>& sendData); 
+    void shapeSendData(const vector<map<string,string>>& sendData); 
 
     // データサイズを取得する関数
     unsigned int getDataSize() const {
         return dataSize;
-    } 
+    }
+
+    // postDataBufを取得する関数 
+    char* getPostDataBuf() const {
+        return postDataBuf;
+    }
+
+    // referenceNumberを取得する関数
+    unsigned int getReferenceNumber() const {
+        return referenceNumber;
+    }
+
+    // shapedSendDataStringを取得する関数
+    string getShapedSendDataString() const {
+        return shapedSendDataString;
+    }
 
     // 各データを初期化する関数
     void initializeData() {
@@ -35,16 +59,16 @@ public:
     }
 
 private:
-    // コンストラクタとデストラクタ
-    ServerSendDataBuilder() = default;
-    ~ServerSendDataBuilder() = default;
 
-    // コピー禁止
-    ServerSendDataBuilder(const ServerSendDataBuilder&) = delete;
-    ServerSendDataBuilder& operator=(const ServerSendDataBuilder&) = delete;
+    // // コピー禁止
+    // ServerSendDataBuilder(const ServerSendDataBuilder&) = delete;
+    // ServerSendDataBuilder& operator=(const ServerSendDataBuilder&) = delete;
 
     // POSTデータ
     char* postDataBuf;
+
+    // 成形したsendDataを保持する文字列
+    string shapedSendDataString;
 
     string postDataString;
 

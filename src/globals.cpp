@@ -33,7 +33,16 @@ const int ADDRESSLENGTH = 5;
 
 
 // 再送信データを貯めるキュー
-deque<char*> gResendQueue;
+BlockingVector<char*> gResendVector;
+
+
+// 再送信データを貯めるヴェクタ
+vector<char*> gResendVectorData;
+
+// ServerSendDataBuilderのvector
+vector<ServerSendDataBuilder> gServerSendDataBuilderVector;
 
 // 再送信データのミューテックス
-mutex gResendQueueMutex;
+mutex gResendVectorMutex;
+
+BlockingVector<ServerSendDataBuilder> gResendVectorServerSendDataBuilder;

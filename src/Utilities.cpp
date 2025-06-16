@@ -1,4 +1,5 @@
 #include "Utilities.hpp"
+#include "ServerSendDataBuilder.hpp" 
 
 string Utilities::convertVectorMapToString(const vector<map<string, string>>& vectorMap)
 {
@@ -140,4 +141,31 @@ string Utilities::convertVectorStringToString(const vector<string>& sendDataVect
         shapedSendData += sendDataVector[i];
     }
     return shapedSendData;
+}
+
+// char*のｎ要素目のバイト値を取得する関数
+char Utilities::getCharNthElement(const char* recvBuf, size_t n, size_t bufSize) 
+{
+    if (n < bufSize) {
+        char recvBufChar = recvBuf[n];
+        return recvBufChar;
+    } else {
+        Logger::getInstance().Error2("Index out of range: " + to_string(n), __FILE__, __LINE__, __FUNCTION__);
+        exit(1); // エラー時はアプリケーションを終了
+    }
+}
+
+// vector<char>を回し、リファレンスNumが合致する要素番号を返す関数
+int Utilities::getVectorCharNthElement(BlockingVector<ServerSendDataBuilder>& vec, char refNum) 
+{
+    for (size_t i = 0; i < vec.Size(); ++i) {
+        const auto& temp = std::move(vec.getVector());
+        const auto& serverSendDataBuilder = temp[i];
+        if ((serverSendDataBuilder.getReferenceNumber()) == refNum) {
+            return static_cast<int>(i);
+        }
+    }
+    Logger::getInstance().Error2("指定された値がvector内に存在しません: " + to_string(refNum), __FILE__, __LINE__, __FUNCTION__);
+    exit(1); // エラー時はアプリケーションを終了
+
 }

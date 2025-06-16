@@ -1,5 +1,7 @@
 #pragma once
 
+class ServerSendDataBuilder;
+
 #include <vector>
 #include <map>
 #include <string>
@@ -9,6 +11,8 @@
 #include <array>
 
 #include "Logger.hpp"
+#include "BlockingVector.hpp"
+// #include "ServerSendDataBuilder.hpp"
 
 using namespace std;
 
@@ -75,4 +79,10 @@ class Utilities
 
         // vector<string>をstringに変換する関数
         static string convertVectorStringToString(const vector<string>& sendDataVector);
+
+        // vector<char>のｎ要素目のバイト値を取得する関数
+        static char getCharNthElement(const char* vec, size_t n, size_t bufSize);
+
+        // vector<char>を回し、リファレンスNumが合致する要素番号を返す関数
+        static int getVectorCharNthElement(BlockingVector<ServerSendDataBuilder>& vec, char refNum); 
 };

@@ -14,7 +14,7 @@
 using namespace std;
 
 /**
- * @brief サーバーとのUDPを管理するクラスです。
+ * @brief サーバーとのUDP通信を管理するクラスです。
 */
 class ServerConnectionClient {
 public:
@@ -23,7 +23,11 @@ public:
     ServerConnectionClient(const string& serverIp, int serverPort);
     ~ServerConnectionClient();
 
+    // サーバーへメッセージを送信する関数
     bool sendMessage(const char* message, unsigned int messageSize);
+
+    // サーバーからメッセージを受信する関数
+    bool recvMessage(char* buffer, unsigned int bufferSize, unsigned int& recvSize);
 
 private:
     int socket_;

@@ -1,6 +1,7 @@
 #include "ServerRequestWorker.hpp"
 
 # define DEBUG
+# define BuFFER_SIZE 16
 
 // シングルトンインスタンス取得
 ServerRequestWorker& ServerRequestWorker::getInstance(ServerConnectionClient& serverClient) {
@@ -15,13 +16,16 @@ void ServerRequestWorker::start() {
     if (running_) return;
     running_ = true;
     thread_ = thread(&ServerRequestWorker::run, this);
-    recvThread_ = thread(&ServerRequestWorker::run, this); // recv専用スレッドも開始
+    recvThread_ = thread(&ServerRequestWorker::runRecving, this); // recv専用スレッドも開始
 }
 
 // ワーカjoin
 void ServerRequestWorker::join() {
     if (thread_.joinable()) {
         thread_.join();
+    }
+    if (recvThread_.joinable()) {
+        recvThread_.join();
     }
 }
 
@@ -34,47 +38,46 @@ void ServerRequestWorker::stop() {
     join();
 }
 
-void ServerRequestWorker::stopRecvThread() {
-    {
-        lock_guard<mutex> lock(mutex_);
-        running_ = false;
-    }
-    if (recvThread_.joinable()) {
-        recvThread_.join();
-    }
-}
-
 void ServerRequestWorker::runRecving() {
     while (!gShouldExit) {
         {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
-        // キューをチェック
-        char* resendData = nullptr;
-        {
-            unique_lock<mutex> lock(gResendQueueMutex);
-            if (gResendQueue.empty()) {
-                // cv.wait(lock);
-                continue;
-            }
+        // vectorをチェック
+        if (gResendVectorServerSendDataBuilder.Empty()) {
+            // cv.wait(lock);
+            continue;
         }
+
         // recv処理
-
-
-        // キューからの取り出し処理
-        {
-            unique_lock<mutex> lock(gResendQueueMutex);
-            resendData = gResendQueue.front();
-            gResendQueue.pop_front();
+        char recvBuffer[BuFFER_SIZE];
+        unsigned int recvSize = 0;
+        if (!serverConnectionClient_.recvMessage(recvBuffer, BuFFER_SIZE, recvSize)) {
+            Logger::getInstance().Error("サーバーからの受信に失敗しました。");
+            continue; // 受信失敗時は次のループへ
         }
-        recvReady_ = true; // recvが準備完了
+        
+        // recvで帰ってきたデータのリファレンスナンバーを取得
+        // recvBufferの2番目の要素にリファレンスナンバーがある
+        char refNum = Utilities::getCharNthElement(recvBuffer, 2, recvSize); // recvSizeのところ、またはBuFFER_SIZE
+        
+        // refNumが合致するvectorの要素を探す
+        int index = Utilities::getVectorCharNthElement(gResendVectorServerSendDataBuilder, refNum);
 
-        // recvしたデータとキューから出したデータを照合
+        // gResendVectorから該当する要素を削除する。
+        if (!gResendVectorServerSendDataBuilder.Try_pick(index)) {
+            Logger::getInstance().Debug("リファレンスナンバーが見つかりませんでした。リファレンスナンバー: " + to_string(refNum));
+        }
+        else {
+            Logger::getInstance().Debug("リファレンスナンバー: " + to_string(refNum) + " のデータをキューから取り出しました。");
+        }
 
-        // 合致したデータをキューから削除する。
-
-
+        //　condition_variableで待機中のrunスレッドに通知
+        {
+            std::unique_lock<std::mutex> lock(cvMutex_);
+            cv_.notify_all();
+        }
     }
 }
 
@@ -85,24 +88,23 @@ void ServerRequestWorker::run() {
             lock_guard<mutex> lg(mutex_);
             if (!running_) break;
         }
-        
-        char* completedData = nullptr;
 
-        // recvReady_がtrueになるまで待機
-        while(!recvReady_)
-        {
-            this_thread::sleep_for(chrono::milliseconds(50))
+        // リファレンスナンバーが0xFFFFを超えた場合は0にリセット
+        if (referenceNumber > 0xFFFF) {
+            referenceNumber = 0;
         }
 
+        // ServerSendDataBuilderのインスタンスを取得
+        ServerSendDataBuilder serverSendDataBuilder(referenceNumber);
+
+        char* completedData = nullptr;
+
         // 再送信データがある場合はそれを送信
-        if (!gResendQueue.empty()) {
-            char* resendData = nullptr;
+        if (!gResendVectorServerSendDataBuilder.Empty()) {
             {
-                unique_lock<mutex> lock(gResendQueueMutex);
-                resendData = gResendQueue.front();
-                gResendQueue.pop_front();
+                gResendVectorServerSendDataBuilder.try_pop(serverSendDataBuilder); // 先頭の要素を取り出す
             }
-            completedData = resendData;
+            Logger::getInstance().Debug("再送信データを取得しました。リファレンスナンバー: " + serverSendDataBuilder.getReferenceNumber());
         }
         // 送信データがない場合は、gSendDataMapからデータを取得
         else
@@ -119,21 +121,21 @@ void ServerRequestWorker::run() {
                 gSendDataMap.erase(gSendDataMap.begin());
             }
             
-            // 送信データを整形
-            const string shapedSendData = ServerSendDataBuilder::getInstance().shapeSendData(sendData);
+            // 送信データを整形→メンバ関数shapedSendDataStringに格納
+            serverSendDataBuilder.shapeSendData(sendData);
 
             // 送信データにヘッダーを追加して、最終的な送信データを作成
-            completedData = ServerSendDataBuilder::getInstance().buildPostData(ServerConstData::DATA_TYPE_LITERAL, shapedSendData);
+            serverSendDataBuilder.buildPostData(ServerConstData::DATA_TYPE_LITERAL, serverSendDataBuilder.getShapedSendDataString());
         }
 #ifdef DEBUG
-        string tempStrBinary = buildBinaryHeaderString(completedData);
-        string tempStrText = buildTextPayloadString(completedData);
+        string tempStrBinary = buildBinaryHeaderString(serverSendDataBuilder.getPostDataBuf());
+        string tempStrText = buildTextPayloadString(serverSendDataBuilder.getPostDataBuf());
         Logger::getInstance().Debug("サーバーへ送られるデータ" + tempStrBinary + tempStrText);
 #endif
-        string completedDataStr(completedData);
+        string completedDataStr(serverSendDataBuilder.getPostDataBuf());
 
         // UDPリクエスト 
-        if(!serverConnectionClient_.sendMessage(completedData, ServerSendDataBuilder::getInstance().getDataSize()))
+        if(!serverConnectionClient_.sendMessage(serverSendDataBuilder.getPostDataBuf(), serverSendDataBuilder.getDataSize()))
         {
             
             completedDataStr = "【サーバー送信失敗】" + completedDataStr;
@@ -147,14 +149,17 @@ void ServerRequestWorker::run() {
 
         // 送信データをキューに登録
         {
-            lock_guard<mutex> lock(gResendQueueMutex);
-            gResendQueue.push_back(completedData);
+            gResendVectorServerSendDataBuilder.Push(serverSendDataBuilder);
+            Logger::getInstance().Debug("サーバーへの送信データをキューに登録しました。リファレンスナンバー: " + to_string(serverSendDataBuilder.getReferenceNumber()));
         }
 
-        recvReady_ = false; // recvが準備完了ではない状態に戻す
+        referenceNumber++;
 
-        // 送信後にデータを初期化
-        ServerSendDataBuilder::getInstance().initializeData();
+        //　condition_variableを使って待機
+        {
+            std::unique_lock<std::mutex> lock(cvMutex_);
+            cv_.wait(lock);
+        } 
     }
 }
 
