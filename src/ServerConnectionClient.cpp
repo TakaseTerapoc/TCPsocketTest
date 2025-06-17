@@ -16,11 +16,35 @@ ServerConnectionClient::ServerConnectionClient(const string& serverIp, int serve
         Logger::getInstance().Error("不正なアドレスです");
         exit(1);
     }
+
+    // タイムアウトの設定
+    setRecvTimeout(3, 0);
 }
 
-ServerConnectionClient::~ServerConnectionClient() 
+void ServerConnectionClient::setRecvTimeout(int sec, int usec)
 {
-    close(socket_);
+    // 受信タイムアウトの設定
+    timeout.tv_sec = sec;
+    timeout.tv_usec = usec;
+    if (setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        Logger::getInstance().Error(
+            fmt::format("ソケットの作成に失敗しました。errno={}, message={}", errno, strerror(errno))
+        );
+        exit(1);
+    }
+}
+
+void ServerConnectionClient::setSendTimeout(int sec, int usec)
+{
+    // 送信タイムアウトの設定
+    timeout.tv_sec = sec;
+    timeout.tv_usec = usec;
+    if (setsockopt(socket_, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout)) < 0) {
+        Logger::getInstance().Error(
+            fmt::format("ソケットの作成に失敗しました。errno={}, message={}", errno, strerror(errno))
+        );
+        exit(1);
+    }
 }
 
 bool ServerConnectionClient::sendMessage(const char* message, unsigned int messageSize) 
@@ -49,7 +73,6 @@ bool ServerConnectionClient::recvMessage(char* buffer, unsigned int bufferSize, 
     ssize_t receivedLen = recvfrom(socket_, buffer, bufferSize, 0,
                                    (struct sockaddr*)&serverAddr_, &addrLen);
     if (receivedLen < 0) {
-        Logger::getInstance().Error("メッセージの受信に失敗しました。");
         return false;
     }
 

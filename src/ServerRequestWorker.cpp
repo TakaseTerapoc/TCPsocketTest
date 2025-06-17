@@ -150,7 +150,7 @@ void ServerRequestWorker::run() {
         // 送信データをキューに登録
         {
             gResendVectorServerSendDataBuilder.Push(serverSendDataBuilder);
-            Logger::getInstance().Debug("サーバーへの送信データをキューに登録しました。リファレンスナンバー: " + to_string(serverSendDataBuilder.getReferenceNumber()));
+            Logger::getInstance().Debug("サーバーへの送信データをvectorに登録しました。リファレンスナンバー: " + to_string(serverSendDataBuilder.getReferenceNumber()));
         }
 
         referenceNumber++;

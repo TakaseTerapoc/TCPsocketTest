@@ -186,9 +186,9 @@ void PLCRequestWorker::run() {
 
         if (dataLump != nullptr && dataLump->isSendReady) {
             // 送信データをPLCへ送信
-            Logger::getInstance().Debug("データをサーバへ送信します。");
             vector<map<string,string>> sendDatacp = dataLump->sendData;
             gSendDataMap.push_back(sendDatacp);
+            Logger::getInstance().Debug("サーバーへ送信するデータをキューに登録しました。");
             dataLump->allClear();
         }
     }

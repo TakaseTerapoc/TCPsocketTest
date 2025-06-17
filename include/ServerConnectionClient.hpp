@@ -21,7 +21,13 @@ public:
     // コンストラクタとデストラクタ
     ServerConnectionClient() = default;
     ServerConnectionClient(const string& serverIp, int serverPort);
-    ~ServerConnectionClient();
+    ~ServerConnectionClient()
+    {
+        if (socket_ >= 0) {
+            close(socket_);
+            Logger::getInstance().Debug("サーバー接続クライアントのソケットを閉じました。");
+        }
+    };
 
     // サーバーへメッセージを送信する関数
     bool sendMessage(const char* message, unsigned int messageSize);
@@ -32,4 +38,12 @@ public:
 private:
     int socket_;
     struct sockaddr_in serverAddr_;
+
+    // 受信タイムアウトを設定する関数
+    void setRecvTimeout(int sec, int usec);
+
+    // 送信タイムアウトを設定する関数
+    void setSendTimeout(int sec, int usec);
+
+    struct timeval timeout;
 };
