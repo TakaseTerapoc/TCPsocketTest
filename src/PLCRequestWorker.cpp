@@ -184,11 +184,21 @@ void PLCRequestWorker::run() {
         // 受信データを確認し、sensorの準備状態を変更する。
         dataLump = getReadySensor(dataLump, sendData);
 
+        // すべてのセンサーデータの準備ができているか確認
         if (dataLump != nullptr && dataLump->isSendReady) {
             // 送信データをPLCへ送信
+            Logger::getInstance().Debug("すべてのセンサーデータの準備ができました。サーバーへ送信します。");
+            
+            // 送信データを整形(タイムスタンプもこの時点で追加される)
             vector<map<string,string>> sendDatacp = dataLump->sendData;
-            gSendDataMap.push_back(sendDatacp);
-            Logger::getInstance().Debug("サーバーへ送信するデータをキューに登録しました。");
+            string shapedSendData = dataLump->shapeSendData(sendDatacp);
+            Logger::getInstance().Debug("整形した送信データ: " + shapedSendData);
+            {
+                unique_lock<mutex> lock(gSendDataMutex);
+                gSendDataVectorStr.push_back(shapedSendData);
+                Logger::getInstance().Debug("サーバーへ送信するデータをキューに登録しました。");
+                gcv.notify_all(); // condition_variableを通知
+            }
             dataLump->allClear();
         }
     }

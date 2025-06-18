@@ -44,6 +44,15 @@ public:
         return referenceNumber;
     }
 
+    // referenceNumberをセットする関数
+    void setReferenceNumber(unsigned int number) {
+        // 0x00~0xFFFFの範囲に収める
+        if (number > 0xFFFF) {
+            number = 0;
+        }
+        referenceNumber = number;
+    }
+
     // shapedSendDataStringを取得する関数
     string getShapedSendDataString() const {
         return shapedSendDataString;
@@ -83,9 +92,6 @@ private:
 
     // データサイズ
     unsigned int dataSize = 0;
-
-    //　vector<map<string,string>>を整形して文字列に変換する関数 
-    vector<string> shapeSendDataVector(const vector<map<string,string>>& sendData);
 
     // ヘッダーデータを構築する関数
     void buildHeaderData(ServerConstData::DataType type, const string& sendData);

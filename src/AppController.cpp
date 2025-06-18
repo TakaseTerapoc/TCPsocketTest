@@ -47,6 +47,11 @@ void AppController::run() {
         startWorkers();
         waitForShutdown();
     }
+    else
+    {
+        Logger::getInstance().Error("PLCまたはサーバーへの接続に失敗しました。アプリケーションを終了します。");
+        exit(1);
+    }
 }
 
 void AppController::initLogger() {
@@ -86,10 +91,20 @@ void AppController::prepareRequestData() {
 bool AppController::setupConnections() {
     Logger::getInstance().Debug("PLCおよびサーバーに接続を試みます。");
 
+    // バリデーションチェック
+    string plcIpAddress = AppConfig::getInstance().GetPLCConfig("ipaddress");
+    string plcPort = AppConfig::getInstance().GetPLCConfig("port");
+    if (!ResourceValidationHelper::checkIpAddressValidation(plcIpAddress)) {
+        return false;
+    }
+    if (!ResourceValidationHelper::checkPortValidation(plcPort)) {
+        return false;
+    }
+
     //　PLC接続
     plcConnectionClient_ = new PLCConnectionClient(
-        AppConfig::getInstance().GetPLCConfig("ipaddress").c_str(),
-        stoi(AppConfig::getInstance().GetPLCConfig("port"))
+        plcIpAddress.c_str(),
+        stoi(plcPort)
     );
 
     // PLC接続エラーが起きたときに何度もリトライするようにする。

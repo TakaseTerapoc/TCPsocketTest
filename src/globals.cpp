@@ -19,8 +19,11 @@ AppController* gAppInstance = nullptr;
 // DataLumpのvectorです。
 vector<DataLump> gDataLump;
 
-// サーバーへ送信するデータを格納するリスト(map)です。
-vector<vector<map<string, string>>> gSendDataMap;
+// // サーバーへ送信するデータを格納するリスト(map)です。
+// vector<vector<map<string, string>>> gSendDataMap;
+
+// サーバーへ送信するデータを格納するリスト(vectorString)です。
+vector<string> gSendDataVectorStr;
 
 // PLCとの通信が再開した時のフラグです。
 atomic<bool> gPLCconnectFlag = true;
@@ -46,3 +49,6 @@ vector<ServerSendDataBuilder> gServerSendDataBuilderVector;
 mutex gResendVectorMutex;
 
 BlockingVector<ServerSendDataBuilder> gResendVectorServerSendDataBuilder;
+
+// 待機するためのcondition_variable
+condition_variable gcv;

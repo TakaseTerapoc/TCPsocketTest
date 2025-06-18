@@ -47,12 +47,6 @@ public:
     // ログをフラッシュする
     void Flush();
 
-    // 現在のタイムスタンプを取得する
-    std::string GetCurrentTimestampString();
-
-    // タイムスタンプ
-    std::string timestamp;
-
 private:
     // コンストラクタとデストラクタ
     Logger() = default;

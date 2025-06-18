@@ -78,11 +78,4 @@ class ServerRequestWorker
 
         // ServerConnectionClientのインスタンス
         ServerConnectionClient serverConnectionClient_;
-
-        // serverへの送信ヘッダデータをstringにする関数             
-        string buildBinaryHeaderString(const char* data, size_t headerSize = 7);
-
-        // serverへの送信テキストデータをstringにする関数
-        string buildTextPayloadString(const char* data, size_t offset = 7);
-
 };

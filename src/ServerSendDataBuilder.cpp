@@ -5,53 +5,10 @@
 //     return instance;
 // }
 
-void ServerSendDataBuilder::shapeSendData(const vector<map<string,string>>& sendData) 
-{
-    string timeStamp = Logger::getInstance().GetCurrentTimestampString();
-    vector<string> sendDataVector;
-
-    // タイムスタンプ整形
-    timeStamp.erase(timeStamp.size() - 4);
-
-    shapedSendDataString += timeStamp + ",";
-
-    // sendDataのメンバーを送信する文字列に並び替え、整形する処理
-    sendDataVector = shapeSendDataVector(sendData);
-    
-    // 送信データを整形
-    shapedSendDataString += Utilities::convertVectorStringToString(sendDataVector);
-
-    // 末尾のカンマを削除
-    shapedSendDataString.pop_back();
-
-    // 確認用
-    Logger::getInstance().Debug("整形したデータ: " + shapedSendDataString);
-}
-
-vector<string> ServerSendDataBuilder::shapeSendDataVector(const vector<map<string,string>>& sendData) 
-{
-    vector<string> sendDataVector;
-
-    for (auto& row : sendData) {
-        vector<string> tempvector;
-        for (auto& pair : row) {
-            if (pair.first == "categoryID" || pair.first == "sensorID" || pair.first == "device" || pair.first == "data") {
-                tempvector.push_back(pair.second + ",");
-            }
-        }
-        swap(tempvector[1], tempvector[3]);
-        sendDataVector.insert(sendDataVector.end(), tempvector.begin(), tempvector.end());
-    }
-
-    return sendDataVector;
-}
+# define HEADER_SIZE 7
 
 void ServerSendDataBuilder::buildPostData(ServerConstData::DataType type, const string& sendData) 
 {
-    // referenceNumberが0xFFFFを超えた場合は0にリセット
-    if (referenceNumber > 0xFFFF) {
-        referenceNumber = 0;
-    }
     // フォーマットヘッダーを作成
     buildHeaderData(type, sendData);
 
@@ -90,7 +47,6 @@ void ServerSendDataBuilder::setDataType(ServerConstData::DataType type)
 void ServerSendDataBuilder::setReferenceNumber()
 {
     Utilities::appendVectorElements(formatHeader, Utilities::decToBytes16ByBigEndian(referenceNumber));
-    referenceNumber++;
 }
 
 /**
@@ -105,8 +61,8 @@ void ServerSendDataBuilder::setDataSize(const string& sendData)
         Logger::getInstance().Error("データサイズが大きすぎます: " + to_string(dataSize));
         exit(1);
     }
-    // dataSizeを16ビットのビッグエンディアン形式に変換
-    vector<char> dataSizeBytes = Utilities::decToBytes16ByBigEndian(dataSize);
+    // dataSizeからヘッダーのサイズ引いたものを16ビットのビッグエンディアン形式に変換
+    vector<char> dataSizeBytes = Utilities::decToBytes16ByBigEndian(dataSize - HEADER_SIZE);
 
     // ヘッダーにデータサイズを追加
     Utilities::appendVectorElements(formatHeader, dataSizeBytes);
@@ -118,7 +74,7 @@ void ServerSendDataBuilder::setDataSize(const string& sendData)
  */ 
 void ServerSendDataBuilder::setDataSum()
 {
-    formatHeader.push_back(static_cast<char>(dataSize & 0xFF)); // 下位バイトのみを追加
+    formatHeader.push_back(static_cast<char>((dataSize - HEADER_SIZE) & 0xFF)); // 下位バイトのみを追加
 }
 
 void ServerSendDataBuilder::setFormatData(const string& sendData)

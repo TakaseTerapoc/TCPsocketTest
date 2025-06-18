@@ -166,6 +166,23 @@ int Utilities::getVectorCharNthElement(BlockingVector<ServerSendDataBuilder>& ve
         }
     }
     Logger::getInstance().Error2("指定された値がvector内に存在しません: " + to_string(refNum), __FILE__, __LINE__, __FUNCTION__);
-    exit(1); // エラー時はアプリケーションを終了
+    return -1; // 見つからない場合は-1を返す
+}
 
+// バイナリヘッダーを文字列に変換する関数
+std::string Utilities::convertBinaryHeaderToString(const char* data, size_t headerSize) {
+    std::ostringstream oss;
+    oss << "Header (hex): ";
+    for (size_t i = 0; i < 7; ++i) {
+        oss << std::hex << std::setw(2) << std::setfill('0')
+            << static_cast<unsigned int>(static_cast<unsigned char>(data[i])) << " ";
+    }
+    return oss.str();
+}
+
+// テキストペイロードを文字列に変換する関数
+std::string Utilities::convertTextPayloadToString(const char* data, size_t offset) {
+    std::ostringstream oss;
+    oss << "Payload (text): " << (data + offset);
+    return oss.str();
 }

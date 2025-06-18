@@ -1,4 +1,7 @@
 #include "../include/Logger.hpp"
+
+#include "TimeStampManager.hpp"
+
 # define DEBUG
 
 Logger& Logger::getInstance()
@@ -16,7 +19,7 @@ void Logger::Init()
     spdlog::init_thread_pool(8192, 1);
 
     // メインロガー用のパターン
-    spdlog::set_pattern("[%^%l%$] %v"); 
+    spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] %v"); 
 
     vector<spdlog::sink_ptr> sinks; // シンクのベクター
     
@@ -36,7 +39,7 @@ void Logger::Init()
         spdlog::async_overflow_policy::block    // キューが満杯になったらブロックする
     );
 
-    m_logger->set_pattern("[%^%l%$] %v"); // m_loggerのログフォーマット
+    m_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] %v"); // m_loggerのログフォーマット
 
     // ログを出すたびに出力
     m_logger->flush_on(spdlog::level::debug);
@@ -67,46 +70,40 @@ void Logger::Init()
 
 
     // センサー用のログフォーマット
-    m_sensor_logger->set_pattern("%v"); 
+    m_sensor_logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] %v"); 
 
     // spdlog::flush_every(chrono::seconds(1)); 
 }
 
 void Logger::Debug(const string& message)
 {
-    string timestamp = GetCurrentTimestampString();
-    m_logger->debug("[{}] {}", timestamp, message);
+    m_logger->debug(message);
 }
 
 void Logger::Info(const string& message)
 {
-    string timestamp = GetCurrentTimestampString();
-    m_logger->info("[{}] {}", timestamp, message);
+    m_logger->info(message);
 }
 
 void Logger::Warn(const string& message)
 {
-    string timestamp = GetCurrentTimestampString();
-    m_logger->warn("[{}] {}", timestamp, message);
+    m_logger->warn(message);
 }
 
 void Logger::Error2(const std::string& message, const char* file, int line, const char* func)
 {
-    string timestamp = GetCurrentTimestampString();
-    m_logger->error("[{}] {} ({}:{}:{})", timestamp, message, file, line, func);
+    m_logger->error("{} ({}:{}:{})", message, file, line, func);
 }
 
 void Logger::Error(const std::string& message)
 {
-    string timestamp = GetCurrentTimestampString();
-    m_logger->error("[{}] {}", timestamp, message);
+    m_logger->error(message);
 }
 
 void Logger::Sensor(const string& message)
 {
     if (m_sensor_logger) {
-        string timestamp = GetCurrentTimestampString();
-        m_sensor_logger->info("[{}] {}", timestamp, message);
+        m_sensor_logger->info(message);
     }
     else {
         m_sensor_logger->error("Sensor logger is not initialized.");
@@ -121,26 +118,4 @@ void Logger::Flush()
     if (m_sensor_logger && spdlog::thread_pool()) {
         m_sensor_logger->flush();
     }
-}
-
-string Logger::GetCurrentTimestampString() {
-    auto now = chrono::system_clock::now();
-    auto t_c = chrono::system_clock::to_time_t(now);
-    tm tm;
-#if defined(_WIN32)
-    localtime_s(&tm, &t_c);
-#else
-    localtime_r(&t_c, &tm);
-#endif
-
-    ostringstream oss;
-    oss << put_time(&tm, "%Y-%m-%d %H:%M:%S");
-
-    // ミリ秒の計算
-    auto ms = chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()) % 1000;
-
-    // ミリ秒を "000"〜"999" の3桁ゼロ埋めで追加
-    oss << '.' << setfill('0') << setw(3) << ms.count();
-    timestamp = oss.str();
-    return oss.str();
 }

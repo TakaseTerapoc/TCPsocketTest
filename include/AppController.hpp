@@ -14,6 +14,7 @@
 #include "FileResources.hpp"
 #include "ServerConstData.hpp"
 #include "ServerSendDataBuilder.hpp"
+#include "ResourceValidationHelper.hpp"
 
 #include <csignal>
 #include <atomic>

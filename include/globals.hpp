@@ -30,8 +30,11 @@ extern mutex gRequestQueueMutex;
 // PLCのリクエストを格納するリストです。
 extern vector<PLCTransactionData> gRData;
 
-// サーバーへ送信するデータを格納するリスト<map>です。
-extern vector<vector<map<string, string>>> gSendDataMap;
+// // サーバーへ送信するデータを格納するリスト<map>です。
+// extern vector<vector<map<string, string>>> gSendDataMap;
+
+// サーバーへ送信するデータを格納するリスト(vectorString)です。
+extern vector<string> gSendDataVectorStr;
 
 // gSendDataのミューテックスです。
 extern mutex gSendDataMutex;
@@ -66,3 +69,6 @@ extern vector<ServerSendDataBuilder> gServerSendDataBuilderVector;
 
 // 再送信データを貯めるServerSendDataBuilderのヴェクタ
 extern BlockingVector<ServerSendDataBuilder> gResendVectorServerSendDataBuilder;
+
+// 待機するためのcondition_variable
+extern condition_variable gcv;

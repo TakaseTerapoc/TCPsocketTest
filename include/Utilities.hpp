@@ -85,4 +85,10 @@ class Utilities
 
         // vector<char>を回し、リファレンスNumが合致する要素番号を返す関数
         static int getVectorCharNthElement(BlockingVector<ServerSendDataBuilder>& vec, char refNum); 
+
+        // バイナリヘッダーを文字列に変換する関数            
+        static string convertBinaryHeaderToString(const char* data, size_t headerSize = 7);
+
+        // テキストペイロードを文字列に変換する関数
+        static string convertTextPayloadToString(const char* data, size_t offset = 7);
 };

@@ -125,7 +125,8 @@
     "stop_token": "cpp",
     "thread": "cpp",
     "variant": "cpp",
-    "csignal": "cpp"
+    "csignal": "cpp",
+    "regex": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

@@ -1,4 +1,5 @@
 #include "ServerRequestWorker.hpp"
+#include "ServerConnectionClient.hpp"
 
 # define DEBUG
 # define BuFFER_SIZE 16
@@ -38,6 +39,7 @@ void ServerRequestWorker::stop() {
     join();
 }
 
+// recv専用スレッドを実行する関数　別スレッド
 void ServerRequestWorker::runRecving() {
     while (!gShouldExit) {
         {
@@ -46,21 +48,39 @@ void ServerRequestWorker::runRecving() {
         }
         // vectorをチェック
         if (gResendVectorServerSendDataBuilder.Empty()) {
+            //　condition_variableで待機中のrunスレッドに通知
+            {
+                std::unique_lock<std::mutex> lock(cvMutex_);
+                cv_.notify_all();
+            }
             // cv.wait(lock);
             continue;
         }
-
         // recv処理
         char recvBuffer[BuFFER_SIZE];
         unsigned int recvSize = 0;
-        if (!serverConnectionClient_.recvMessage(recvBuffer, BuFFER_SIZE, recvSize)) {
-            Logger::getInstance().Error("サーバーからの受信に失敗しました。");
-            continue; // 受信失敗時は次のループへ
+        if(!serverConnectionClient_.recvMessage(recvBuffer, BuFFER_SIZE, recvSize)) {
+            if (gShouldExit) {
+                break; // gShouldExitがtrueなら、スレッドを終了
+            }
+            // エラーコードをチェック
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                // タイムアウトエラーの場合は、再試行
+                Logger::getInstance().Debug("サーバーからの受信がタイムアウトしました。再試行します。"+ to_string(errno));
+                this_thread::sleep_for(chrono::milliseconds(100));
+                continue; // タイムアウトエラーの場合は、再試行
+            } else {
+                // その他のエラーの場合は、ログに記録
+                Logger::getInstance().Error("サーバーからの受信中にエラーが発生しました。errno: " + to_string(errno));
+                continue; // 受信失敗時は次のループへ
+            }
         }
+        
+        Logger::getInstance().Debug("サーバーからのACK受信に成功しました。受信データ: " + Utilities::convertBinaryHeaderToString(recvBuffer));
         
         // recvで帰ってきたデータのリファレンスナンバーを取得
         // recvBufferの2番目の要素にリファレンスナンバーがある
-        char refNum = Utilities::getCharNthElement(recvBuffer, 2, recvSize); // recvSizeのところ、またはBuFFER_SIZE
+        char refNum = Utilities::getCharNthElement(recvBuffer, 3, recvSize); // recvSizeのところ、またはBuFFER_SIZE
         
         // refNumが合致するvectorの要素を探す
         int index = Utilities::getVectorCharNthElement(gResendVectorServerSendDataBuilder, refNum);
@@ -70,7 +90,7 @@ void ServerRequestWorker::runRecving() {
             Logger::getInstance().Debug("リファレンスナンバーが見つかりませんでした。リファレンスナンバー: " + to_string(refNum));
         }
         else {
-            Logger::getInstance().Debug("リファレンスナンバー: " + to_string(refNum) + " のデータをキューから取り出しました。");
+            Logger::getInstance().Debug("リファレンスナンバー: " + to_string(refNum) + " のデータをヴェクターから取り出しました。");
         }
 
         //　condition_variableで待機中のrunスレッドに通知
@@ -79,9 +99,15 @@ void ServerRequestWorker::runRecving() {
             cv_.notify_all();
         }
     }
+    Logger::getInstance().Debug("終了処理があったため受信スレッドを終了します。");
+    //　condition_variableで待機中のrunスレッドに通知
+    {
+        std::unique_lock<std::mutex> lock(cvMutex_);
+        cv_.notify_all();
+    }
 }
 
-// キューから出し、PLCへのTCPリクエストを依頼する。
+// キューから出し、PLCへのTCPリクエストを依頼する。別スレッド
 void ServerRequestWorker::run() {
     while (!gShouldExit) {
         {
@@ -89,49 +115,55 @@ void ServerRequestWorker::run() {
             if (!running_) break;
         }
 
-        // リファレンスナンバーが0xFFFFを超えた場合は0にリセット
-        if (referenceNumber > 0xFFFF) {
-            referenceNumber = 0;
-        }
-
         // ServerSendDataBuilderのインスタンスを取得
-        ServerSendDataBuilder serverSendDataBuilder(referenceNumber);
+        ServerSendDataBuilder serverSendDataBuilder;
 
         char* completedData = nullptr;
 
         // 再送信データがある場合はそれを送信
         if (!gResendVectorServerSendDataBuilder.Empty()) {
+            Logger::getInstance().Debug("再送信データがあるため、vectorから取得します。");
             {
                 gResendVectorServerSendDataBuilder.try_pop(serverSendDataBuilder); // 先頭の要素を取り出す
             }
-            Logger::getInstance().Debug("再送信データを取得しました。リファレンスナンバー: " + serverSendDataBuilder.getReferenceNumber());
+            Logger::getInstance().Debug("再送信データを取得しました。リファレンスナンバー: " + to_string(serverSendDataBuilder.getReferenceNumber()));
         }
-        // 送信データがない場合は、gSendDataMapからデータを取得
+        // 送信データがない場合は、gSendDataVectorStrからデータを取得
         else
         {
-            vector<map<string,string>> sendData;
+            Logger::getInstance().Debug("再送信データがないため、gSendDataVectorStrからデータを取得します。");
+            string sendData;
             {
                 unique_lock<mutex> lock(gSendDataMutex);
-                if (gSendDataMap.empty()) {
-                    // cv.wait(lock);
+                if (gSendDataVectorStr.empty()) {
+                    Logger::getInstance().Debug("gSendDataVectorStrが空です。待機します。");
+                    gcv.wait(lock);
                     continue;
                 }
-                sendData = gSendDataMap.front();
+                sendData = gSendDataVectorStr.front();
 
-                gSendDataMap.erase(gSendDataMap.begin());
+                gSendDataVectorStr.erase(gSendDataVectorStr.begin());
             }
-            
-            // 送信データを整形→メンバ関数shapedSendDataStringに格納
-            serverSendDataBuilder.shapeSendData(sendData);
+
+            // リファレンスナンバーを設定
+            serverSendDataBuilder.setReferenceNumber(referenceNumber++);
 
             // 送信データにヘッダーを追加して、最終的な送信データを作成
-            serverSendDataBuilder.buildPostData(ServerConstData::DATA_TYPE_LITERAL, serverSendDataBuilder.getShapedSendDataString());
+            serverSendDataBuilder.buildPostData(ServerConstData::DATA_TYPE_LITERAL, sendData);
+
+            // 送信データをキューに登録
+            {
+                gResendVectorServerSendDataBuilder.Push(serverSendDataBuilder);
+                Logger::getInstance().Debug("サーバーへの送信データをvectorに登録しました。リファレンスナンバー: " + to_string(serverSendDataBuilder.getReferenceNumber()));
+            }
         }
+        // デバッグ用出力
 #ifdef DEBUG
-        string tempStrBinary = buildBinaryHeaderString(serverSendDataBuilder.getPostDataBuf());
-        string tempStrText = buildTextPayloadString(serverSendDataBuilder.getPostDataBuf());
+        string tempStrBinary = Utilities::convertBinaryHeaderToString(serverSendDataBuilder.getPostDataBuf());
+        string tempStrText = Utilities::convertTextPayloadToString(serverSendDataBuilder.getPostDataBuf());
         Logger::getInstance().Debug("サーバーへ送られるデータ" + tempStrBinary + tempStrText);
 #endif
+        // 送信データを文字列に変換
         string completedDataStr(serverSendDataBuilder.getPostDataBuf());
 
         // UDPリクエスト 
@@ -147,34 +179,12 @@ void ServerRequestWorker::run() {
         }
         Logger::getInstance().Sensor(completedDataStr);
 
-        // 送信データをキューに登録
-        {
-            gResendVectorServerSendDataBuilder.Push(serverSendDataBuilder);
-            Logger::getInstance().Debug("サーバーへの送信データをvectorに登録しました。リファレンスナンバー: " + to_string(serverSendDataBuilder.getReferenceNumber()));
-        }
-
-        referenceNumber++;
-
         //　condition_variableを使って待機
         {
+            Logger::getInstance().Debug("サーバーへの送信後、condition_variableで待機します。");
             std::unique_lock<std::mutex> lock(cvMutex_);
             cv_.wait(lock);
+            Logger::getInstance().Debug("condition_variableで待機中のrunスレッドが通知を受け取りました。");
         } 
     }
-}
-
-std::string ServerRequestWorker::buildBinaryHeaderString(const char* data, size_t headerSize) {
-    std::ostringstream oss;
-    oss << "Header (hex): ";
-    for (size_t i = 0; i < 7; ++i) {
-        oss << std::hex << std::setw(2) << std::setfill('0')
-            << static_cast<unsigned int>(static_cast<unsigned char>(data[i])) << " ";
-    }
-    return oss.str();
-}
-
-std::string ServerRequestWorker::buildTextPayloadString(const char* data, size_t offset) {
-    std::ostringstream oss;
-    oss << "Payload (text): " << (data + offset);
-    return oss.str();
 }
