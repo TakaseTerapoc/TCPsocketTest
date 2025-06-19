@@ -39,6 +39,9 @@ private:
     int socket_;
     struct sockaddr_in serverAddr_;
 
+    // ノンブロッキングモードを設定する関数
+    void setNonblocking();
+
     // 受信タイムアウトを設定する関数
     void setRecvTimeout(int sec, int usec);
 

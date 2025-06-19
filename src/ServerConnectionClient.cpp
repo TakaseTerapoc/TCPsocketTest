@@ -18,7 +18,10 @@ ServerConnectionClient::ServerConnectionClient(const string& serverIp, int serve
     }
 
     // タイムアウトの設定
-    setRecvTimeout(3, 0);
+    setRecvTimeout(0, 100000); // 0秒、100ミリ秒
+
+    // ノンブロッキングモードに設定
+    // setNonblocking();
 }
 
 void ServerConnectionClient::setRecvTimeout(int sec, int usec)
@@ -43,6 +46,20 @@ void ServerConnectionClient::setSendTimeout(int sec, int usec)
         Logger::getInstance().Error(
             fmt::format("ソケットの作成に失敗しました。errno={}, message={}", errno, strerror(errno))
         );
+        exit(1);
+    }
+}
+
+void ServerConnectionClient::setNonblocking()
+{
+    // ノンブロッキングモードの設定
+    int flags = fcntl(socket_, F_GETFL, 0);
+    if (flags < 0) {
+        Logger::getInstance().Error("ソケットのフラグ取得に失敗しました。");
+        exit(1);
+    }
+    if (fcntl(socket_, F_SETFL, flags | O_NONBLOCK) < 0) {
+        Logger::getInstance().Error("ソケットのノンブロッキングモード設定に失敗しました。");
         exit(1);
     }
 }

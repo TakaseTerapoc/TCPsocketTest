@@ -17,7 +17,7 @@ void ServerRequestWorker::start() {
     if (running_) return;
     running_ = true;
     thread_ = thread(&ServerRequestWorker::run, this);
-    recvThread_ = thread(&ServerRequestWorker::runRecving, this); // recv専用スレッドも開始
+    // recvThread_ = thread(&ServerRequestWorker::runRecving, this); // recv専用スレッドも開始
 }
 
 // ワーカjoin
@@ -25,9 +25,9 @@ void ServerRequestWorker::join() {
     if (thread_.joinable()) {
         thread_.join();
     }
-    if (recvThread_.joinable()) {
-        recvThread_.join();
-    }
+    // if (recvThread_.joinable()) {
+    //     recvThread_.join();
+    // }
 }
 
 // ワーカー停止
@@ -41,40 +41,60 @@ void ServerRequestWorker::stop() {
 
 // recv専用スレッドを実行する関数　別スレッド
 void ServerRequestWorker::runRecving() {
-    while (!gShouldExit) {
-        {
-            lock_guard<mutex> lg(mutex_);
-            if (!running_) break;
-        }
+    // while (!gShouldExit) {
+    //     {
+    //         lock_guard<mutex> lg(mutex_);
+    //         if (!running_) break;
+    //     }
+        
+        // //　condition_variableで待機
+        // {
+        //     std::unique_lock<std::mutex> lock(cvMutex_);
+        //     cv_.wait(lock);
+        // }
+
         // vectorをチェック
         if (gResendVectorServerSendDataBuilder.Empty()) {
-            //　condition_variableで待機中のrunスレッドに通知
-            {
-                std::unique_lock<std::mutex> lock(cvMutex_);
-                cv_.notify_all();
-            }
-            // cv.wait(lock);
-            continue;
+            Logger::getInstance().Debug("gResendVectorServerSendDataBuilderが空です。");
+            return;
         }
+
+        // {
+        //     std::unique_lock<std::mutex> lock(cvMutex_);
+        //     cv_.notify_all();n
+        // }
+
         // recv処理
         char recvBuffer[BuFFER_SIZE];
         unsigned int recvSize = 0;
         if(!serverConnectionClient_.recvMessage(recvBuffer, BuFFER_SIZE, recvSize)) {
-            if (gShouldExit) {
-                break; // gShouldExitがtrueなら、スレッドを終了
-            }
+            
+            // if (gShouldExit) {
+            //     break; // gShouldExitがtrueなら、スレッドを終了
+            // }
+
+            // this_thread::sleep_for(chrono::milliseconds(100));
+            // {
+            //     std::unique_lock<std::mutex> lock(cvMutex_);
+            //     cv_.notify_all();
+            // }
             // エラーコードをチェック
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 // タイムアウトエラーの場合は、再試行
-                Logger::getInstance().Debug("サーバーからの受信がタイムアウトしました。再試行します。"+ to_string(errno));
-                this_thread::sleep_for(chrono::milliseconds(100));
-                continue; // タイムアウトエラーの場合は、再試行
+                Logger::getInstance().Debug("サーバーからの受信がタイムアウトしました"+ to_string(errno));
+                return;
+                // break; // タイムアウトエラーの場合は、再試行
             } else {
                 // その他のエラーの場合は、ログに記録
                 Logger::getInstance().Error("サーバーからの受信中にエラーが発生しました。errno: " + to_string(errno));
-                continue; // 受信失敗時は次のループへ
+                return;
+                // break; // 受信失敗時は次のループへ
             }
         }
+        // if (gShouldExit) {
+        //     Logger::getInstance().Debug("gShouldExitがtrueのため、受信スレッドを終了します。");
+        //     break; // gShouldExitがtrueなら、スレッドを終了
+        // }
         
         Logger::getInstance().Debug("サーバーからのACK受信に成功しました。受信データ: " + Utilities::convertBinaryHeaderToString(recvBuffer));
         
@@ -93,18 +113,18 @@ void ServerRequestWorker::runRecving() {
             Logger::getInstance().Debug("リファレンスナンバー: " + to_string(refNum) + " のデータをヴェクターから取り出しました。");
         }
 
-        //　condition_variableで待機中のrunスレッドに通知
-        {
-            std::unique_lock<std::mutex> lock(cvMutex_);
-            cv_.notify_all();
-        }
-    }
-    Logger::getInstance().Debug("終了処理があったため受信スレッドを終了します。");
-    //　condition_variableで待機中のrunスレッドに通知
-    {
-        std::unique_lock<std::mutex> lock(cvMutex_);
-        cv_.notify_all();
-    }
+        // //　condition_variableで待機中のrunスレッドに通知
+        // {
+        //     std::unique_lock<std::mutex> lock(cvMutex_);
+        //     cv_.notify_all();
+        // }
+    // }
+    // Logger::getInstance().Debug("終了処理があったため受信スレッドを終了します。");
+    // //　condition_variableで待機中のrunスレッドに通知
+    // {
+    //     std::unique_lock<std::mutex> lock(cvMutex_);
+    //     cv_.notify_all();
+    // }
 }
 
 // キューから出し、PLCへのTCPリクエストを依頼する。別スレッド
@@ -137,7 +157,7 @@ void ServerRequestWorker::run() {
                 unique_lock<mutex> lock(gSendDataMutex);
                 if (gSendDataVectorStr.empty()) {
                     Logger::getInstance().Debug("gSendDataVectorStrが空です。待機します。");
-                    gcv.wait(lock);
+                    gcv.wait(lock, [] { return !gShouldExit; });
                     continue;
                 }
                 sendData = gSendDataVectorStr.front();
@@ -176,15 +196,12 @@ void ServerRequestWorker::run() {
         else
         {
             Logger::getInstance().Debug("サーバーへの送信に成功しました。");
+            runRecving();
+            //　condition_variableを使って待機
+                // std::unique_lock<std::mutex> lock(cvMutex_);
+                // cv_.notify_all(); // 待機中のrunReceiveスレッドに通知
+                // Logger::getInstance().Debug("condition_variableで待機中のrunReceiveスレッドに通知しました。");
         }
         Logger::getInstance().Sensor(completedDataStr);
-
-        //　condition_variableを使って待機
-        {
-            Logger::getInstance().Debug("サーバーへの送信後、condition_variableで待機します。");
-            std::unique_lock<std::mutex> lock(cvMutex_);
-            cv_.wait(lock);
-            Logger::getInstance().Debug("condition_variableで待機中のrunスレッドが通知を受け取りました。");
-        } 
     }
 }
