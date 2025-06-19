@@ -39,92 +39,48 @@ void ServerRequestWorker::stop() {
     join();
 }
 
-// recv専用スレッドを実行する関数　別スレッド
+// 受信処理を行う関数
 void ServerRequestWorker::runRecving() {
-    // while (!gShouldExit) {
-    //     {
-    //         lock_guard<mutex> lg(mutex_);
-    //         if (!running_) break;
-    //     }
-        
-        // //　condition_variableで待機
-        // {
-        //     std::unique_lock<std::mutex> lock(cvMutex_);
-        //     cv_.wait(lock);
-        // }
 
-        // vectorをチェック
-        if (gResendVectorServerSendDataBuilder.Empty()) {
-            Logger::getInstance().Debug("gResendVectorServerSendDataBuilderが空です。");
+    // vectorをチェック
+    if (gResendVectorServerSendDataBuilder.Empty()) {
+        Logger::getInstance().Debug("gResendVectorServerSendDataBuilderが空です。");
+        return;
+    }
+
+    // recv処理
+    char recvBuffer[BuFFER_SIZE];
+    unsigned int recvSize = 0;
+    if(!serverConnectionClient_.recvMessage(recvBuffer, BuFFER_SIZE, recvSize)) {
+        // エラーコードをチェック
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            // タイムアウトエラーの場合は、再試行
+            Logger::getInstance().Debug("サーバーからの受信がタイムアウトしました"+ to_string(errno));
             return;
+        } else {
+            // その他のエラーの場合は、ログに記録
+            Logger::getInstance().Error("サーバーからの受信中にエラーが発生しました。errno: " + to_string(errno));
+            return;
+            // break; // 受信失敗時は次のループへ
         }
+    }
+    
+    Logger::getInstance().Debug("サーバーからのACK受信に成功しました。受信データ: " + Utilities::convertBinaryHeaderToString(recvBuffer));
+    
+    // recvで帰ってきたデータのリファレンスナンバーを取得
+    // recvBufferの3番目の要素にリファレンスナンバーがある
+    char refNum = Utilities::getCharNthElement(recvBuffer, 3, recvSize); // recvSizeのところ、またはBuFFER_SIZE
+    
+    // refNumが合致するvectorの要素を探す
+    int index = Utilities::getVectorCharNthElement(gResendVectorServerSendDataBuilder, refNum);
 
-        // {
-        //     std::unique_lock<std::mutex> lock(cvMutex_);
-        //     cv_.notify_all();n
-        // }
-
-        // recv処理
-        char recvBuffer[BuFFER_SIZE];
-        unsigned int recvSize = 0;
-        if(!serverConnectionClient_.recvMessage(recvBuffer, BuFFER_SIZE, recvSize)) {
-            
-            // if (gShouldExit) {
-            //     break; // gShouldExitがtrueなら、スレッドを終了
-            // }
-
-            // this_thread::sleep_for(chrono::milliseconds(100));
-            // {
-            //     std::unique_lock<std::mutex> lock(cvMutex_);
-            //     cv_.notify_all();
-            // }
-            // エラーコードをチェック
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // タイムアウトエラーの場合は、再試行
-                Logger::getInstance().Debug("サーバーからの受信がタイムアウトしました"+ to_string(errno));
-                return;
-                // break; // タイムアウトエラーの場合は、再試行
-            } else {
-                // その他のエラーの場合は、ログに記録
-                Logger::getInstance().Error("サーバーからの受信中にエラーが発生しました。errno: " + to_string(errno));
-                return;
-                // break; // 受信失敗時は次のループへ
-            }
-        }
-        // if (gShouldExit) {
-        //     Logger::getInstance().Debug("gShouldExitがtrueのため、受信スレッドを終了します。");
-        //     break; // gShouldExitがtrueなら、スレッドを終了
-        // }
-        
-        Logger::getInstance().Debug("サーバーからのACK受信に成功しました。受信データ: " + Utilities::convertBinaryHeaderToString(recvBuffer));
-        
-        // recvで帰ってきたデータのリファレンスナンバーを取得
-        // recvBufferの2番目の要素にリファレンスナンバーがある
-        char refNum = Utilities::getCharNthElement(recvBuffer, 3, recvSize); // recvSizeのところ、またはBuFFER_SIZE
-        
-        // refNumが合致するvectorの要素を探す
-        int index = Utilities::getVectorCharNthElement(gResendVectorServerSendDataBuilder, refNum);
-
-        // gResendVectorから該当する要素を削除する。
-        if (!gResendVectorServerSendDataBuilder.Try_pick(index)) {
-            Logger::getInstance().Debug("リファレンスナンバーが見つかりませんでした。リファレンスナンバー: " + to_string(refNum));
-        }
-        else {
-            Logger::getInstance().Debug("リファレンスナンバー: " + to_string(refNum) + " のデータをヴェクターから取り出しました。");
-        }
-
-        // //　condition_variableで待機中のrunスレッドに通知
-        // {
-        //     std::unique_lock<std::mutex> lock(cvMutex_);
-        //     cv_.notify_all();
-        // }
-    // }
-    // Logger::getInstance().Debug("終了処理があったため受信スレッドを終了します。");
-    // //　condition_variableで待機中のrunスレッドに通知
-    // {
-    //     std::unique_lock<std::mutex> lock(cvMutex_);
-    //     cv_.notify_all();
-    // }
+    // gResendVectorから該当する要素を削除する。
+    if (!gResendVectorServerSendDataBuilder.Try_pick(index)) {
+        Logger::getInstance().Debug("リファレンスナンバーが見つかりませんでした。リファレンスナンバー: " + to_string(refNum));
+    }
+    else {
+        Logger::getInstance().Debug("リファレンスナンバー: " + to_string(refNum) + " のデータをヴェクターから取り出しました。");
+    }
 }
 
 // キューから出し、PLCへのTCPリクエストを依頼する。別スレッド
@@ -151,19 +107,13 @@ void ServerRequestWorker::run() {
         // 送信データがない場合は、gSendDataVectorStrからデータを取得
         else
         {
-            Logger::getInstance().Debug("再送信データがないため、gSendDataVectorStrからデータを取得します。");
-            string sendData;
-            {
-                unique_lock<mutex> lock(gSendDataMutex);
-                if (gSendDataVectorStr.empty()) {
-                    Logger::getInstance().Debug("gSendDataVectorStrが空です。待機します。");
-                    gcv.wait(lock, [] { return !gShouldExit; });
-                    continue;
-                }
-                sendData = gSendDataVectorStr.front();
-
-                gSendDataVectorStr.erase(gSendDataVectorStr.begin());
+            // gSendDataVectorStrが空でないか確認
+            if (gSendDataVectorStr.empty()) {
+                continue;
             }
+            string sendData = gSendDataVectorStr.front();
+
+            gSendDataVectorStr.erase(gSendDataVectorStr.begin());
 
             // リファレンスナンバーを設定
             serverSendDataBuilder.setReferenceNumber(referenceNumber++);
@@ -197,10 +147,6 @@ void ServerRequestWorker::run() {
         {
             Logger::getInstance().Debug("サーバーへの送信に成功しました。");
             runRecving();
-            //　condition_variableを使って待機
-                // std::unique_lock<std::mutex> lock(cvMutex_);
-                // cv_.notify_all(); // 待機中のrunReceiveスレッドに通知
-                // Logger::getInstance().Debug("condition_variableで待機中のrunReceiveスレッドに通知しました。");
         }
         Logger::getInstance().Sensor(completedDataStr);
     }
